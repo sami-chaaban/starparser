@@ -10,13 +10,13 @@ python3 starparser.py --i input.star [options]
 
 ## Getting Started
 
-* You need to have Python 3 installed and have the **pandas** and **optparse** packages.
+* You need to have **Python 3** installed and have the **pandas** and **optparse** packages.
 
-* Your file needs to be a standard Relion 3.1 star file with an optics table, particle table, and particle list with tab delimited columns.
+* Your file needs to be a standard **Relion 3.1** star file with an optics table, particle table, and particle list with tab delimited columns, (i.e. any Relion 3.1 output).
 
 ## Options
 
-* ```--plot_defocus``` Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all.
+* ```--plot_defocus``` Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset, otherwise plots all.
 
 * ```--delete_column``` Delete column and renumber headers. E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
@@ -42,7 +42,7 @@ python3 starparser.py --i input.star [options]
 
 * ```-q``` Particle query. To enter multiple queries, separate them with a slash: 20200101/20200203.
 
-* ```-o``` Output file name. Default is output.star
+* ```-o``` Output file name. Default is output.star.
 
 ## Examples
 

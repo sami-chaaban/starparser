@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
 import sys
 import pandas as pd
 import optparse
@@ -29,7 +35,7 @@ def setupParserOptions():
 
     parser.add_option("--count_particles",
         action="store_true", dest="parser_countme", default=False,
-        help="Count particles. Can be used with -c and -q for a subset count, otherwise counts all.")
+        help="Count particles and print the result. Can be used with -c and -q for a subset count, otherwise counts all.")
     
     parser.add_option("--count_mics",
         action="store_true", dest="parser_uniquemics", default=False,
@@ -37,7 +43,7 @@ def setupParserOptions():
     
     parser.add_option("--max_defocus",
         action="store", dest="parser_maxdefocus", type="float", default = 0,
-        help="Maximum defocus.")
+        help="Extract particles with defocus values less than this value (Angstroms). Can be used with -c and -q to only consider a subset.")
     
     parser.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="",
@@ -49,7 +55,7 @@ def setupParserOptions():
     
     parser.add_option("-q",
         action="store", dest="parser_query", type="string", default="",
-        help="String query. To enter multiple columns, separate them with a slash: 20200101/20200203.")
+        help="Particle query. To enter multiple columns, separate them with a slash: 20200101/20200203.")
     
     parser.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="",
@@ -57,17 +63,26 @@ def setupParserOptions():
     
     parser.add_option("-f",
         action="store", dest="parser_file2", type="string", default="",
-        help="Name of second file to extract columns from. Pick column headers with -c.")
+        help="Name of second file to extract columns from.")
     
     parser.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,
-        help="Remove optics table and Optics column, renumber headers. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.")
+        help="Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.")
     
     parser.add_option("-o",
         action="store", dest="parser_output", type="string", default = "output.star",
-        help="Output file name.")
+        help="Output file name. Default is output.star")
 
     options,args = parser.parse_args()
+
+#    #for when the filename was an argument without option
+#     if len(args) > 1:
+#             parser.error("\nToo many filenames.")
+#     if len(args) == 0:
+#             parser.error("\nNo filename. Run  %prog -h to get the help text.")
+#     if len(sys.argv) < 2:
+#             parser.print_help()
+#             sys.exit()
 
     if len(sys.argv) < 4:
             parser.print_help()
@@ -78,6 +93,8 @@ def setupParserOptions():
     for i in parser.option_list:
             if isinstance(i.dest,str):
                     params[i.dest] = getattr(options,i.dest)
+                    
+#     params['file'] = args[0] #for when the filename was an argument without option
                     
     return(params)
 
@@ -431,6 +448,9 @@ def mainloop(params):
         sys.exit()
         
     if params["parser_swapcolumns"] != "":
+        if params["parser_file2"] == "":
+            print("Error: provide a second file to swap columns from with -f.")
+            sys.exit()
         otherparticles, metadata = getparticles(params["parser_file2"])
         columstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
@@ -482,3 +502,4 @@ def mainloop(params):
 if __name__ == "__main__":
     params = setupParserOptions()
     mainloop(params)
+

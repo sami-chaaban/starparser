@@ -163,7 +163,7 @@ def countqueryparticles(particles,columns,query):
     totalquery = 0
     
     if len(columns)>1:
-        print("\Error: you have specified two different columns.\n")
+        print("\nError: you have specified two different columns.\n")
         sys.exit()
     
     q = "|".join(query)

@@ -40,7 +40,7 @@ python3 starparser.py --i input.star [options]
 
 * ```-c``` Column query. E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
-* ```-q``` Particle query. To enter multiple columns, separate them with a slash: 20200101/20200203.
+* ```-q``` Particle query. To enter multiple queries, separate them with a slash: 20200101/20200203.
 
 * ```-o``` Output file name. Default is output.star
 

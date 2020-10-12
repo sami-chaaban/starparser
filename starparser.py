@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
 import sys
 import pandas as pd
 import optparse
@@ -65,7 +71,7 @@ def setupParserOptions():
 
     parser.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=50,
-        help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in a micrograph to be grouped together.")
+        help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
     
     parser.add_option("-o",
         action="store", dest="parser_output", type="string", default = "output.star",

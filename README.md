@@ -36,7 +36,7 @@ python3 starparser.py --i input.star [options]
 
 * ```--relegate``` Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.
 
-* ```--regroup``` Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups.
+* ```--regroup``` Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.
 
 * ```-f``` Name of second file to extract columns from.
 

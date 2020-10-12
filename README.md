@@ -8,7 +8,7 @@ Usage:
 python3 starparser.py --i input.star [options]
 ```
 
-Alternatively, add an alias to your .cshrc `alias starparser 'python3 /home/scripts/starparser.py` and run the script with `starparser --i input.star [options]`
+Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scripts/starparser.py'`) and run the script with `starparser --i input.star [options]`	
 
 ## Getting Started
 

@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import sys
 import pandas as pd
 import optparse
@@ -61,8 +55,8 @@ def setupParserOptions():
         action="store", dest="parser_swapcolumns", type="string", default="",
         help="Swap columns from another star file (specified with -f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
     
-    parser.add_option("-f",
-        action="store", dest="parser_file2", type="string", default="",
+    parser.add_option("--f",
+        action="store", dest="parser_file2", default="",
         help="Name of second file to extract columns from.")
     
     parser.add_option("--relegate",
@@ -73,8 +67,8 @@ def setupParserOptions():
         action="store", dest="parser_regroup", type="int", default=50,
         help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
     
-    parser.add_option("-o",
-        action="store", dest="parser_output", type="string", default = "output.star",
+    parser.add_option("--o",
+        action="store", dest="parser_output", default = "output.star",
         help="Output file name. Default is output.star")
 
     options,args = parser.parse_args()

@@ -34,19 +34,19 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--list_column``` Write all values of a column to a file (filename is the header). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
 
-* ```--swap_columns``` Swap columns from another star file (specified with -f). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
+* ```--swap_columns``` Swap columns from another star file (specified with --f). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
 * ```--relegate``` Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.
 
 * ```--regroup``` Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.
 
-* ```-f``` Name of second file to extract columns from.
+* ```--o``` Output file name. Default is output.star.
+
+* ```--f``` Name of second file to extract columns from.
 
 * ```-c``` Column query. E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
 * ```-q``` Particle query. To enter multiple queries, separate them with a slash: 20200101/20200203.
-
-* ```-o``` Output file name. Default is output.star.
 
 ## Examples
 
@@ -69,7 +69,7 @@ python3 starparser.py --i run_data.star --plot_defocus -c _rlnMicrographName -q 
 * Delete the \_rlnCtfMaxResolution and \_rlnCtfFigureOfMerit columns.
 
 ```
-python3 starparser.py --i run_data.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit -o output.star
+python3 starparser.py --i run_data.star --o output.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
 ```
 
 ---
@@ -77,7 +77,7 @@ python3 starparser.py --i run_data.star --delete_column _rlnCtfMaxResolution/_rl
 * Delete all particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
-python3 starparser.py --i run_data.star --delete_particles -c _rlnMicrographName -q 200702/200715 -o output.star
+python3 starparser.py --i run_data.star --o output.star --delete_particles -c _rlnMicrographName -q 200702/200715
 ```
 
 ---
@@ -85,7 +85,7 @@ python3 starparser.py --i run_data.star --delete_particles -c _rlnMicrographName
 * Make a new star file with only particles that have "1" in the \_rlnClassNumber column.
 
 ```
-python3 starparser.py --i run_data.star --extract_particles -c _rlnClassNumber -q 1 -o output.star
+python3 starparser.py --i run_data.star --o output.star --extract_particles -c _rlnClassNumber -q 1
 ```
 
 ---
@@ -93,7 +93,7 @@ python3 starparser.py --i run_data.star --extract_particles -c _rlnClassNumber -
 * Count the number of particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
-python3 starparser.py --i run_data.star --count_particles -c _rlnMicrographName -q 200702/200715 -o output.star
+python3 starparser.py --i run_data.star --o output.star --count_particles -c _rlnMicrographName -q 200702/200715
 ```
 
 ---
@@ -117,7 +117,7 @@ python3 starparser.py --i run_data.star --count_mics -c _rlnMicrographName -q 20
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value and write to a new file.
 
 ```
-python3 starparser.py --i run_data.star --max_defocus 40000 -o output.star
+python3 starparser.py --i run_data.star --o output.star --max_defocus 40000
 ```
 
 ---
@@ -125,7 +125,7 @@ python3 starparser.py --i run_data.star --max_defocus 40000 -o output.star
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value that also have "200826" in the \_rlnMicrographName column, and write to a new file.
 
 ```
-python3 starparser.py --i run_data.star --max_defocus 40000 -c _rlnMicrographName -q 200826 -o output.star
+python3 starparser.py --i run_data.star --o output.star --max_defocus 40000 -c _rlnMicrographName -q 200826
 ```
 
 ---
@@ -157,7 +157,7 @@ python3 starparser.py --i run_data.star --list_column _rlnDefocusU -c _rlnMicrog
 * Swap the \_rlnAnglePsi, \_rlnAngleRot, \_rlnAngleTilt, \_rlnNormCorrection, \_rlnLogLikeliContribution, \_rlnMaxValueProbDistribution, \_rlnNrOfSignificantSamples, \_rlnOriginXAngst, \_rlnOriginYAngst from file2.star into run_data.star.
 
 ```
-python3 starparser.py --i run_data.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst -f file2.star -o output.star
+python3 starparser.py --i run_data.star --f file2.star --o output.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
 ```
 
 ---
@@ -165,7 +165,7 @@ python3 starparser.py --i run_data.star --swap_columns _rlnAnglePsi/_rlnAngleRot
 * Relegate the star file to be compatible with Relion 3.0.
 
 ```
-python3 starparser.py --i run_data.star --relegate -o output.star
+python3 starparser.py --i run_data.star --o output.star --relegate
 ```
 
 ---

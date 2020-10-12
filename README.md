@@ -54,11 +54,15 @@ python3 starparser.py --i input.star [options]
 python3 starparser.py --i run_data.star --plot_defocus
 ```
 
+---
+
 * Plot a histogram of defocus values from a subset of micrographs that contain "200826" or "200827".
 
 ```
 python3 starparser.py --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
 ```
+
+---
 
 * Delete the \_rlnCtfMaxResolution and \_rlnCtfFigureOfMerit columns.
 
@@ -66,11 +70,15 @@ python3 starparser.py --i run_data.star --plot_defocus -c _rlnMicrographName -q 
 python3 starparser.py --i run_data.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit -o output.star
 ```
 
+---
+
 * Delete all particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
 python3 starparser.py --i run_data.star --delete_particles -c _rlnMicrographName -q 200702/200715 -o output.star
 ```
+
+---
 
 * Make a new star file with only particles that have "1" in the \_rlnClassNumber column.
 
@@ -78,11 +86,15 @@ python3 starparser.py --i run_data.star --delete_particles -c _rlnMicrographName
 python3 starparser.py --i run_data.star --extract_particles -c _rlnClassNumber -q 1 -o output.star
 ```
 
+---
+
 * Count the number of particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
 python3 starparser.py --i run_data.star --count_particles -c _rlnMicrographName -q 200702/200715 -o output.star
 ```
+
+---
 
 * Count the total number of unique micrographs.
 
@@ -90,26 +102,39 @@ python3 starparser.py --i run_data.star --count_particles -c _rlnMicrographName 
 python3 starparser.py --i run_data.star --count_mics
 ```
 
+---
+
 * Count the total number of unique micrographs in the subset that contain "200826" in the \_rlnMicrographName column.
 
 ```
 python3 starparser.py --i run_data.star --count_mics -c _rlnMicrographName -q 200826
 ```
+
+---
+
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value and write to a new file.
 
 ```
 python3 starparser.py --i run_data.star --max_defocus 40000 -o output.star
 ```
+
+---
+
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value that also have "200826" in the \_rlnMicrographName column, and write to a new file.
 
 ```
 python3 starparser.py --i run_data.star --max_defocus 40000 -c _rlnMicrographName -q 200826 -o output.star
 ```
+
+---
+
 * List all micrographs in the star file to a new text file.
 
 ```
 python3 starparser.py --i run_data.star --list_column _rlnMicrographName
 ```
+
+---
 
 * List all defocus values and x-coordinate values in the star file to new text files.
 
@@ -117,11 +142,15 @@ python3 starparser.py --i run_data.star --list_column _rlnMicrographName
 python3 starparser.py --i run_data.star --list_column _rlnDefocusU/_rlnCoordinateX
 ```
 
+---
+
 * List all defocus values of particles that contain "200826" in the \_rlnMicrographName column.
 
 ```
 python3 starparser.py --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q 200826
 ```
+
+---
 
 * Swap the \_rlnAnglePsi, \_rlnAngleRot, \_rlnAngleTilt, \_rlnNormCorrection, \_rlnLogLikeliContribution, \_rlnMaxValueProbDistribution, \_rlnNrOfSignificantSamples, \_rlnOriginXAngst, \_rlnOriginYAngst from file2.star into run_data.star
 
@@ -129,11 +158,16 @@ python3 starparser.py --i run_data.star --list_column _rlnDefocusU -c _rlnMicrog
 python3 starparser.py --i run_data.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst -f file2.star -o output.star
 ```
 
-* Relegate the star file to on compatible with Relion 3.0.
+---
+
+* Relegate the star file to be compatible with Relion 3.0.
 
 ```
 python3 starparser.py --i run_data.star --relegate -o output.star
 ```
+
+---
+
 
 ## License
 

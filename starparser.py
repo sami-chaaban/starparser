@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import sys
 import pandas as pd
 import optparse
@@ -68,6 +62,10 @@ def setupParserOptions():
     parser.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,
         help="Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.")
+
+    parser.add_option("--regroup",
+        action="store", dest="parser_regroup", type="int", default=50,
+        help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in a micrograph to be grouped together.")
     
     parser.add_option("-o",
         action="store", dest="parser_output", type="string", default = "output.star",
@@ -384,6 +382,25 @@ def writecol(particles, columns):
     
     return(outputs)
 
+def regroup(particles, numpergroup):
+    
+    newgroups = []
+    roundtotal = round(len(particles.index)/numpergroup)
+    leftover = (len(particles.index)) % numpergroup
+    for i in range(roundtotal):
+        newgroups.append([i for j in range(numpergroup)])
+    newgroups.append([newgroups[-1][-1] for i in range(leftover)])
+    newgroups = [item for sublist in newgroups for item in sublist]
+
+    regroupedparticles = particles.copy()
+    regroupedparticles.sort_values("_rlnDefocusU", inplace=True)
+    regroupedparticles.drop("_rlnGroupNumber", 1, inplace=True)
+    regroupedparticles["_rlnGroupNumber"] = newgroups
+    regroupedparticles.sort_index(inplace = True)
+    regroupedparticles = regroupedparticles[particles.columns]
+
+    return(regroupedparticles)
+    
 ########################################################
     
 def mainloop(params):
@@ -497,6 +514,13 @@ def mainloop(params):
         colstowrite = params["parser_writecol"].split("/")
         outputs = writecol(particles2use, colstowrite)
         print("\nWrote entries from " + str(colstowrite) + "\n-->Output files: " + str(outputs) + " \n")
+        sys.exit()
+        
+    if params["parser_regroup"] != "":
+        numpergroup = params["parser_regroup"]
+        regroupedparticles = regroup(particles2use, numpergroup)
+        writestar(regroupedparticles, metadata, params["parser_output"], relegateflag)
+        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values\n-->Output star file: " + params["parser_output"] + " \n")
         sys.exit()
 
 if __name__ == "__main__":

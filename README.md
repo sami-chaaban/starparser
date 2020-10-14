@@ -52,6 +52,8 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 The following examples run the starparser command assuming an alias has been created as described above, otherwise, run it with `python3 starparser.py`.
 
+---
+
 * Plot a histogram of defocus values.
 
 ```

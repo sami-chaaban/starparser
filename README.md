@@ -50,10 +50,12 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 ## Examples
 
+The following examples run the starparser command assuming an alias has been created as described above, otherwise, run it with `python3 starparser.py`.
+
 * Plot a histogram of defocus values.
 
 ```
-python3 starparser.py --i run_data.star --plot_defocus
+starparser --i run_data.star --plot_defocus
 ```
 
 ---
@@ -61,7 +63,7 @@ python3 starparser.py --i run_data.star --plot_defocus
 * Plot a histogram of defocus values from a subset of micrographs that contain "200826" or "200827".
 
 ```
-python3 starparser.py --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
+starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
 ```
 
 ---
@@ -69,7 +71,7 @@ python3 starparser.py --i run_data.star --plot_defocus -c _rlnMicrographName -q 
 * Delete the \_rlnCtfMaxResolution and \_rlnCtfFigureOfMerit columns.
 
 ```
-python3 starparser.py --i run_data.star --o output.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
+starparser --i run_data.star --o output.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
 ```
 
 ---
@@ -77,7 +79,7 @@ python3 starparser.py --i run_data.star --o output.star --delete_column _rlnCtfM
 * Delete all particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
-python3 starparser.py --i run_data.star --o output.star --delete_particles -c _rlnMicrographName -q 200702/200715
+starparser --i run_data.star --o output.star --delete_particles -c _rlnMicrographName -q 200702/200715
 ```
 
 ---
@@ -85,7 +87,7 @@ python3 starparser.py --i run_data.star --o output.star --delete_particles -c _r
 * Make a new star file with only particles that have "1" in the \_rlnClassNumber column.
 
 ```
-python3 starparser.py --i run_data.star --o output.star --extract_particles -c _rlnClassNumber -q 1
+starparser --i run_data.star --o output.star --extract_particles -c _rlnClassNumber -q 1
 ```
 
 ---
@@ -93,7 +95,7 @@ python3 starparser.py --i run_data.star --o output.star --extract_particles -c _
 * Count the number of particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
-python3 starparser.py --i run_data.star --o output.star --count_particles -c _rlnMicrographName -q 200702/200715
+starparser --i run_data.star --o output.star --count_particles -c _rlnMicrographName -q 200702/200715
 ```
 
 ---
@@ -101,7 +103,7 @@ python3 starparser.py --i run_data.star --o output.star --count_particles -c _rl
 * Count the total number of unique micrographs.
 
 ```
-python3 starparser.py --i run_data.star --count_mics
+starparser --i run_data.star --count_mics
 ```
 
 ---
@@ -109,7 +111,7 @@ python3 starparser.py --i run_data.star --count_mics
 * Count the total number of unique micrographs in the subset that contain "200826" in the \_rlnMicrographName column.
 
 ```
-python3 starparser.py --i run_data.star --count_mics -c _rlnMicrographName -q 200826
+starparser --i run_data.star --count_mics -c _rlnMicrographName -q 200826
 ```
 
 ---
@@ -117,7 +119,7 @@ python3 starparser.py --i run_data.star --count_mics -c _rlnMicrographName -q 20
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value and write to a new file.
 
 ```
-python3 starparser.py --i run_data.star --o output.star --max_defocus 40000
+starparser --i run_data.star --o output.star --max_defocus 40000
 ```
 
 ---
@@ -125,7 +127,7 @@ python3 starparser.py --i run_data.star --o output.star --max_defocus 40000
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value that also have "200826" in the \_rlnMicrographName column, and write to a new file.
 
 ```
-python3 starparser.py --i run_data.star --o output.star --max_defocus 40000 -c _rlnMicrographName -q 200826
+starparser --i run_data.star --o output.star --max_defocus 40000 -c _rlnMicrographName -q 200826
 ```
 
 ---
@@ -133,7 +135,7 @@ python3 starparser.py --i run_data.star --o output.star --max_defocus 40000 -c _
 * List all micrographs in the star file to a new text file.
 
 ```
-python3 starparser.py --i run_data.star --list_column _rlnMicrographName
+starparser --i run_data.star --list_column _rlnMicrographName
 ```
 
 ---
@@ -141,7 +143,7 @@ python3 starparser.py --i run_data.star --list_column _rlnMicrographName
 * List all defocus values and x-coordinate values in the star file to new text files.
 
 ```
-python3 starparser.py --i run_data.star --list_column _rlnDefocusU/_rlnCoordinateX
+starparser --i run_data.star --list_column _rlnDefocusU/_rlnCoordinateX
 ```
 
 ---
@@ -149,7 +151,7 @@ python3 starparser.py --i run_data.star --list_column _rlnDefocusU/_rlnCoordinat
 * List all defocus values of particles that contain "200826" in the \_rlnMicrographName column.
 
 ```
-python3 starparser.py --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q 200826
+starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q 200826
 ```
 
 ---
@@ -157,7 +159,7 @@ python3 starparser.py --i run_data.star --list_column _rlnDefocusU -c _rlnMicrog
 * Swap the \_rlnAnglePsi, \_rlnAngleRot, \_rlnAngleTilt, \_rlnNormCorrection, \_rlnLogLikeliContribution, \_rlnMaxValueProbDistribution, \_rlnNrOfSignificantSamples, \_rlnOriginXAngst, \_rlnOriginYAngst from file2.star into run_data.star.
 
 ```
-python3 starparser.py --i run_data.star --f file2.star --o output.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
+starparser --i run_data.star --f file2.star --o output.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
 ```
 
 ---
@@ -165,7 +167,7 @@ python3 starparser.py --i run_data.star --f file2.star --o output.star --swap_co
 * Relegate the star file to be compatible with Relion 3.0.
 
 ```
-python3 starparser.py --i run_data.star --o output.star --relegate
+starparser --i run_data.star --o output.star --relegate
 ```
 
 ---

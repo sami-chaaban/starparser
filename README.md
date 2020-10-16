@@ -18,7 +18,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 ## Options
 
-* ```--plot_defocus``` Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset, otherwise plots all.
+* ```--plot_defocus``` Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with -c and -q for a subset, otherwise plots all.
 
 * ```--delete_column``` Delete column and renumber headers. E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 

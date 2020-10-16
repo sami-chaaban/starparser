@@ -44,9 +44,9 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--f``` Name of second file to extract columns from.
 
-* ```-c``` Column query. E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash.
+* ```-c``` Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with -q. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash.
 
-* ```-q``` Particle query. To enter multiple queries, separate them with a slash: 20200101/20200203. Note the single dash.
+* ```-q``` Query term to look for in the column specified by -c. To enter multiple queries, separate them with a slash: 20200101/20200203. Note the single dash.
 
 ## Examples
 

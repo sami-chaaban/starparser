@@ -73,15 +73,6 @@ def setupParserOptions():
 
     options,args = parser.parse_args()
 
-#    #for when the filename was an argument without option
-#     if len(args) > 1:
-#             parser.error("\nToo many filenames.")
-#     if len(args) == 0:
-#             parser.error("\nNo filename. Run  %prog -h to get the help text.")
-#     if len(sys.argv) < 2:
-#             parser.print_help()
-#             sys.exit()
-
     if len(sys.argv) < 4:
             parser.print_help()
             sys.exit()
@@ -432,7 +423,7 @@ def mainloop(params):
         
         for c in columns:
             if c not in allparticles.columns:
-                print("Error: " + str(c) + " does not exist in your star file.")
+                print("Error: the column [" + str(c) + "] does not exist in your star file.")
                 sys.exit()
                 
     else:

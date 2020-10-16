@@ -1,6 +1,6 @@
 # StarParser
 
-Use this script to manipulate Relion 3.1 star files.
+Use this script to manipulate Relion 3.1 star files. See options and examples below.
 
 Usage:
 

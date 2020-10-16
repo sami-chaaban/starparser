@@ -186,7 +186,7 @@ def countqueryparticles(particles,columns,query):
         
     percentparticles = round(totalquery*100/totalparticles,1)
 
-    print('\nThere are ' + str(totalquery) + ' particles that match ' + query + ' in the specified columns (out of ' + str(totalparticles) + ', or ' + str(percentparticles) + '%).\n')
+    print('\nThere are ' + str(totalquery) + ' particles that match ' + str(query) + ' in the specified columns (out of ' + str(totalparticles) + ', or ' + str(percentparticles) + '%).\n')
 
 def plotdefocus(particles):
     

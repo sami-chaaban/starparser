@@ -18,8 +18,6 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 ## Options
 
-* ```--plot_defocus``` Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with -c and -q for a subset, otherwise plots all.
-
 * ```--delete_column``` Delete column and renumber headers. E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
 * ```--delete_particles``` Delete particles. Pick a column header (-c) and query (-q) to delete particles that match it.
@@ -30,7 +28,11 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--count_mics``` Count the number of unique micrographs. Can be used with -c and -q for a subset count, otherwise counts all.
 
+* ```--plot_defocus``` Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with -c and -q for a subset, otherwise plots all.
+
 * ```--max_defocus``` Extract particles with defocus values less than this value (Angstroms). Can be used with -c and -q to only consider a subset.
+
+* ```--plot_classparts``` Plot the number of particles per class for all iterations up to the one provided in the input.
 
 * ```--list_column``` Write all values of a column to a file (filename is the header). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
 
@@ -170,6 +172,14 @@ starparser --i run_data.star --f file2.star --o output.star --swap_columns _rlnA
 
 ```
 starparser --i run_data.star --o output.star --relegate
+```
+
+---
+
+* Plot the number of particles per class for the 25 iterations of a Class3D job.
+
+```
+starparser --i run_it025_data.star --plot_classparts
 ```
 
 ---

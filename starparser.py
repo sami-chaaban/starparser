@@ -1,6 +1,7 @@
 import sys
 import pandas as pd
 import optparse
+import matplotlib
 
 def setupParserOptions():
     

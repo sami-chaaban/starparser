@@ -5,7 +5,7 @@ import optparse
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog [options]",
-        version="%prog 1.0.")
+        version="%prog 1.1.")
 
     parser.add_option("--i",
         action="store", dest="file",
@@ -14,6 +14,10 @@ def setupParserOptions():
     parser.add_option("--plot_defocus",
         action="store_true", dest="parser_plotdefocus", default=False,
         help="Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all.")
+    
+    parser.add_option("--plot_classparts",
+        action="store_true", dest="parser_classdistribution", default=False,
+        help="Plot the number of particles per class for all iterations up to the one provided in the input.")
     
     parser.add_option("--delete_column",
         action="store", dest="parser_delcolumn", type="string", default="",
@@ -72,6 +76,7 @@ def setupParserOptions():
         help="Output file name. Default is output.star")
 
     options,args = parser.parse_args()
+
 
     if len(sys.argv) < 4:
             parser.print_help()
@@ -162,7 +167,7 @@ def countparticles(particles):
     totalparticles = len(particles.index)
     print('\nThere are ' + str(totalparticles) + ' particles in total.\n')    
 
-def countqueryparticles(particles,columns,query):
+def countqueryparticles(particles,columns,query,quiet):
 
     totalparticles = len(particles.index)
     
@@ -177,8 +182,11 @@ def countqueryparticles(particles,columns,query):
         
     percentparticles = round(totalquery*100/totalparticles,1)
 
-    print('\nThere are ' + str(totalquery) + ' particles that match ' + str(query) + ' in the specified columns (out of ' + str(totalparticles) + ', or ' + str(percentparticles) + '%).\n')
+    if not quiet:
+        print('\nThere are ' + str(totalquery) + ' particles that match ' + str(query) + ' in the specified columns (out of ' + str(totalparticles) + ', or ' + str(percentparticles) + '%).\n')
 
+    return(totalquery)
+        
 def plotdefocus(particles):
     
     particles["_rlnDefocusU"] = pd.to_numeric(particles["_rlnDefocusU"], downcast="float")
@@ -188,6 +196,36 @@ def plotdefocus(particles):
     
     fig = ax.get_figure()
     fig.savefig('Defocus_histogram.png')
+    
+def plotclassparts(filename):
+    
+    position = filename.find("_it")
+    iteration = int(filename[position+3:position+6])
+    classdistribution = []
+    allparticles, metadata = getparticles(filename)
+    numclasses = int(max(allparticles["_rlnClassNumber"]))
+    
+    print("\nLooping from iteration 0 to " + str(iteration) + " on " + str(numclasses) + " classes.\n")
+
+    numperclassdf = pd.DataFrame()
+
+    for i in range(iteration+1):
+        iterationstring = str(i).zfill(3)
+        iterationfile = filename[:position+3] + iterationstring + filename[position+6:]
+        allparticles, metadata = getparticles(iterationfile)
+        numperclass = []
+        for c in range(1,numclasses+1):
+            numperclass.append(countqueryparticles(allparticles, ["_rlnClassNumber"], [str(c)], True))
+        numperclassdf[str(i)] = numperclass
+
+    numperclassdf.index +=1
+
+    for c in range(numclasses):
+        ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Particle number")
+    fig = ax.get_figure()
+    fig.savefig('Class_distribution.png')
     
 def maxdefocus(particles, maxvalue):
     
@@ -435,7 +473,7 @@ def mainloop(params):
     #Set up jobs that probably don't require a subset (faster this way)
     
     if params["parser_countme"] and params["parser_column"] != "" and params["parser_query"] != "":
-        countqueryparticles(allparticles, columns, query)
+        countqueryparticles(allparticles, columns, query, False)
         sys.exit()
     elif params["parser_countme"]:
         countparticles(allparticles)
@@ -464,6 +502,11 @@ def mainloop(params):
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
         writestar(swappedparticles, metadata, params["parser_output"], relegateflag)
         print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"] +               "\n-->Output star file: " + params["parser_output"] + "\n")
+        sys.exit()
+        
+    if params["parser_classdistribution"]:
+        plotclassparts(filename)
+        print("\n-->Output to Class_distribution.png.\n")
         sys.exit()
     
     ######

@@ -1,7 +1,12 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
 import sys
 import pandas as pd
 import optparse
-import matplotlib
 
 def setupParserOptions():
     
@@ -458,26 +463,9 @@ def mainloop(params):
         
     ################################################################
     
-    #Variable conversions
+    #Essential variables
     
     filename = params['file']
-    
-    if params["parser_query"] != "":
-        query = params["parser_query"].split("/")
-    
-    if params["parser_column"] != "":
-        columns = params["parser_column"].split("/")
-        
-        for c in columns:
-            if c not in allparticles.columns:
-                print("Error: the column [" + str(c) + "] does not exist in your star file.")
-                sys.exit()
-                
-    else:
-        
-        columns = ""
-        
-    relegateflag = params["parser_relegate"]
     
     #####################################################################
     
@@ -495,6 +483,23 @@ def mainloop(params):
     allparticles, metadata = getparticles(filename)
 
     totalparticles = len(allparticles.index)
+    
+    if params["parser_query"] != "":
+        query = params["parser_query"].split("/")
+    
+    if params["parser_column"] != "":
+        columns = params["parser_column"].split("/")
+        
+        for c in columns:
+            if c not in allparticles.columns:
+                print("Error: the column [" + str(c) + "] does not exist in your star file.")
+                sys.exit()
+                
+    else:
+        
+        columns = ""
+        
+    relegateflag = params["parser_relegate"]
     
     #####################################################################
         

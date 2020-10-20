@@ -543,7 +543,8 @@ def mainloop(params):
         unsharedfile2 = len(otherparticles["_rlnImageName"]) - sharedparticles
         print("\n" + filename + " and " + params["parser_compareparts"] + " share " + str(sharedparticles) + " particles.")
         print(filename + " has " + str(unsharedfile1) + " unique particles and " + params["parser_compareparts"] + " has " + str(unsharedfile2) + " unique particles.\n")
-    
+        sys.exit()
+
     #######################################################################
     
     #setup SUBSET for remaining functions if necessary

@@ -12,7 +12,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 ## Getting Started
 
-* You need to have **Python 3** installed and have the **pandas** package. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas`, which is activated with `conda activate star`.
+* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`.
 
 * Your star file needs to be a standard **Relion 3.1** star file with an optics table, particle table, and particle list with tab delimited columns, (e.g. it does not work on \*\_model.star files).
 

@@ -58,6 +58,11 @@ def setupParserOptions():
     parser.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="",
         help="Swap columns from another star file (specified with -f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+
+    parser.add_option("--compare_particles",
+        action="store", dest="parser_compareparts", type="string", default="",
+        help="Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.")
+    
     
     parser.add_option("--f",
         action="store", dest="parser_file2", default="",
@@ -530,6 +535,14 @@ def mainloop(params):
         writestar(swappedparticles, metadata, params["parser_output"], relegateflag)
         print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"] +               "\n-->Output star file: " + params["parser_output"] + "\n")
         sys.exit()
+        
+    if params["parser_compareparts"] != "":
+        otherparticles, metadata = getparticles(params["parser_compareparts"])
+        sharedparticles = len(set(allparticles["_rlnImageName"]) & set(otherparticles["_rlnImageName"]))
+        unsharedfile1 = len(allparticles["_rlnImageName"]) - sharedparticles
+        unsharedfile2 = len(otherparticles["_rlnImageName"]) - sharedparticles
+        print("\n" + filename + " and " + params["parser_compareparts"] + " share " + str(sharedparticles) + " particles.")
+        print(filename + " has " + str(unsharedfile1) + " unique particles and " + params["parser_compareparts"] + " has " + str(unsharedfile2) + " unique particles.\n")
     
     #######################################################################
     

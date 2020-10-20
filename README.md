@@ -18,11 +18,11 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 ## Options
 
-* ```--delete_column``` Delete column and renumber headers. E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
+* ```--delete_column``` Delete column, renumber headers, and output to a new star file (default output.star, or specified with --o). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
-* ```--delete_particles``` Delete particles. Pick a column header (-c) and query (-q) to delete particles that match it.
+* ```--delete_particles``` Delete particles that match a query (specified with -q) within a column header (specified with -c), and write to a new star file (default output.star, or specified with --o).
 
-* ```--extract_particles``` Write a star file with particles that match a column header (-c) and query (-q).
+* ```--extract_particles``` Find particles that match a column header (-c) and query (-q) and write them to a new star file (default output.star, or specified with --o).
 
 * ```--count_particles``` Count particles and print the result. Can be used with -c and -q for a subset count, otherwise counts all.
 
@@ -34,19 +34,19 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--plot_classparts``` Plot the number of particles per class for all iterations up to the one provided in the input.
 
-* ```--list_column``` Write all values of a column to a file (filename is the header). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
+* ```--list_column``` Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
 
-* ```--swap_columns``` Swap columns from another star file (specified with --f). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that they should be in the same position in both files.
+* ```--swap_columns``` Swap columns from another star file (specified with --f). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files. Write the result to a new star file (default output.star, or specified with --o).
 
 * ```--compare_particles``` Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.
 
-* ```--relegate``` Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.
+* ```--relegate``` Remove optics table and optics column and write to a new star file (default output.star, or specified with --o). This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.
 
-* ```--regroup``` Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
+* ```--regroup``` Regroup particles such that those with similar defocus values are in the same group (the size of the group is specified here) and write to a new star file (default output.star, or specified with --o). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
 * ```--o``` Output file name. Default is output.star.
 
-* ```--f``` Name of second file to extract columns from.
+* ```--f``` Name of second file to extract columns from. Used with --swap_columns.
 
 * ```-c``` Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with -q. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash.
 

@@ -40,7 +40,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--compare_particles``` Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.
 
-* ```--relegate``` Remove optics table and optics column and write to a new star file (default output.star, or specified with --o). This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.
+* ```--relegate``` Remove optics table and optics column and write to a new star file (default output.star, or specified with --o). This may not be sufficient to be fully compatible with Relion 3.0; use --delete_column to remove other bad columns before this, if necessary. Note that the output star file will no longer be compatible with starparser.
 
 * ```--regroup``` Regroup particles such that those with similar defocus values are in the same group (the size of the group is specified here) and write to a new star file (default output.star, or specified with --o). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 

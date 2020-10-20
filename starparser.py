@@ -5,7 +5,7 @@ import optparse
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog [options]",
-        version="%prog 1.1.")
+        version="%prog 1.0.")
 
     parser.add_option("--i",
         action="store", dest="file",
@@ -77,6 +77,14 @@ def setupParserOptions():
 
     options,args = parser.parse_args()
 
+#    #for when the filename was an argument without option
+#     if len(args) > 1:
+#             parser.error("\nToo many filenames.")
+#     if len(args) == 0:
+#             parser.error("\nNo filename. Run  %prog -h to get the help text.")
+#     if len(sys.argv) < 2:
+#             parser.print_help()
+#             sys.exit()
 
     if len(sys.argv) < 4:
             parser.print_help()
@@ -434,6 +442,8 @@ def regroup(particles, numpergroup):
     
 def mainloop(params):
     
+    ##############################################################
+    
     #CHECKS
     
     if 'file' not in params:
@@ -445,13 +455,11 @@ def mainloop(params):
         sys.exit()
         
         
-    ##################################
+    ################################################################
+    
+    #Variable conversions
     
     filename = params['file']
-    
-    allparticles, metadata = getparticles(filename)
-
-    totalparticles = len(allparticles.index)
     
     if params["parser_query"] != "":
         query = params["parser_query"].split("/")
@@ -469,8 +477,27 @@ def mainloop(params):
         columns = ""
         
     relegateflag = params["parser_relegate"]
+    
+    #####################################################################
+    
+    #Set up jobs that don't require initialization
+    
+    if params["parser_classdistribution"]:
+        plotclassparts(filename)
+        print("\n-->Output to Class_distribution.png.\n")
+        sys.exit()
+    
+    #########################################################################
+    
+    #Initialize stuff
+    
+    allparticles, metadata = getparticles(filename)
+
+    totalparticles = len(allparticles.index)
+    
+    #####################################################################
         
-    #Set up jobs that probably don't require a subset (faster this way)
+    #Set up jobs that don't require a subset (faster this way)
     
     if params["parser_countme"] and params["parser_column"] != "" and params["parser_query"] != "":
         countqueryparticles(allparticles, columns, query, False)
@@ -503,13 +530,9 @@ def mainloop(params):
         writestar(swappedparticles, metadata, params["parser_output"], relegateflag)
         print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"] +               "\n-->Output star file: " + params["parser_output"] + "\n")
         sys.exit()
-        
-    if params["parser_classdistribution"]:
-        plotclassparts(filename)
-        print("\n-->Output to Class_distribution.png.\n")
-        sys.exit()
     
-    ######
+    #######################################################################
+    
     #setup SUBSET for remaining functions if necessary
     
     if relegateflag:

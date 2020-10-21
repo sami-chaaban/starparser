@@ -206,14 +206,14 @@ def getiterationlist(filename):
 
             iterationfilename.append(basename + "_it" + str(ci).zfill(3) + "_data.star")
 
-        iterationfilename = iterationfilename[::-1]
-
     else:
 
         iterationfilename = []
         for i in reversed(range(0,iteration+1)):
             iterationstring = str(i).zfill(3)
             iterationfilename.append(filename[:position+3] + iterationstring + filename[position+6:])
+            
+        iterationfilename = iterationfilename[::-1]
 
 
     return(iterationfilename)

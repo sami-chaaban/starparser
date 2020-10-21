@@ -32,7 +32,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--max_defocus``` Extract particles with defocus values less than this value (Angstroms). Can be used with -c and -q to only consider a subset.
 
-* ```--plot_classparts``` Plot the number of particles per class for all iterations up to the one provided in the input.
+* ```--plot_classparts``` Plot the number of particles per class for all iterations up to the one provided in the input. It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs.
 
 * ```--list_column``` Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
 

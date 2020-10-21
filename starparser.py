@@ -175,6 +175,49 @@ def getparticles(filename):
 
     return(allparticles, metadata)
 
+def getiterationlist(filename):
+    
+    position = filename.find("_it")
+    iteration = int(filename[position+3:position+6])
+
+    if filename.find("_ct") != -1:
+
+        totalct = filename.count("_ct")
+        continueit = []
+        for i in range(totalct):
+            if i == 0:
+                temppos = filename.find("_ct")
+                tempendpos = filename[temppos+3:].find("_") + temppos
+                continueit.append(filename[temppos+3:tempendpos+3])
+            else:
+                temppos = filename[tempendpos:].find("_") + tempendpos
+                tempendpos = filename[temppos+3:].find("_") + temppos
+                continueit.append(filename[temppos+3:tempendpos+3])
+
+        iterationfilename = []
+        for ci in range(iteration+1):
+            basename = filename[:(filename.find("run_"))] + "run"
+            if ci > int(continueit[0])-1:           
+                for ccii in continueit:
+                    if int(ccii) > ci:
+                        continue
+                    else:
+                        basename = basename + "_ct" + ccii
+
+            iterationfilename.append(basename + "_it" + str(ci).zfill(3) + "_data.star")
+
+        iterationfilename = iterationfilename[::-1]
+
+    else:
+
+        iterationfilename = []
+        for i in reversed(range(0,iteration+1)):
+            iterationstring = str(i).zfill(3)
+            iterationfilename.append(filename[:position+3] + iterationstring + filename[position+6:])
+
+
+    return(iterationfilename)
+
 def countparticles(particles):
 
     totalparticles = len(particles.index)
@@ -217,14 +260,14 @@ def plotclassparts(filename):
     classdistribution = []
     allparticles, metadata = getparticles(filename)
     numclasses = int(max(allparticles["_rlnClassNumber"]))
+    iterationfilename = getiterationlist(filename)
     
     print("\nLooping from iteration 0 to " + str(iteration) + " on " + str(numclasses) + " classes.\n")
 
     numperclassdf = pd.DataFrame()
 
-    for i in range(iteration+1):
-        iterationstring = str(i).zfill(3)
-        iterationfile = filename[:position+3] + iterationstring + filename[position+6:]
+    for i in range(len(iterationfilename)):
+        iterationfile = iterationfilename[i]
         allparticles, metadata = getparticles(iterationfile)
         numperclass = []
         for c in range(1,numclasses+1):
@@ -544,7 +587,7 @@ def mainloop(params):
         print("\n" + filename + " and " + params["parser_compareparts"] + " share " + str(sharedparticles) + " particles.")
         print(filename + " has " + str(unsharedfile1) + " unique particles and " + params["parser_compareparts"] + " has " + str(unsharedfile2) + " unique particles.\n")
         sys.exit()
-
+    
     #######################################################################
     
     #setup SUBSET for remaining functions if necessary

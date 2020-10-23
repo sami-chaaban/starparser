@@ -66,7 +66,7 @@ def setupParserOptions():
     
     parser.add_option("--class_proportion",
         action="store_true", dest="parser_classproportion", default=False,
-        help="Find the proportion of particles that belong to each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportion and plot the result in Class_proportion.png")
+        help="Find the proportion of particles that belong to each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportions and plot the result in Class_proportion.png")
     
     parser.add_option("--f",
         action="store", dest="parser_file2", default="",
@@ -81,12 +81,12 @@ def setupParserOptions():
         help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
     
     parser.add_option("--o",
-        action="store", dest="parser_output", default = "output.star",
-        help="Output file name. Default is output.star")
+        action="store", dest="parser_outname", default = "output.star",
+        help="Output file name for a star file to be written. Default is output.star")
     
     parser.add_option("--t",
         action="store", dest="parser_outtype", default = "png",
-         help="Plot output file type. Choose between png, jpg, and pdf. Default is png.")
+        help="File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.")
 
     options,args = parser.parse_args()
 
@@ -649,15 +649,15 @@ def mainloop(params):
     if params["parser_delcolumn"] != "":
         columns = params["parser_delcolumn"].split("/")
         newparticles, metadata = delcolumn(allparticles, columns, metadata)
-        writestar(newparticles, metadata, params["parser_output"], relegateflag)
-        print("\nRemoved the columns " + str(columns) + "\nOutput star file: " + params["parser_output"] + "\n")
+        writestar(newparticles, metadata, params["parser_outname"], relegateflag)
+        print("\nRemoved the columns " + str(columns) + "\nOutput star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_delparticles"]:
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
-        writestar(newparticles, metadata, params["parser_output"], relegateflag)
-        print("\nRemoved " + str(purgednumber) + " particles out of " + str(totalparticles) + " that had particles that matched " + str(query) +               " in the column " + params["parser_column"] + " (or " + str(round(purgednumber*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_output"] + "\n")
+        writestar(newparticles, metadata, params["parser_outname"], relegateflag)
+        print("\nRemoved " + str(purgednumber) + " particles out of " + str(totalparticles) + " that had particles that matched " + str(query) +               " in the column " + params["parser_column"] + " (or " + str(round(purgednumber*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_swapcolumns"] != "":
@@ -667,8 +667,8 @@ def mainloop(params):
         otherparticles, metadata = getparticles(params["parser_file2"])
         columstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
-        writestar(swappedparticles, metadata, params["parser_output"], relegateflag)
-        print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"] +               "\n-->Output star file: " + params["parser_output"] + "\n")
+        writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
+        print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"] +               "\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_compareparts"] != "":
@@ -685,7 +685,7 @@ def mainloop(params):
             print("\nError: you have not entered a query.\n")
             sys.exit()
         elif params["parser_column"] == "":
-            print("\nError: you have not entered a column.")
+            print("\nError: you have not entered a column.\n")
             sys.exit()
         classproportion(allparticles, columns, query)
         sys.exit()
@@ -706,8 +706,8 @@ def mainloop(params):
         sys.exit()
 
     if params["parser_extractparticles"]:
-        writestar(particles2use, metadata, params["parser_output"], relegateflag)
-        print("\n-->Output star file: " + params["parser_output"] + "\n")
+        writestar(particles2use, metadata, params["parser_outname"], relegateflag)
+        print("\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_plotdefocus"]:
@@ -716,13 +716,13 @@ def mainloop(params):
         
     if params["parser_maxdefocus"] != 0:
         purgedparticles, purgednumber = maxdefocus(particles2use, params["parser_maxdefocus"])
-        writestar(purgedparticles, metadata, params["parser_output"], relegateflag)
-        print("\nRemoved " + str(purgednumber) + " particles out of " + str(len(purgedparticles.index)) + " that had defocus values above " + str(params["parser_maxdefocus"]) + " (or " +               str(round(purgednumber*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_output"] + "\n")
+        writestar(purgedparticles, metadata, params["parser_outname"], relegateflag)
+        print("\nRemoved " + str(purgednumber) + " particles out of " + str(len(purgedparticles.index)) + " that had defocus values above " + str(params["parser_maxdefocus"]) + " (or " +               str(round(purgednumber*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if relegateflag:
-        writestar(particles2use, metadata, params["parser_output"], relegateflag)
-        print("\nRemoved the optics table and _rlnOpticsGroup.\n-->Output star file: " + params["parser_output"] + "\n")
+        writestar(particles2use, metadata, params["parser_outname"], relegateflag)
+        print("\nRemoved the optics table and _rlnOpticsGroup.\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_writecol"] != "":
@@ -734,8 +734,8 @@ def mainloop(params):
     if params["parser_regroup"] != "":
         numpergroup = params["parser_regroup"]
         regroupedparticles = regroup(particles2use, numpergroup)
-        writestar(regroupedparticles, metadata, params["parser_output"], relegateflag)
-        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values\n-->Output star file: " + params["parser_output"] + " \n")
+        writestar(regroupedparticles, metadata, params["parser_outname"], relegateflag)
+        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values\n-->Output star file: " + params["parser_outname"] + " \n")
         sys.exit()
 
 if __name__ == "__main__":

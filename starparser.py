@@ -1,6 +1,7 @@
 import sys
 import pandas as pd
 import optparse
+import matplotlib.pyplot as plt
 
 def setupParserOptions():
     
@@ -63,6 +64,9 @@ def setupParserOptions():
         action="store", dest="parser_compareparts", type="string", default="",
         help="Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.")
     
+    parser.add_option("--class_proportion",
+        action="store_true", dest="parser_classproportion", default=False,
+        help="Find the proportion of particles that belong to each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportion and plot the result in Class_proportion.png")
     
     parser.add_option("--f",
         action="store", dest="parser_file2", default="",
@@ -79,6 +83,10 @@ def setupParserOptions():
     parser.add_option("--o",
         action="store", dest="parser_output", default = "output.star",
         help="Output file name. Default is output.star")
+    
+    parser.add_option("--t",
+        action="store", dest="parser_outtype", default = "png",
+         help="Plot output file type. Choose between png, jpg, and pdf. Default is png.")
 
     options,args = parser.parse_args()
 
@@ -251,7 +259,7 @@ def plotdefocus(particles):
     ax.set_xlabel("DefocusU")
     
     fig = ax.get_figure()
-    fig.savefig('Defocus_histogram.png')
+    outputfig(fig, "Defocus_histogram")
     
 def plotclassparts(filename):
     
@@ -281,7 +289,7 @@ def plotclassparts(filename):
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Particle number")
     fig = ax.get_figure()
-    fig.savefig('Class_distribution.png')
+    outputfig(fig, "Class_distribution")
     
 def maxdefocus(particles, maxvalue):
     
@@ -485,7 +493,89 @@ def regroup(particles, numpergroup):
     regroupedparticles = regroupedparticles[particles.columns]
 
     return(regroupedparticles)
+
+def classproportion(particles, columns, query):
+
+    totalqueried = len(query)
     
+    if totalqueried < 2:
+        print("\nError: please enter at least two queries separated by a slash.\n")
+        sys.exit()
+
+    subsetparticles, totalsubset = extractparticles(particles, columns, query)
+
+    classestocheck = list(set(subsetparticles["_rlnClassNumber"]))
+    classestocheck_int = [int(i) for i in classestocheck]
+    classestocheck_int.sort()
+    classestocheck = [str(i) for i in classestocheck_int]
+
+    percentparts_lst = []
+
+    for c in classestocheck:
+
+        sub_subsetparticles, totalclasssubsubset = extractparticles(subsetparticles,["_rlnClassNumber"], [c])
+
+        percentparts = []
+
+        for q in query:
+
+            totalclasspartsinsubset = countqueryparticles(sub_subsetparticles, columns, [q], True)
+
+            percentparts.append(totalclasspartsinsubset*100 / totalclasssubsubset)
+
+        percentparts_lst.append(percentparts)
+
+    #####################################
+    
+    print("\n")
+
+    for i,c in enumerate(classestocheck):
+
+        print("\nClass " + c)
+
+        for j,q in enumerate(query):
+
+            print("-" + q + ": " + str(round(percentparts_lst[i][j],2)) + "%")
+
+    print("\n")
+
+    #####################################
+
+    def accumu(lis):
+        total = 0
+        for x in lis:
+            total += x
+            yield total
+
+    percentparts_cumulative = []
+
+    for c in range(len(classestocheck)):
+
+        percentparts_cumulative.append(list(accumu(percentparts_lst[c])))
+
+    percentparts_reordered = []
+
+    for q in range(totalqueried):
+
+        percentparts_reordered.append([item[q] for item in percentparts_cumulative])
+
+    fig = plt.figure()
+
+    for q in list(reversed(range(totalqueried))):
+
+        plt.bar(classestocheck, percentparts_reordered[q], 0.32)
+
+    plt.legend(list(reversed(query)))
+    plt.ylabel('Percent of particles')
+    plt.xlabel('Class Number')
+    
+    outputfig(fig, "Class_proportion")
+
+def outputfig(fig, name):
+    
+    fig.savefig(name + "." + outtype)
+    print("\n-->Output to " + name + "." + outtype + ".\n")
+        
 ########################################################
     
 def mainloop(params):
@@ -515,7 +605,6 @@ def mainloop(params):
     
     if params["parser_classdistribution"]:
         plotclassparts(filename)
-        print("\n-->Output to Class_distribution.png.\n")
         sys.exit()
     
     #########################################################################
@@ -540,6 +629,9 @@ def mainloop(params):
     else:
         
         columns = ""
+    
+    global outtype
+    outtype = params["parser_outtype"]
         
     relegateflag = params["parser_relegate"]
     
@@ -587,7 +679,17 @@ def mainloop(params):
         print("\n" + filename + " and " + params["parser_compareparts"] + " share " + str(sharedparticles) + " particles.")
         print(filename + " has " + str(unsharedfile1) + " unique particles and " + params["parser_compareparts"] + " has " + str(unsharedfile2) + " unique particles.\n")
         sys.exit()
-    
+        
+    if params["parser_classproportion"]:
+        if params["parser_query"] == "":
+            print("\nError: you have not entered a query.\n")
+            sys.exit()
+        elif params["parser_column"] == "":
+            print("\nError: you have not entered a column.")
+            sys.exit()
+        classproportion(allparticles, columns, query)
+        sys.exit()
+        
     #######################################################################
     
     #setup SUBSET for remaining functions if necessary
@@ -610,7 +712,6 @@ def mainloop(params):
         
     if params["parser_plotdefocus"]:
         plotdefocus(particles2use)
-        print("\n-->Output to Defocus_histogram.png.\n")
         sys.exit()
         
     if params["parser_maxdefocus"] != 0:

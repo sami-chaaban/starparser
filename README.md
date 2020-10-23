@@ -32,13 +32,15 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--max_defocus``` Extract particles with defocus values less than this value (Angstroms). Can be used with -c and -q to only consider a subset.
 
-* ```--plot_classparts``` Plot the number of particles per class for all iterations up to the one provided in the input. It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs.
+* ```--plot_classparts``` Plot the number of particles per class for all iterations up to the one provided in the input. It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue).
 
 * ```--list_column``` Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
 
 * ```--swap_columns``` Swap columns from another star file (specified with --f). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files. Write the result to a new star file (default output.star, or specified with --o).
 
 * ```--compare_particles``` Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.
+
+* ```--class_proportion``` Find the proportion of particles that belong to each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportions and plot the result in Class_proportion.png.
 
 * ```--relegate``` Remove optics table and optics column and write to a new star file (default output.star, or specified with --o). This may not be sufficient to be fully compatible with Relion 3.0; use --delete_column to remove other bad columns before this, if necessary. Note that the output star file will no longer be compatible with starparser.
 
@@ -47,6 +49,8 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 * ```--o``` Output file name. Default is output.star.
 
 * ```--f``` Name of second file to extract columns from. Used with --swap_columns.
+
+* ```--t``` File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.
 
 * ```-c``` Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with -q. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash.
 
@@ -186,6 +190,13 @@ starparser --i run_it025_data.star --plot_classparts
 
 ---
 
+* Plot the proportion of particles in each class that belong to 200702 versus 200716 within the \_rlnMicrographName column.
+
+```
+starparser --i run_it025_data.star --plot_classparts
+```
+
+---
 
 ## License
 

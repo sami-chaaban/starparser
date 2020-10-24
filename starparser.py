@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[ ]:
+
+
 import sys
 import pandas as pd
 import optparse
@@ -629,6 +635,9 @@ def mainloop(params):
     
     filename = params['file']
     
+    global outtype
+    outtype = params["parser_outtype"]
+    
     #####################################################################
     
     #Set up jobs that don't require initialization
@@ -659,9 +668,6 @@ def mainloop(params):
     else:
         
         columns = ""
-    
-    global outtype
-    outtype = params["parser_outtype"]
         
     relegateflag = params["parser_relegate"]
     

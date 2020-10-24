@@ -6,98 +6,131 @@ import matplotlib.pyplot as plt
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog [options]",
-        version="%prog 1.0.")
+        version="%prog 1.1.")
 
     parser.add_option("--i",
-        action="store", dest="file",
+        action="store", dest="file", metavar='starfile-name',
         help="Input file name.")
+    
+    plot_opts = optparse.OptionGroup(
+        parser, 'Plotting Options',
+        'Plot various data from the star files.',
+        )
 
-    parser.add_option("--plot_defocus",
+    plot_opts.add_option("--plot_defocus",
         action="store_true", dest="parser_plotdefocus", default=False,
-        help="Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all.")
+        help="Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all. Use --t to change filetype.")
     
-    parser.add_option("--plot_classparts",
+    plot_opts.add_option("--plot_classparts",
         action="store_true", dest="parser_classdistribution", default=False,
-        help="Plot the number of particles per class for all iterations up to the one provided in the input.")
+        help="Plot the number of particles per class for all iterations up to the one provided in the input. Use --t to change filetype.")
     
-    parser.add_option("--delete_column",
-        action="store", dest="parser_delcolumn", type="string", default="",
+    plot_opts.add_option("--class_proportion",
+        action="store_true", dest="parser_classproportion", default=False,
+        help="Plot the proportion of particles that match different queries in each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
+
+    parser.add_option_group(plot_opts)
+    
+    modify_opts = optparse.OptionGroup(
+        parser, 'Modification Options',
+        'Modify the star file.',
+        )
+    
+    modify_opts.add_option("--extract_particles",
+        action="store_true", dest="parser_extractparticles", default=False,
+        help="Write a star file with particles that match a column header (-c) and query (-q).")
+    
+    modify_opts.add_option("--delete_column",
+        action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name',
         help="Delete column and renumber headers. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
     
-    parser.add_option("--delete_particles",
+    modify_opts.add_option("--delete_particles",
         action="store_true", dest="parser_delparticles", default=False,
         help="Delete particles. Pick a column header (-c) and query (-q) to delete particles that match it.")
     
-    parser.add_option("--extract_particles",
-        action="store_true", dest="parser_extractparticles", default=False,
-        help="Write a star file with particles that match a column header (-c) and query (-q).")
-
-    parser.add_option("--count_particles",
-        action="store_true", dest="parser_countme", default=False,
-        help="Count particles and print the result. Can be used with -c and -q for a subset count, otherwise counts all.")
-    
-    parser.add_option("--count_mics",
-        action="store_true", dest="parser_uniquemics", default=False,
-        help="Count the number of unique micrographs. Can be used with -c and -q for a subset count, otherwise counts all.")
-    
-    parser.add_option("--max_defocus",
-        action="store", dest="parser_maxdefocus", type="float", default = 0,
+    modify_opts.add_option("--max_defocus",
+        action="store", dest="parser_maxdefocus", type="float", default = 0, metavar='maximum-value',
         help="Extract particles with defocus values less than this value (Angstroms). Can be used with -c and -q to only consider a subset.")
     
-    parser.add_option("--list_column",
-        action="store", dest="parser_writecol", type="string", default="",
-        help="Write all values of a column to a file (filename is the header). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.")
-    
-    parser.add_option("-c",
-        action="store", dest="parser_column", type="string", default="",
-        help="Column query. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
-    
-    parser.add_option("-q",
-        action="store", dest="parser_query", type="string", default="",
-        help="Particle query. To enter multiple columns, separate them with a slash: 20200101/20200203.")
-    
-    parser.add_option("--swap_columns",
-        action="store", dest="parser_swapcolumns", type="string", default="",
+    modify_opts.add_option("--swap_columns",
+        action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with -f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
-
-    parser.add_option("--compare_particles",
-        action="store", dest="parser_compareparts", type="string", default="",
-        help="Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.")
     
-    parser.add_option("--class_proportion",
-        action="store_true", dest="parser_classproportion", default=False,
-        help="Find the proportion of particles that belong to each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportions and plot the result in Class_proportion.png")
-    
-    parser.add_option("--f",
-        action="store", dest="parser_file2", default="",
-        help="Name of second file to extract columns from.")
-    
-    parser.add_option("--relegate",
+    modify_opts.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,
         help="Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.")
 
-    parser.add_option("--regroup",
-        action="store", dest="parser_regroup", type="int", default=50,
+    modify_opts.add_option("--regroup",
+        action="store", dest="parser_regroup", type="int", default=50, metavar='particles-per-group',
         help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
+
+    parser.add_option_group(modify_opts)
     
-    parser.add_option("--o",
-        action="store", dest="parser_outname", default = "output.star",
+    info_opts = optparse.OptionGroup(
+        parser, 'Data Mining Options',
+        'Count, list, and compare information in the star file.',
+        )
+    
+    info_opts.add_option("--count_particles",
+        action="store_true", dest="parser_countme", default=False,
+        help="Count particles and print the result. Can be used with -c and -q for a subset count, otherwise counts all.")
+    
+    info_opts.add_option("--count_mics",
+        action="store_true", dest="parser_uniquemics", default=False,
+        help="Count the number of unique micrographs. Can be used with -c and -q for a subset count, otherwise counts all.")
+    
+    info_opts.add_option("--list_column",
+        action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
+        help="Write all values of a column to a file (filename is the header). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.")
+    
+    info_opts.add_option("--compare_particles",
+        action="store", dest="parser_compareparts", type="string", default="", metavar='other-starfile-name',
+        help="Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.")
+
+    parser.add_option_group(info_opts)
+    
+    query_opts = optparse.OptionGroup(
+        parser, 'Query Options',
+        'Used with the above to find specific particles.',
+        )
+    
+    query_opts.add_option("-c",
+        action="store", dest="parser_column", type="string", default="", metavar='column-name(s)',
+        help="Column query. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+    
+    query_opts.add_option("-q",
+        action="store", dest="parser_query", type="string", default="", metavar='query(ies)',
+        help="Particle query. To enter multiple queries, separate them with a slash: 20200101/20200203.")
+    
+    parser.add_option_group(query_opts)
+    
+    output_opts = optparse.OptionGroup(
+        parser, 'Output Options',
+        'Output names and filetypes.',
+        )
+    
+    output_opts.add_option("--o",
+        action="store", dest="parser_outname", default = "output.star", metavar='output-name',
         help="Output file name for a star file to be written. Default is output.star")
     
-    parser.add_option("--t",
-        action="store", dest="parser_outtype", default = "png",
+    output_opts.add_option("--t",
+        action="store", dest="parser_outtype", default = "png", metavar='plot-filetype',
         help="File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.")
+    
+    parser.add_option_group(output_opts)
+
+    extra_opts = optparse.OptionGroup(
+        parser, 'Extra Options',
+        'Miscalaneous options used with the above functions.',
+        )
+    
+    extra_opts.add_option("--f",
+        action="store", dest="parser_file2", default="", metavar='other-starfile-name',
+        help="Name of second file to extract columns from. Used with --swap_columns.")
+    
+    parser.add_option_group(extra_opts)
 
     options,args = parser.parse_args()
-
-#    #for when the filename was an argument without option
-#     if len(args) > 1:
-#             parser.error("\nToo many filenames.")
-#     if len(args) == 0:
-#             parser.error("\nNo filename. Run  %prog -h to get the help text.")
-#     if len(sys.argv) < 2:
-#             parser.print_help()
-#             sys.exit()
 
     if len(sys.argv) < 4:
             parser.print_help()
@@ -105,12 +138,9 @@ def setupParserOptions():
 
     params={}
 
-    for i in parser.option_list:
-            if isinstance(i.dest,str):
-                    params[i.dest] = getattr(options,i.dest)
-                    
-#     params['file'] = args[0] #for when the filename was an argument without option
-                    
+    for i in options.__dict__.items():
+        params[i[0]] = i[1]
+        
     return(params)
 
 def parsestar(starfile):
@@ -256,7 +286,7 @@ def plotdefocus(particles):
     particles["_rlnDefocusU"] = pd.to_numeric(particles["_rlnDefocusU"], downcast="float")
 
     ax = particles["_rlnDefocusU"].plot.hist(bins=400)
-    ax.set_xlabel("DefocusU")
+    ax.set_xlabel("_rlnDefocusU")
     
     fig = ax.get_figure()
     outputfig(fig, "Defocus_histogram")
@@ -527,7 +557,7 @@ def classproportion(particles, columns, query):
 
     #####################################
     
-    print("\n")
+    print("\nThere are " + str(len(classestocheck)) + " classe(s). Checking the proportion of " + str(query) + "\n")
 
     for i,c in enumerate(classestocheck):
 
@@ -535,7 +565,7 @@ def classproportion(particles, columns, query):
 
         for j,q in enumerate(query):
 
-            print("-" + q + ": " + str(round(percentparts_lst[i][j],2)) + "%")
+            print("-" + q + ": " + str(round(percentparts_lst[i][j],1)) + "%")
 
     print("\n")
 

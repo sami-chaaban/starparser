@@ -80,6 +80,8 @@ The following examples run the `starparser` command assuming an alias has been c
 starparser --i run_data.star --plot_defocus
 ```
 
+![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
+
 ---
 
 * Plot a histogram of defocus values from a subset of micrographs that contain "200826" or "200827".
@@ -87,6 +89,8 @@ starparser --i run_data.star --plot_defocus
 ```
 starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
 ```
+
+![Defocus plot](./Examples/Defocus_histogram_subset.png "Defocus plot")
 
 ---
 
@@ -200,13 +204,17 @@ starparser --i run_data.star --o output.star --relegate
 starparser --i run_it025_data.star --plot_classparts
 ```
 
+![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
+
 ---
 
-* Plot the proportion of particles in each class that belong to 200702 versus 200716 within the \_rlnMicrographName column.
+* Plot the proportion of particles in each class that belong to 200702 versus 200826 within the \_rlnMicrographName column.
 
 ```
-starparser --i run_it025_data.star --plot_classparts
+starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
 ```
+
+![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
 
 ---
 

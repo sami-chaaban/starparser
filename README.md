@@ -80,7 +80,7 @@ The following examples run the `starparser` command assuming an alias has been c
 ```
 starparser --i run_data.star --plot_defocus
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;Output **Defocus_histogram.png**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Defocus_histogram.png**:
 ![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
 
 ---
@@ -91,7 +91,7 @@ starparser --i run_data.star --plot_defocus
 starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
 ```
 
-* Output **Defocus_histogram.png**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Defocus_histogram.png**:
 ![Defocus plot](./Examples/Defocus_histogram_subset.png "Defocus plot")
 
 ---
@@ -102,7 +102,7 @@ starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/2008
 starparser --i run_it025_data.star --plot_classparts
 ```
 
-** Output **Class_distribution.png**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Class_distribution.png**:
 ![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
 
 ---
@@ -113,7 +113,7 @@ starparser --i run_it025_data.star --plot_classparts
 starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
 ```
 
-** Output **Class_proportion.png**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Class_proportion.png**:
 ![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
 
 ---
@@ -135,7 +135,7 @@ starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_colu
 starparser --i run_data.star --o run_data_del200702_del200715.star --delete_particles -c _rlnMicrographName -q 200702/200715
 ```
 
-** A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be any particle that has either 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be any particle that has either 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days.
 
 ---
 
@@ -145,7 +145,7 @@ starparser --i run_data.star --o run_data_del200702_del200715.star --delete_part
 starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1
 ```
 
-** A new star file named **run_data_c1.star** will be output with only particles that belong to class #1. This is identical to Subset Selection in Relion (which has more options, including regrouping, etc.).
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class #1. This is identical to Subset Selection in Relion (which has more options, including regrouping, etc.).
 
 ---
 
@@ -155,7 +155,7 @@ starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnCla
 starparser --i run_data.star --o run_data_under4um.star --max_defocus 40000
 ```
 
-** A new star file named **run_data_under4um.star** will be output with only particles that have defocus estimations below 4 microns.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_under4um.star** will be output with only particles that have defocus estimations below 4 microns.
 
 ---
 
@@ -165,7 +165,7 @@ starparser --i run_data.star --o run_data_under4um.star --max_defocus 40000
 starparser --i run_data.star --o run_data_under4um_200826.star --max_defocus 40000 -c _rlnMicrographName -q 200826
 ```
 
-** A new star file named **run_data_under4um_200826.star** will be output with only particles that have defocus estimations below 4 microns that also contain 200826 in the \_rlnMicrographName column.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_under4um_200826.star** will be output with only particles that have defocus estimations below 4 microns that also contain 200826 in the \_rlnMicrographName column.
 
 ---
 
@@ -175,7 +175,7 @@ starparser --i run_data.star --o run_data_under4um_200826.star --max_defocus 400
 starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
 ```
 
-** A new star file named **run_data_swapped.star** will be output that will be identical to run_data.star except for the columns in the input, which will instead be swapped in from run_data_2.star. This is useful for sourcing alignments from early global refinements.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_swapped.star** will be output that will be identical to run_data.star except for the columns in the input, which will instead be swapped in from run_data_2.star. This is useful for sourcing alignments from early global refinements.
 
 ---
 
@@ -185,7 +185,7 @@ starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swa
 starparser --i run_data.star --o run_data_3p0.star --relegate
 ```
 
-** A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered.
 
 ---
 

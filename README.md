@@ -80,7 +80,7 @@ The following examples run the `starparser` command assuming an alias has been c
 ```
 starparser --i run_data.star --plot_defocus
 ```
-  * Output **Defocus_histogram.png**:
+    * Output **Defocus_histogram.png**:
 ![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
 
 ---

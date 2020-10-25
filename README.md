@@ -18,7 +18,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 ## Options
 
-### Plotting options
+### Plotting
 
 * ```--plot_defocus``` Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with -c and -q for a subset, otherwise plots all.
 
@@ -26,7 +26,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--class_proportion``` Find the proportion of particles that belong to each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportions and plot the result in Class_proportion.png.
 
-### Modification options
+### Modifying
 
 * ```--extract_particles``` Find particles that match a column header (-c) and query (-q) and write them to a new star file (default output.star, or specified with --o).
 
@@ -42,7 +42,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--regroup``` Regroup particles such that those with similar defocus values are in the same group (the size of the group is specified here) and write to a new star file (default output.star, or specified with --o). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
-### Data mining options
+### Data mining
 
 * ```--count_particles``` Count particles and print the result. Can be used with -c and -q for a subset count, otherwise counts all.
 
@@ -52,27 +52,31 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--compare_particles``` Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.
 
-### Query options
+### Querying
 
 * ```-c``` Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with -q. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash in using this option.
 
 * ```-q``` Query term to look for in the column specified by -c. To enter multiple queries, separate them with a slash: 20200101/20200203. Note the single dash in using this option.
 
-### Output options
+### Output
 
 * ```--o``` Output file name. Default is output.star.
 
 * ```--t``` File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.
 
-### Extra options
+### Miscellaneous
 
 * ```--f``` Name of second file to extract columns from. Used with --swap_columns.
+
+---
 
 ## Examples
 
 The following examples run the `starparser` command assuming an alias has been created as described above, otherwise, run it with `python3 starparser.py`.
 
 ---
+
+### Plotting
 
 * Plot a histogram of defocus values.
 
@@ -93,6 +97,28 @@ starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/2008
 ![Defocus plot](./Examples/Defocus_histogram_subset.png "Defocus plot")
 
 ---
+
+* Plot the number of particles per class for the 25 iterations of a Class3D job.
+
+```
+starparser --i run_it025_data.star --plot_classparts
+```
+
+![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
+
+---
+
+* Plot the proportion of particles in each class that belong to 200702 versus 200826 within the \_rlnMicrographName column.
+
+```
+starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
+```
+
+![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
+
+---
+
+### Modifying
 
 * Delete the \_rlnCtfMaxResolution and \_rlnCtfFigureOfMerit columns.
 
@@ -118,6 +144,40 @@ starparser --i run_data.star --o output.star --extract_particles -c _rlnClassNum
 
 ---
 
+* Extract particles with defocus values (in \_rlnDefocusU) less than this value and write to a new file.
+
+```
+starparser --i run_data.star --o output.star --max_defocus 40000
+```
+
+---
+
+* Extract particles with defocus values (in \_rlnDefocusU) less than this value that also have "200826" in the \_rlnMicrographName column, and write to a new file.
+
+```
+starparser --i run_data.star --o output.star --max_defocus 40000 -c _rlnMicrographName -q 200826
+```
+
+---
+
+* Swap the following columns from file2.star into run_data.star: \_rlnAnglePsi, \_rlnAngleRot, \_rlnAngleTilt, \_rlnNormCorrection, \_rlnLogLikeliContribution, \_rlnMaxValueProbDistribution, \_rlnNrOfSignificantSamples, \_rlnOriginXAngst, \_rlnOriginYAngst.
+
+```
+starparser --i run_data.star --f file2.star --o output.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
+```
+
+---
+
+* Relegate the star file to be compatible with Relion 3.0.
+
+```
+starparser --i run_data.star --o output.star --relegate
+```
+
+---
+
+### Data mining
+
 * Count the number of particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
@@ -138,22 +198,6 @@ starparser --i run_data.star --count_mics
 
 ```
 starparser --i run_data.star --count_mics -c _rlnMicrographName -q 200826
-```
-
----
-
-* Extract particles with defocus values (in \_rlnDefocusU) less than this value and write to a new file.
-
-```
-starparser --i run_data.star --o output.star --max_defocus 40000
-```
-
----
-
-* Extract particles with defocus values (in \_rlnDefocusU) less than this value that also have "200826" in the \_rlnMicrographName column, and write to a new file.
-
-```
-starparser --i run_data.star --o output.star --max_defocus 40000 -c _rlnMicrographName -q 200826
 ```
 
 ---
@@ -182,41 +226,6 @@ starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q
 
 ---
 
-* Swap the following columns from file2.star into run_data.star: \_rlnAnglePsi, \_rlnAngleRot, \_rlnAngleTilt, \_rlnNormCorrection, \_rlnLogLikeliContribution, \_rlnMaxValueProbDistribution, \_rlnNrOfSignificantSamples, \_rlnOriginXAngst, \_rlnOriginYAngst.
-
-```
-starparser --i run_data.star --f file2.star --o output.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
-```
-
----
-
-* Relegate the star file to be compatible with Relion 3.0.
-
-```
-starparser --i run_data.star --o output.star --relegate
-```
-
----
-
-* Plot the number of particles per class for the 25 iterations of a Class3D job.
-
-```
-starparser --i run_it025_data.star --plot_classparts
-```
-
-![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
-
----
-
-* Plot the proportion of particles in each class that belong to 200702 versus 200826 within the \_rlnMicrographName column.
-
-```
-starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
-```
-
-![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
-
----
 
 ## License
 

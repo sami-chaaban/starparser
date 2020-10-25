@@ -144,7 +144,7 @@ starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_colu
 starparser --i run_data.star --o run_data_del200702_del200715.star --delete_particles -c _rlnMicrographName -q 200702/200715
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be any particle that has either 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be missing any particle that has either 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days that had the date in the filename.
 
 ---
 
@@ -262,6 +262,17 @@ starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q
 
 ---
 
+* **Compare particles between star files**
+
+```
+starparser --i run_it025_data.star --compare_particles particles.star
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star and particles.star share 36328 particles.*
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star has 32792 unique particles and particles.star has 1 unique particles.*
+
+---
 
 ## License
 

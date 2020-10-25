@@ -248,7 +248,7 @@ starparser --i run_data.star --list_column _rlnMicrographName
 starparser --i run_data.star --list_column _rlnDefocusU/_rlnCoordinateX
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of \_rlnDefocusU will be written to *DefocusU.txt* and All entries of \_rlnCoordinateX will be written to *CoordinateX.txt*.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of \_rlnDefocusU will be written to *DefocusU.txt* and all entries of \_rlnCoordinateX will be written to *CoordinateX.txt*.
 
 ---
 

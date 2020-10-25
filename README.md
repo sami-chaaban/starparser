@@ -48,7 +48,7 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 * ```--count_mics``` Count the number of unique micrographs. Can be used with -c and -q for a subset count, otherwise counts all.
 
-* ```--list_column``` Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
+* ```--list_column``` Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.
 
 * ```--compare_particles``` Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.
 
@@ -80,6 +80,7 @@ The following examples run the `starparser` command assuming an alias has been c
 ```
 starparser --i run_data.star --plot_defocus
 ```
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Defocus_histogram.png**:
 ![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
 
@@ -120,7 +121,7 @@ starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 2
 
 ### Modifying
 
-* Delete the \_rlnCtfMaxResolution and \_rlnCtfFigureOfMerit columns.
+* **Delete columns**
 
 ```
 starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
@@ -129,7 +130,7 @@ starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_colu
 
 ---
 
-* Delete all particles with "200702" or "200715" in the \_rlnMicrographName column.
+* **Delete a subset of particles**
 
 ```
 starparser --i run_data.star --o run_data_del200702_del200715.star --delete_particles -c _rlnMicrographName -q 200702/200715
@@ -139,17 +140,17 @@ starparser --i run_data.star --o run_data_del200702_del200715.star --delete_part
 
 ---
 
-* Make a new star file with only particles that have "1" in the \_rlnClassNumber column.
+* **Extract a subset of particles**
 
 ```
 starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class #1. This is identical to Subset Selection in Relion (which has more options, including regrouping, etc.).
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class #1. In this case, extracting a class here is identical to Subset Selection in Relion (which has more options, including regrouping, etc.).
 
 ---
 
-* Extract particles with defocus values (in \_rlnDefocusU) less than this value and write to a new file.
+* **Extract particles with specific defoci**
 
 ```
 starparser --i run_data.star --o run_data_under4um.star --max_defocus 40000
@@ -159,7 +160,7 @@ starparser --i run_data.star --o run_data_under4um.star --max_defocus 40000
 
 ---
 
-* Extract particles with defocus values (in \_rlnDefocusU) less than this value that also have "200826" in the \_rlnMicrographName column, and write to a new file.
+* **Extract a subset of particles that also have a specific defocus**
 
 ```
 starparser --i run_data.star --o run_data_under4um_200826.star --max_defocus 40000 -c _rlnMicrographName -q 200826
@@ -169,7 +170,7 @@ starparser --i run_data.star --o run_data_under4um_200826.star --max_defocus 400
 
 ---
 
-* Swap the following columns from file2.star into run_data.star: \_rlnAnglePsi, \_rlnAngleRot, \_rlnAngleTilt, \_rlnNormCorrection, \_rlnLogLikeliContribution, \_rlnMaxValueProbDistribution, \_rlnNrOfSignificantSamples, \_rlnOriginXAngst, \_rlnOriginYAngst.
+* **Swap columns**
 
 ```
 starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
@@ -179,7 +180,7 @@ starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swa
 
 ---
 
-* Relegate the star file to be compatible with Relion 3.0.
+* **Relegate a star file**
 
 ```
 starparser --i run_data.star --o run_data_3p0.star --relegate
@@ -191,51 +192,64 @@ starparser --i run_data.star --o run_data_3p0.star --relegate
 
 ### Data mining
 
-* Count the number of particles with "200702" or "200715" in the \_rlnMicrographName column.
+* **Count specific particles**
 
 ```
-starparser --i run_data.star --o output.star --count_particles -c _rlnMicrographName -q 200702/200715
+starparser --i particles.star --o output.star --count_particles -c _rlnMicrographName -q 200702/200715
 ```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *There are 7726 particles that match ['200702', '200715'] in the specified columns (out of 69120, or 11.2%).*
 
 ---
 
-* Count the total number of unique micrographs.
+* **Count the number of micrographs**
 
 ```
 starparser --i run_data.star --count_mics
 ```
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *There are 7994 unique micrographs in this dataset.*
+
 ---
 
-* Count the total number of unique micrographs in the subset that contain "200826" in the \_rlnMicrographName column.
+* **Count the number of micrographs for specific particles**
 
 ```
 starparser --i run_data.star --count_mics -c _rlnMicrographName -q 200826
 ```
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *Creating a subset of 2358 particles that match ['200826'] in the columns ['\_rlnMicrographName'] \(or 3.4%\)*
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *There are 288 unique micrographs in this dataset.*
+
 ---
 
-* List all micrographs in the star file to a new text file.
+* **List all items from a column in a text file**
 
 ```
 starparser --i run_data.star --list_column _rlnMicrographName
 ```
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of \_rlnMicrographName will be written to *MicrographName.txt* in a single column.
+
 ---
 
-* List all defocus values and x-coordinate values in the star file to new text files.
+* **List all items from multiple columns in independent text files**
 
 ```
 starparser --i run_data.star --list_column _rlnDefocusU/_rlnCoordinateX
 ```
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of \_rlnDefocusU will be written to *DefocusU.txt* and All entries of \_rlnCoordinateX will be written to *CoordinateX.txt*.
+
 ---
 
-* List all defocus values of particles that contain "200826" in the \_rlnMicrographName column.
+* **List all items from a column that match specific particles**
 
 ```
 starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q 200826
 ```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Only \_rlnDefocusU entries that have 200826 in \_rlnMicrographName will be written to *DefocusU.txt*.
 
 ---
 

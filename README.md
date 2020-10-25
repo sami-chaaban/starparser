@@ -134,7 +134,7 @@ starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 2
 ```
 starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;A new star file named **run_data_delCTFMax_delCTFFoM.star** will be identical to run_data.star except will be missing those two columns. The headers in the particles table will be renumbered.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_delCTFMax_delCTFFoM.star** will be identical to run_data.star except will be missing those two columns. The headers in the particles table will be renumbered.
 
 ---
 

@@ -114,6 +114,8 @@ starparser --i run_it025_data.star --plot_classparts
 starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
 ```
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  The percentage in each class will be displayed in terminal.
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Class_proportion.png**:
 ![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
 
@@ -219,6 +221,7 @@ starparser --i run_data.star --count_mics -c _rlnMicrographName -q 200826
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *Creating a subset of 2358 particles that match ['200826'] in the columns ['\_rlnMicrographName'] \(or 3.4%\)*
+
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *There are 288 unique micrographs in this dataset.*
 
 ---

@@ -74,8 +74,6 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scr
 
 The following examples run the `starparser` command assuming an alias has been created as described above, otherwise, run it with `python3 starparser.py`.
 
----
-
 ### Plotting
 
 * Plot a histogram of defocus values.
@@ -84,6 +82,7 @@ The following examples run the `starparser` command assuming an alias has been c
 starparser --i run_data.star --plot_defocus
 ```
 
+** Output **Defocus_histogram.png**:
 ![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
 
 ---
@@ -94,6 +93,7 @@ starparser --i run_data.star --plot_defocus
 starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
 ```
 
+** Output **Defocus_histogram.png**:
 ![Defocus plot](./Examples/Defocus_histogram_subset.png "Defocus plot")
 
 ---
@@ -104,6 +104,7 @@ starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/2008
 starparser --i run_it025_data.star --plot_classparts
 ```
 
+** Output **Class_distribution.png**:
 ![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
 
 ---
@@ -114,6 +115,7 @@ starparser --i run_it025_data.star --plot_classparts
 starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
 ```
 
+** Output **Class_proportion.png**:
 ![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
 
 ---
@@ -123,56 +125,70 @@ starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 2
 * Delete the \_rlnCtfMaxResolution and \_rlnCtfFigureOfMerit columns.
 
 ```
-starparser --i run_data.star --o output.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
+starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
 ```
+
+** A new star file named **run_data_delCTFMax_delCTFFoM.star** will be identical to run_data.star except will be missing those two columns. The headers in the particles table will be renumbered.
 
 ---
 
 * Delete all particles with "200702" or "200715" in the \_rlnMicrographName column.
 
 ```
-starparser --i run_data.star --o output.star --delete_particles -c _rlnMicrographName -q 200702/200715
+starparser --i run_data.star --o run_data_del200702_del200715.star --delete_particles -c _rlnMicrographName -q 200702/200715
 ```
+
+** A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be any particle that has either 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days.
 
 ---
 
 * Make a new star file with only particles that have "1" in the \_rlnClassNumber column.
 
 ```
-starparser --i run_data.star --o output.star --extract_particles -c _rlnClassNumber -q 1
+starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1
 ```
+
+** A new star file named **run_data_c1.star** will be output with only particles that belong to class #1. This is identical to Subset Selection in Relion (which has more options, including regrouping, etc.).
 
 ---
 
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value and write to a new file.
 
 ```
-starparser --i run_data.star --o output.star --max_defocus 40000
+starparser --i run_data.star --o run_data_under4um.star --max_defocus 40000
 ```
+
+** A new star file named **run_data_under4um.star** will be output with only particles that have defocus estimations below 4 microns.
 
 ---
 
 * Extract particles with defocus values (in \_rlnDefocusU) less than this value that also have "200826" in the \_rlnMicrographName column, and write to a new file.
 
 ```
-starparser --i run_data.star --o output.star --max_defocus 40000 -c _rlnMicrographName -q 200826
+starparser --i run_data.star --o run_data_under4um_200826.star --max_defocus 40000 -c _rlnMicrographName -q 200826
 ```
+
+** A new star file named **run_data_under4um_200826.star** will be output with only particles that have defocus estimations below 4 microns that also contain 200826 in the \_rlnMicrographName column.
 
 ---
 
 * Swap the following columns from file2.star into run_data.star: \_rlnAnglePsi, \_rlnAngleRot, \_rlnAngleTilt, \_rlnNormCorrection, \_rlnLogLikeliContribution, \_rlnMaxValueProbDistribution, \_rlnNrOfSignificantSamples, \_rlnOriginXAngst, \_rlnOriginYAngst.
 
 ```
-starparser --i run_data.star --f file2.star --o output.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
+starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
 ```
+
+** A new star file named **run_data_swapped.star** will be output that will be identical to run_data.star except for the columns in the input, which will instead be swapped in from run_data_2.star. This is useful for sourcing alignments from early global refinements.
 
 ---
 
 * Relegate the star file to be compatible with Relion 3.0.
 
 ```
-starparser --i run_data.star --o output.star --relegate
+starparser --i run_data.star --o run_data_3p0.star --relegate
 ```
+
+** A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered.
 
 ---
 

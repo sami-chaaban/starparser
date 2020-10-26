@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog [options]",
-        version="%prog 1.1.")
+        version="%prog 1.2.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
@@ -143,6 +143,8 @@ def setupParserOptions():
         
     return(params)
 
+############################################################
+
 def parsestar(starfile):
 
     starfilesplit = starfile.split()
@@ -161,11 +163,21 @@ def parsestar(starfile):
             
     if opticsstop == 0:
         
-        print('Could not find end of optics table. Exiting.')
+        print('Error: Could not find end of optics table. Exiting.')
         
         sys.exit()
 
     particlesstop = 0
+
+    opticstablestop = 0
+    
+    for i in range(5,opticsstop,2):
+        
+        if starfilesplit[i][0] != "_":
+        
+            opticstablestop = i
+            
+            break
             
     for i in range(opticsstop+3,200):
 
@@ -177,23 +189,39 @@ def parsestar(starfile):
 
     if particlesstop == 0:
 
-        print('Could not find end of particles table. Exiting.')
+        print('Error: Could not find end of particles table. Exiting.')
 
         sys.exit()
+        
+    opticstable = starfilesplit[3:opticstablestop]
+    
+    opticstableheaders = []
+    for m in opticstable[::2][1:]: 
+        opticstableheaders.append(m)
 
-    opticstable = starfilesplit[3:opticsstop]
+    optics = starfilesplit[opticstablestop:opticsstop]
 
     particlestable = starfilesplit[opticsstop+3:particlesstop]
     
-    headers = []
+    particlestableheaders = []
     for m in particlestable[::2][1:]: 
-        headers.append(m)
+        particlestableheaders.append(m)
 
     particles = starfilesplit[particlesstop:]
 
-    return(version,opticstable,headers,particles)
+    return(version,opticstableheaders,optics,particlestableheaders,particles)
 
 #######################################################################################################
+
+def makepandas(headers,items):
+    
+    totalcolumns = len(headers)
+
+    items_lst = [items[x:x+totalcolumns] for x in range(0, len(items), totalcolumns)]
+
+    itemspd = pd.DataFrame(items_lst, columns = headers)
+    
+    return(itemspd)
 
 def getparticles(filename):
     
@@ -201,17 +229,67 @@ def getparticles(filename):
     starfile = file.read()
     file.close()
 
-    version, opticstable, headers, particles = parsestar(starfile)
+    version, opticsheaders, optics, particlesheaders, particles = parsestar(starfile)
     
-    metadata = [version,opticstable,headers]
-
-    totalcolumns = len(headers)
-
-    particles_lst = [particles[x:x+totalcolumns] for x in range(0, len(particles), totalcolumns)]
-
-    allparticles = pd.DataFrame(particles_lst, columns = headers)
+    alloptics = makepandas(opticsheaders, optics)
+    allparticles = makepandas(particlesheaders, particles)
+    
+    metadata = [version,opticsheaders,alloptics,particlesheaders]
 
     return(allparticles, metadata)
+
+def writestar(particles, metadata, outputname, relegate):
+    
+    output = open(outputname,"w")
+    
+    output.write('\n')
+
+    version = metadata[0]
+
+    for t in version:
+        output.write(t)
+        output.write(' ')
+    output.write('\n\n')
+    
+    if not relegate:
+        
+        optics = metadata[2]
+
+        output.write('data_optics\n\n')
+        output.write('loop_')
+        
+        opticsheaders = metadata[1]
+        count=1
+        for p in opticsheaders:
+            output.write('\n')
+            output.write(p)
+            output.write(" #"+str(count))
+            count += 1
+        output.write('\n')
+        optics.to_csv(output, header=None, index=None, sep='\t', mode='a')
+
+        output.write('\n\n')
+        for t in version:
+            output.write(t)
+            output.write(' ')
+            
+        output.write('\n\n')
+
+    output.write('data_particles\n\n')
+    output.write('loop_')
+
+    headers = metadata[3]
+    count=1
+    for p in headers:
+        output.write('\n')
+        output.write(p)
+        output.write(" #"+str(count))
+        count += 1
+
+    output.write('\n')
+    particles.to_csv(output, header=None, index=None, sep='\t', mode='a')
+
+    output.close()
 
 def getiterationlist(filename):
     
@@ -255,6 +333,16 @@ def getiterationlist(filename):
 
 
     return(iterationfilename)
+
+def delcolumn(particles, columns, metadata):
+    
+    nocolparticles = particles.copy()
+    
+    for c in columns:
+        nocolparticles.drop(c, 1, inplace=True)
+        metadata[3].remove(c)
+    
+    return(nocolparticles, metadata)
 
 def countparticles(particles):
 
@@ -335,16 +423,6 @@ def maxdefocus(particles, maxvalue):
     
     return(purgedparticles, purgednumber)
 
-def delcolumn(particles, columns, metadata):
-    
-    nocolparticles = particles.copy()
-    
-    for c in columns:
-        nocolparticles.drop(c, 1, inplace=True)
-        metadata[2].remove(c)
-    
-    return(nocolparticles, metadata)
-
 def delparticles(particles, columns, query):
     
     purgedparticles = particles.copy()
@@ -412,63 +490,6 @@ def renumbercol(datatable, columns):
             newdatatable.append(L)
             
     return(newdatatable)
-
-def writestar(particles, metadata, outputname, relegate):
-    
-    output = open(outputname,"w")
-    
-    output.write('\n')
-
-    version = metadata[0]
-
-    for t in version:
-        output.write(t)
-        output.write(' ')
-    output.write('\n\n')
-    
-    if not relegate:
-
-        output.write('data_optics\n\n')
-        output.write('loop_\n')
-
-        opticstable = metadata[1][1:]
-
-        for n,i in enumerate(opticstable[1:]):
-
-            output.write(i)
-            output.write('\t')
-            if i[0] != '#':
-                if i[0] != '_':
-                    opticsvaluesstart=n+2
-                    break
-            else:
-                output.write("\n")
-
-        for i in opticstable[opticsvaluesstart:]:
-            output.write(i)
-            output.write('\t')
-        output.write('\n\n\n')
-
-        for t in version:
-            output.write(t)
-            output.write(' ')
-        output.write('\n\n')
-
-    output.write('data_particles\n\n')
-    output.write('loop_')
-
-    headers = metadata[2]
-    count=1
-    for p in headers:
-        output.write('\n')
-        output.write(p)
-        output.write(" #"+str(count))
-        count += 1
-
-    output.write('\n')
-    particles.to_csv(output, header=None, index=None, sep=' ', mode='a')
-
-    output.close()
     
 def checksubset(particles, params):
     

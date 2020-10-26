@@ -87,6 +87,10 @@ def setupParserOptions():
         action="store", dest="parser_compareparts", type="string", default="", metavar='other-starfile-name',
         help="Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.")
 
+    info_opts.add_option("--new_optics",
+        action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
+        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group.")
+    
     parser.add_option_group(info_opts)
     
     query_opts = optparse.OptionGroup(
@@ -626,6 +630,29 @@ def outputfig(fig, name):
     
     fig.savefig(name + "." + outtype)
     print("\n-->Output to " + name + "." + outtype + ".\n")
+    
+def makeopticsgroup(particles,metadata,newgroup):
+    
+    optics = metadata[2]
+    
+    newoptics = optics.append(optics.loc[len(optics.index)-1], ignore_index = True)
+    
+    newoptics.loc[len(newoptics.index)-1]["_rlnOpticsGroupName"] = newgroup
+    
+    opticsnumber = int(newoptics.loc[len(newoptics.index)-1]["_rlnOpticsGroup"]) + 1
+    
+    newoptics.loc[len(newoptics.index)-1]["_rlnOpticsGroup"] = opticsnumber
+    
+    return(newoptics, opticsnumber)
+    
+def setparticleoptics(particles,column,query,opticsnumber):
+    
+    particlesnewoptics = particles.copy()
+    
+    for q in query:
+        particlesnewoptics.loc[particles[column[0]].str.contains(q), "_rlnOpticsGroup"] = opticsnumber
+        
+    return(particlesnewoptics)
         
 ########################################################
     
@@ -739,6 +766,15 @@ def mainloop(params):
             print("\nError: you have not entered a column.\n")
             sys.exit()
         classproportion(allparticles, columns, query)
+        sys.exit()
+        
+    if params["parser_newoptics"] !="":
+        newgroup = params["parser_newoptics"]
+        newoptics, opticsnumber = makeopticsgroup(allparticles,metadata,newgroup)
+        metadata[2] = newoptics
+        particlesnewoptics = setparticleoptics(allparticles,columns,query,str(opticsnumber))
+        writestar(particlesnewoptics,metadata,params["parser_outname"],False)
+        print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for particles that match " + str(query) + " in the column " + str(columns) + ".\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     #######################################################################

@@ -54,7 +54,7 @@ def setupParserOptions():
     
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
-        help="Swap columns from another star file (specified with -f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+        help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
     
     modify_opts.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,

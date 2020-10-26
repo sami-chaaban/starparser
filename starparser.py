@@ -22,8 +22,8 @@ def setupParserOptions():
         help="Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all. Use --t to change filetype.")
     
     plot_opts.add_option("--plot_classparts",
-        action="store_true", dest="parser_classdistribution", default=False,
-        help="Plot the number of particles per class for all iterations up to the one provided in the input. Use --t to change filetype.")
+        action="store", dest="parser_classdistribution", type="string", default="all", metavar="classes",
+        help="Plot the number of particles per class for all iterations up to the one provided in the input. Type \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
     
     plot_opts.add_option("--class_proportion",
         action="store_true", dest="parser_classproportion", default=False,
@@ -383,16 +383,20 @@ def plotdefocus(particles):
     fig = ax.get_figure()
     outputfig(fig, "Defocus_histogram")
     
-def plotclassparts(filename):
+def plotclassparts(filename, classes):
+    
+    classes = list(map(int, classes))
     
     position = filename.find("_it")
     iteration = int(filename[position+3:position+6])
     classdistribution = []
     allparticles, metadata = getparticles(filename)
-    numclasses = int(max(allparticles["_rlnClassNumber"]))
+    numclasses = max(list(map(int, allparticles["_rlnClassNumber"].tolist())))
     iterationfilename = getiterationlist(filename)
     
-    print("\nLooping from iteration 0 to " + str(iteration) + " on " + str(numclasses) + " classes.\n")
+    print("\nLooping through iteration 0 to " + str(iteration) + " on " + str(numclasses) + " classes.")
+    if -1 not in classes:
+        print("--Only plotting classes " + str(classes) + ".")
 
     numperclassdf = pd.DataFrame()
 
@@ -407,7 +411,10 @@ def plotclassparts(filename):
     numperclassdf.index +=1
 
     for c in range(numclasses):
-        ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
+        if -1 in classes:
+            ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
+        elif c in classes:
+            ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Particle number")
     fig = ax.get_figure()
@@ -684,8 +691,11 @@ def mainloop(params):
     
     #Set up jobs that don't require initialization
     
-    if params["parser_classdistribution"]:
-        plotclassparts(filename)
+    if params["parser_classdistribution"] != "":
+        if params["parser_classdistribution"] == "all":
+            plotclassparts(filename, [-1])
+        else:
+            plotclassparts(filename,params["parser_classdistribution"].split("/"))
         sys.exit()
     
     #########################################################################
@@ -828,4 +838,10 @@ def mainloop(params):
 if __name__ == "__main__":
     params = setupParserOptions()
     mainloop(params)
+
+
+# In[ ]:
+
+
+
 

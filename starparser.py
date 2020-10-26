@@ -89,7 +89,7 @@ def setupParserOptions():
 
     info_opts.add_option("--new_optics",
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
-        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group.")
+        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated; change the values to the correct ones in the output star file.")
     
     parser.add_option_group(info_opts)
     

@@ -411,9 +411,10 @@ def plotclassparts(filename, classes):
     numperclassdf.index +=1
 
     for c in range(numclasses):
+        test = c+1
         if -1 in classes:
             ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
-        elif c in classes:
+        elif test in classes:
             ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Particle number")
@@ -838,3 +839,4 @@ def mainloop(params):
 if __name__ == "__main__":
     params = setupParserOptions()
     mainloop(params)
+

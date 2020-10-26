@@ -838,10 +838,3 @@ def mainloop(params):
 if __name__ == "__main__":
     params = setupParserOptions()
     mainloop(params)
-
-
-# In[ ]:
-
-
-
-

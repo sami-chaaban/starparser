@@ -278,6 +278,12 @@ starparser --i run_it025_data.star --compare_particles particles.star
 
 ---
 
+## Version
+
+* **1.2** - October 2020
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

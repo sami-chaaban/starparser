@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.2.")
+        version="%prog 1.3.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
@@ -449,6 +449,10 @@ def limitparticles(particles, column, limit, operator):
     
     particles.drop(tempcolumnname,1, inplace=True)
     limitedparticles.drop(tempcolumnname,1, inplace=True)
+
+    if len(limitedparticles.index) == 0:
+        print("\nError: no particles match your input.")
+        sys.exit()
     
     return(limitedparticles)
 

@@ -106,7 +106,7 @@ starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/2008
 * Plot the number of particles per class for the 25 iterations of a Class3D job.
 
 ```
-starparser --i run_it025_data.star --plot_classparts
+starparser --i run_it025_data.star --plot_classparts all
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Class_distribution.png**:

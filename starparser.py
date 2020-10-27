@@ -449,10 +449,6 @@ def limitparticles(particles, column, limit, operator):
     
     particles.drop(tempcolumnname,1, inplace=True)
     limitedparticles.drop(tempcolumnname,1, inplace=True)
-
-    if len(limitedparticles.index) == 0:
-        print("\nError: no particles match your input.")
-        sys.exit()
     
     return(limitedparticles)
 

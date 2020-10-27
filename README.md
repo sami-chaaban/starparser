@@ -24,6 +24,8 @@ starparser --i input.star [options]
 
 *See below for examples on how to use these options*
 
+* **```-h```** Show a list of  all the options.
+
 ### Plotting
 
 * **```--plot_defocus```** Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. Use ```--t``` to change filetype.

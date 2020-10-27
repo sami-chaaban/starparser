@@ -1,4 +1,5 @@
 import sys
+import os.path
 import pandas as pd
 import optparse
 import matplotlib.pyplot as plt
@@ -690,6 +691,10 @@ def mainloop(params):
     #Essential variables
     
     filename = params['file']
+
+    if not os.path.isfile(filename):
+        print("\nError: \"" + filename + "\" does not exist.\n")
+        sys.exit();
     
     global outtype
     outtype = params["parser_outtype"]
@@ -759,10 +764,14 @@ def mainloop(params):
         if params["parser_file2"] == "":
             print("Error: provide a second file to swap columns from with -f.")
             sys.exit()
-        otherparticles, metadata = getparticles(params["parser_file2"])
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\nError: \"" + file2 + "\" does not exist.\n")
+            sys.exit();
+        otherparticles, metadata = getparticles(file2)
         columstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
-        print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"])
+        print("\nSwapped in " + str(columstoswap) + " from " + file2)
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
@@ -789,6 +798,9 @@ def mainloop(params):
         newgroup = params["parser_newoptics"]
         newoptics, opticsnumber = makeopticsgroup(allparticles,metadata,newgroup)
         metadata[2] = newoptics
+        if params["parser_column"] == "" or params["parser_query"] == "":
+            print("\nError: you did not enter a column or query(ies).\n")
+            sys.exit()
         particlesnewoptics = setparticleoptics(allparticles,columns,query,str(opticsnumber))
         print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for particles that match " + str(query) + " in the column " + str(columns))
         writestar(particlesnewoptics,metadata,params["parser_outname"],False)
@@ -802,8 +814,14 @@ def mainloop(params):
         columntocheck = parsedinput[0]
         operator = parsedinput[1]
         limit = float(parsedinput[2])
+        if operator not in ["lt", "gt"]:
+            print("\nError: use \"lt\" or \"gt\" as the operator for less than and greater than, respectively.")
+            sys.exit()
         limitedparticles = limitparticles(allparticles, columntocheck, limit, operator)
-        print("\nExtracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that had " + str(columntocheck) + " values " + operator + " " + str(limit))
+        if operator == "lt":
+            print("\nExtracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values less than " + str(limit))
+        elif operator == "gt":
+            print("\nExtracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values greater than " + str(limit))
         writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         

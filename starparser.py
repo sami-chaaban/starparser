@@ -751,7 +751,7 @@ def mainloop(params):
     if params["parser_delparticles"]:
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
-        print("\nRemoved " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + " (or " + str(round(purgednumber*100/totalparticles,1)) + "%).")
+        print("\nRemoved " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         

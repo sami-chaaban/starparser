@@ -22,13 +22,13 @@ starparser --i input.star [options]
 
 ## Options
 
-*See below for examples on how to use these options*
-
 * **```-h```** Show a list of  all the options.
 
 * **```--i```** Input star file.
 
 ### Plotting
+
+*See below for examples on how to use these options*
 
 * **```--plot_defocus```** Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. Use ```--t``` to change filetype.
 
@@ -37,6 +37,8 @@ starparser --i input.star [options]
 * **```--class_proportion```** Find the proportion of particles that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions and plot the result in Class_proportion.png. Use ```--t``` to change filetype.
 
 ### Modifying
+
+*See below for examples on how to use these options*
 
 * **```--extract_particles```** Find particles that match a column header (```-c```) and query (```-q```) and write them to a new star file (default output.star, or specified with ```--o```).
 
@@ -53,6 +55,8 @@ starparser --i input.star [options]
 * **```--regroup```** Regroup particles such that those with similar defocus values are in the same group (the size of the group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
 ### Data mining
+
+*See below for examples on how to use these options*
 
 * **```--count_particles```** Count particles and print the result. Can be used with ```-c``` and ```-q``` to count only a subset of particles that match the query, otherwise counts all.
 

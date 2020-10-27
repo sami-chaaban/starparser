@@ -50,7 +50,7 @@ starparser --i input.star [options]
 
 * **```--swap_columns```** Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files. Write the result to a new star file (default output.star, or specified with ```--o```).
 
-* **```--relegate```** Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```). This may not be sufficient to be fully compatible with Relion 3.0; use ```--delete_column``` to remove other bad columns before this, if necessary. Note that the output star file will no longer be compatible with starparser.
+* **```--relegate```** Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```). This may not be sufficient to be fully compatible with Relion 3.0; use ```--delete_column``` to remove other bad columns before this (e.g. helix-specific columns), if necessary. Note that the output star file will no longer be compatible with starparser.
 
 * **```--regroup```** Regroup particles such that those with similar defocus values are in the same group (the size of the group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 

@@ -44,7 +44,7 @@ starparser --i input.star [options]
 
 * **```--delete_particles```** Delete particles that match a query (specified with ```-q```) within a column header (specified with ```-c```), and write to a new star file (default output.star, or specified with ```--o```).
 
-* **```--max_defocus```** Extract particles with defocus values less than this value (Angstroms). Can be used with ```-c``` and ```-q``` to only consider a subset.
+* **```--limit_particles```** Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
 
 * **```--swap_columns```** Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files. Write the result to a new star file (default output.star, or specified with ```--o```).
 
@@ -162,23 +162,13 @@ starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnCla
 
 ---
 
-* **Extract particles with specific defoci**
+* **Extract particles with limited defoci**
 
 ```
-starparser --i run_data.star --o run_data_under4um.star --max_defocus 40000
+starparser --i run_data.star --o run_data_under4um.star --limit_particles _rlnDefocusU/lt/40000
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_under4um.star** will be output with only particles that have defocus estimations below 4 microns.
-
----
-
-* **Extract a subset of particles that also have a specific defocus**
-
-```
-starparser --i run_data.star --o run_data_under4um_200826.star --max_defocus 40000 -c _rlnMicrographName -q 200826
-```
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_under4um_200826.star** will be output with only particles that have defocus estimations below 4 microns that also contain 200826 in the \_rlnMicrographName column.
 
 ---
 
@@ -280,7 +270,7 @@ starparser --i run_it025_data.star --compare_particles particles.star
 
 ## Version
 
-* **1.2** - October 2020
+* **1.3** - October 2020
 
 ## License
 

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def setupParserOptions():
     
-    parser = optparse.OptionParser(usage="Usage: %prog [options]",
+    parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
         version="%prog 1.2.")
 
     parser.add_option("--i",
@@ -22,7 +22,7 @@ def setupParserOptions():
         help="Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all. Use --t to change filetype.")
     
     plot_opts.add_option("--plot_classparts",
-        action="store", dest="parser_classdistribution", type="string", default="all", metavar="classes",
+        action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
         help="Plot the number of particles per class for all iterations up to the one provided in the input. Type \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
     
     plot_opts.add_option("--class_proportion",
@@ -48,9 +48,9 @@ def setupParserOptions():
         action="store_true", dest="parser_delparticles", default=False,
         help="Delete particles. Pick a column header (-c) and query (-q) to delete particles that match it.")
     
-    modify_opts.add_option("--max_defocus",
-        action="store", dest="parser_maxdefocus", type="float", default = 0, metavar='maximum-value',
-        help="Extract particles with defocus values less than this value (Angstroms). Can be used with -c and -q to only consider a subset.")
+    modify_opts.add_option("--limit_particles",
+        action="store", dest="parser_limitparticles", type="string", default = "", metavar='limit',
+        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/operator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
     
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
@@ -421,19 +421,36 @@ def plotclassparts(filename, classes):
     fig = ax.get_figure()
     outputfig(fig, "Class_distribution")
     
-def maxdefocus(particles, maxvalue):
+# def maxdefocus(particles, maxvalue):
     
-    particles["_rlnDefocusU_float"] = particles["_rlnDefocusU"]
-    particles["_rlnDefocusU_float"] = pd.to_numeric(particles["_rlnDefocusU_float"], downcast="float")
-    purgedparticles = particles.copy()
-    purgedparticles = purgedparticles[purgedparticles["_rlnDefocusU_float"]<maxvalue]
+#     particles["_rlnDefocusU_float"] = particles["_rlnDefocusU"]
+#     particles["_rlnDefocusU_float"] = pd.to_numeric(particles["_rlnDefocusU_float"], downcast="float")
+#     purgedparticles = particles.copy()
+#     purgedparticles = purgedparticles[purgedparticles["_rlnDefocusU_float"]<maxvalue]
     
-    purgednumber = len(particles.index) - len(purgedparticles.index)
+#     purgednumber = len(particles.index) - len(purgedparticles.index)
     
-    particles.drop("_rlnDefocusU_float",1, inplace=True)
-    purgedparticles.drop("_rlnDefocusU_float",1, inplace=True)
+#     particles.drop("_rlnDefocusU_float",1, inplace=True)
+#     purgedparticles.drop("_rlnDefocusU_float",1, inplace=True)
     
-    return(purgedparticles, purgednumber)
+#     return(purgedparticles, purgednumber)
+
+def limitparticles(particles, column, limit, operator):
+    
+    tempcolumnname = column + "_float"
+    particles[tempcolumnname] = particles[column]
+    particles[tempcolumnname] = pd.to_numeric(particles[tempcolumnname], downcast="float")
+    limitedparticles = particles.copy()
+
+    if operator == "lt":
+        limitedparticles = limitedparticles[limitedparticles[tempcolumnname]<limit]
+    elif operator == "gt":
+        limitedparticles = limitedparticles[limitedparticles[tempcolumnname]>limit]
+    
+    particles.drop(tempcolumnname,1, inplace=True)
+    limitedparticles.drop(tempcolumnname,1, inplace=True)
+    
+    return(limitedparticles)
 
 def delparticles(particles, columns, query):
     
@@ -787,6 +804,19 @@ def mainloop(params):
         writestar(particlesnewoptics,metadata,params["parser_outname"],False)
         print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for particles that match " + str(query) + " in the column " + str(columns) + ".\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
+
+    if params["parser_limitparticles"] != "":
+        parsedinput = params["parser_limitparticles"].split("/")
+        if len(parsedinput) > 3:
+            print("\nError: provide argument in this format: column/operator/value (e.g. _rlnDefocusU/lt/40000).")
+            sys.exit()
+        columntocheck = parsedinput[0]
+        operator = parsedinput[1]
+        limit = float(parsedinput[2])
+        limitedparticles = limitparticles(allparticles, columntocheck, limit, operator)
+        writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
+        print("\nExtracted " + str(len(limitedparticles.index)) + " particles out of " + str(totalparticles) + " that had " + str(columntocheck) + " values " + operator + " " + str(limit) + " (or " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_outname"] + "\n")
+        sys.exit()
         
     #######################################################################
     
@@ -810,12 +840,6 @@ def mainloop(params):
         
     if params["parser_plotdefocus"]:
         plotdefocus(particles2use)
-        sys.exit()
-        
-    if params["parser_maxdefocus"] != 0:
-        purgedparticles, purgednumber = maxdefocus(particles2use, params["parser_maxdefocus"])
-        writestar(purgedparticles, metadata, params["parser_outname"], relegateflag)
-        print("\nRemoved " + str(purgednumber) + " particles out of " + str(len(purgedparticles.index)) + " that had defocus values above " + str(params["parser_maxdefocus"]) + " (or " +               str(round(purgednumber*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if relegateflag:

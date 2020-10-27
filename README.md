@@ -64,7 +64,7 @@ starparser --i input.star [options]
 
 * **```--list_column```** Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 
-* **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.
+* **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file. It uses the \_rlnImageName column to do the comparison.
 
 ### Querying
 

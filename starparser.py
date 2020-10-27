@@ -776,12 +776,16 @@ def mainloop(params):
         sys.exit()
         
     if params["parser_compareparts"] != "":
-        otherparticles, metadata = getparticles(params["parser_compareparts"])
+        file2 = params["parser_compareparts"]
+        if not os.path.isfile(file2):
+            print("\nError: \"" + file2 + "\" does not exist.\n")
+            sys.exit();
+        otherparticles, metadata = getparticles(file2)
         sharedparticles = len(set(allparticles["_rlnImageName"]) & set(otherparticles["_rlnImageName"]))
         unsharedfile1 = len(allparticles["_rlnImageName"]) - sharedparticles
         unsharedfile2 = len(otherparticles["_rlnImageName"]) - sharedparticles
-        print("\n" + filename + " and " + params["parser_compareparts"] + " share " + str(sharedparticles) + " particles.")
-        print(filename + " has " + str(unsharedfile1) + " unique particles and " + params["parser_compareparts"] + " has " + str(unsharedfile2) + " unique particles.\n")
+        print("\n" + filename + " and " + file2 + " share " + str(sharedparticles) + " particles.")
+        print(filename + " has " + str(unsharedfile1) + " unique particles and " + file2 + " has " + str(unsharedfile2) + " unique particles.\n")
         sys.exit()
         
     if params["parser_classproportion"]:

@@ -48,7 +48,7 @@ starparser --i input.star [options]
 
 * **```--limit_particles```** Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
 
-* **```--swap_columns```** Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files. Write the result to a new star file (default output.star, or specified with ```--o```).
+* **```--swap_columns```** Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--relegate```** Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```). This may not be sufficient to be fully compatible with Relion 3.0; use ```--delete_column``` to remove other bad columns before this (e.g. helix-specific columns), if necessary. Note that the output star file will no longer be compatible with starparser.
 

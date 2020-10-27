@@ -267,6 +267,9 @@ def writestar(particles, metadata, outputname, relegate):
             
         output.write('\n\n')
 
+    else:
+        print("\nRemoved the optics table and _rlnOpticsGroup.")
+
     output.write('data_particles\n\n')
     output.write('loop_')
 
@@ -282,6 +285,8 @@ def writestar(particles, metadata, outputname, relegate):
     particles.to_csv(output, header=None, index=None, sep='\t', mode='a')
 
     output.close()
+
+    print("\n-->Output star file: " + outputname + "\n")
 
 def getiterationlist(filename):
     
@@ -331,6 +336,9 @@ def delcolumn(particles, columns, metadata):
     nocolparticles = particles.copy()
     
     for c in columns:
+        if c not in nocolparticles:
+            print("\nError: the column \"" + c + "\" does not exist.\n")
+            sys.exit()
         nocolparticles.drop(c, 1, inplace=True)
         metadata[3].remove(c)
     
@@ -457,10 +465,17 @@ def extractparticles(particles, columns, query):
     return(extractedparticles, extractednumber)
 
 def swapcolumns(original_particles, swapfrom_particles, columns):
+
+    if len(original_particles.index) != len(swapfrom_particles.index):
+        print("\nError: the star files don't have the same number of particles: " + str(len(original_particles.index)) + " vs " + str(len(swapfrom_particles.index)) + ".\n")
+        sys.exit()
     
     swappedparticles = original_particles.copy()
     
     for c in columns:
+        if c not in original_particles:
+            print("\nError: the column \"" + c + "\" does not exist.\n")
+            sys.exit()
         columnindex = original_particles.columns.get_loc(c)
         swappedparticles.drop(c,1, inplace=True)
         swappedparticles.insert(columnindex, c, swapfrom_particles[c].values.tolist())
@@ -729,15 +744,15 @@ def mainloop(params):
     if params["parser_delcolumn"] != "":
         columns = params["parser_delcolumn"].split("/")
         newparticles, metadata = delcolumn(allparticles, columns, metadata)
+        print("\nRemoved the columns " + str(columns))
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
-        print("\nRemoved the columns " + str(columns) + "\nOutput star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_delparticles"]:
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
+        print("\nRemoved " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + " (or " + str(round(purgednumber*100/totalparticles,1)) + "%).")
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
-        print("\nRemoved " + str(purgednumber) + " particles out of " + str(totalparticles) + " that had particles that matched " + str(query) +               " in the column " + params["parser_column"] + " (or " + str(round(purgednumber*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_swapcolumns"] != "":
@@ -747,8 +762,8 @@ def mainloop(params):
         otherparticles, metadata = getparticles(params["parser_file2"])
         columstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
+        print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"])
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
-        print("\nSwapped in " + str(columstoswap) + " from " + params["parser_file2"] +               "\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_compareparts"] != "":
@@ -775,8 +790,8 @@ def mainloop(params):
         newoptics, opticsnumber = makeopticsgroup(allparticles,metadata,newgroup)
         metadata[2] = newoptics
         particlesnewoptics = setparticleoptics(allparticles,columns,query,str(opticsnumber))
+        print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for particles that match " + str(query) + " in the column " + str(columns))
         writestar(particlesnewoptics,metadata,params["parser_outname"],False)
-        print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for particles that match " + str(query) + " in the column " + str(columns) + ".\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
 
     if params["parser_limitparticles"] != "":
@@ -788,8 +803,8 @@ def mainloop(params):
         operator = parsedinput[1]
         limit = float(parsedinput[2])
         limitedparticles = limitparticles(allparticles, columntocheck, limit, operator)
+        print("\nExtracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that had " + str(columntocheck) + " values " + operator + " " + str(limit))
         writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
-        print("\nExtracted " + str(len(limitedparticles.index)) + " particles out of " + str(totalparticles) + " that had " + str(columntocheck) + " values " + operator + " " + str(limit) + " (or " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%).\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     #######################################################################
@@ -809,7 +824,6 @@ def mainloop(params):
 
     if params["parser_extractparticles"]:
         writestar(particles2use, metadata, params["parser_outname"], relegateflag)
-        print("\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_plotdefocus"]:
@@ -818,7 +832,6 @@ def mainloop(params):
         
     if relegateflag:
         writestar(particles2use, metadata, params["parser_outname"], relegateflag)
-        print("\nRemoved the optics table and _rlnOpticsGroup.\n-->Output star file: " + params["parser_outname"] + "\n")
         sys.exit()
         
     if params["parser_writecol"] != "":
@@ -830,8 +843,8 @@ def mainloop(params):
     if params["parser_regroup"] != "":
         numpergroup = params["parser_regroup"]
         regroupedparticles = regroup(particles2use, numpergroup)
+        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values.")
         writestar(regroupedparticles, metadata, params["parser_outname"], relegateflag)
-        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values\n-->Output star file: " + params["parser_outname"] + " \n")
         sys.exit()
 
 if __name__ == "__main__":

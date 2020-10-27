@@ -18,7 +18,7 @@ starparser --i input.star [options]
 
 * You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`.
 
-* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table, particle table, and particle list with tab delimited columns, (e.g. it does not work on \*\_model.star files).
+* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table, particle table, and particle list with tab delimited columns, (e.g. it does not work on *\*\_model.star* files).
 
 ## Options
 
@@ -30,11 +30,11 @@ starparser --i input.star [options]
 
 *See below for examples on how to use these options*
 
-* **```--plot_defocus```** Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. Use ```--t``` to change filetype.
+* **```--plot_defocus```** Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. Use ```--t``` to change filetype (see the *Output* options).
 
-* **```--plot_classparts```** Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a dash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype.
+* **```--plot_classparts```** Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a dash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
-* **```--class_proportion```** Find the proportion of particles that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions and plot the result in Class_proportion.png. Use ```--t``` to change filetype.
+* **```--class_proportion```** Find the proportion of particles that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
 
 ### Modifying
 

@@ -13,9 +13,7 @@ def setupParserOptions():
         help="Input file name.")
     
     plot_opts = optparse.OptionGroup(
-        parser, 'Plotting Options',
-        'Plot various data from the star files.',
-        )
+        parser, 'Plotting Options')
 
     plot_opts.add_option("--plot_defocus",
         action="store_true", dest="parser_plotdefocus", default=False,
@@ -32,9 +30,7 @@ def setupParserOptions():
     parser.add_option_group(plot_opts)
     
     modify_opts = optparse.OptionGroup(
-        parser, 'Modification Options',
-        'Modify the star file.',
-        )
+        parser, 'Modification Options')
     
     modify_opts.add_option("--extract_particles",
         action="store_true", dest="parser_extractparticles", default=False,
@@ -67,9 +63,7 @@ def setupParserOptions():
     parser.add_option_group(modify_opts)
     
     info_opts = optparse.OptionGroup(
-        parser, 'Data Mining Options',
-        'Count, list, and compare information in the star file.',
-        )
+        parser, 'Data Mining Options')
     
     info_opts.add_option("--count_particles",
         action="store_true", dest="parser_countme", default=False,
@@ -94,9 +88,7 @@ def setupParserOptions():
     parser.add_option_group(info_opts)
     
     query_opts = optparse.OptionGroup(
-        parser, 'Query Options',
-        'Used with the above to find specific particles.',
-        )
+        parser, 'Query Options')
     
     query_opts.add_option("-c",
         action="store", dest="parser_column", type="string", default="", metavar='column-name(s)',
@@ -109,9 +101,7 @@ def setupParserOptions():
     parser.add_option_group(query_opts)
     
     output_opts = optparse.OptionGroup(
-        parser, 'Output Options',
-        'Output names and filetypes.',
-        )
+        parser, 'Output Options')
     
     output_opts.add_option("--o",
         action="store", dest="parser_outname", default = "output.star", metavar='output-name',
@@ -124,9 +114,7 @@ def setupParserOptions():
     parser.add_option_group(output_opts)
 
     extra_opts = optparse.OptionGroup(
-        parser, 'Extra Options',
-        'Miscalaneous options used with the above functions.',
-        )
+        parser, 'Miscellaneous Options')
     
     extra_opts.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
@@ -420,20 +408,6 @@ def plotclassparts(filename, classes):
     ax.set_ylabel("Particle number")
     fig = ax.get_figure()
     outputfig(fig, "Class_distribution")
-    
-# def maxdefocus(particles, maxvalue):
-    
-#     particles["_rlnDefocusU_float"] = particles["_rlnDefocusU"]
-#     particles["_rlnDefocusU_float"] = pd.to_numeric(particles["_rlnDefocusU_float"], downcast="float")
-#     purgedparticles = particles.copy()
-#     purgedparticles = purgedparticles[purgedparticles["_rlnDefocusU_float"]<maxvalue]
-    
-#     purgednumber = len(particles.index) - len(purgedparticles.index)
-    
-#     particles.drop("_rlnDefocusU_float",1, inplace=True)
-#     purgedparticles.drop("_rlnDefocusU_float",1, inplace=True)
-    
-#     return(purgedparticles, purgednumber)
 
 def limitparticles(particles, column, limit, operator):
     

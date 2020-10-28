@@ -548,8 +548,8 @@ def writecol(particles, columns):
 def regroup(particles, numpergroup):
     
     newgroups = []
-    roundtotal = round(len(particles.index)/numpergroup)
-    leftover = (len(particles.index)) % numpergroup
+    roundtotal = int(len(particles.index)/numpergroup)
+    leftover = (len(particles.index)) - roundtotal*numpergroup
     for i in range(roundtotal):
         newgroups.append([i for j in range(numpergroup)])
     newgroups.append([newgroups[-1][-1] for i in range(leftover)])
@@ -557,12 +557,24 @@ def regroup(particles, numpergroup):
 
     regroupedparticles = particles.copy()
     regroupedparticles.sort_values("_rlnDefocusU", inplace=True)
-    regroupedparticles.drop("_rlnGroupNumber", 1, inplace=True)
-    regroupedparticles["_rlnGroupNumber"] = newgroups
+
+    if "_rlnGroupNumber" in regroupedparticles.columns:
+        regroupedparticles.drop("_rlnGroupNumber", 1, inplace=True)
+        regroupedparticles["_rlnGroupNumber"] = newgroups
+
+    if "_rlnGroupName" in regroupedparticles.columns:
+        regroupedparticles.drop("_rlnGroupName", 1, inplace=True)
+        newgroups = [("group_"+str(i).zfill(4)) for i in newgroups]
+        regroupedparticles["_rlnGroupName"] = newgroups
+    
     regroupedparticles.sort_index(inplace = True)
     regroupedparticles = regroupedparticles[particles.columns]
 
-    return(regroupedparticles)
+    numgroups = roundtotal
+    if leftover != 0:
+        numgroups += 1
+
+    return(regroupedparticles, numgroups)
 
 def classproportion(particles, columns, query):
 
@@ -864,8 +876,8 @@ def mainloop(params):
         
     if params["parser_regroup"] != "":
         numpergroup = params["parser_regroup"]
-        regroupedparticles = regroup(particles2use, numpergroup)
-        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values.")
+        regroupedparticles, numgroups = regroup(particles2use, numpergroup)
+        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values (" + str(numgroups) + " groups in total).")
         writestar(regroupedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 

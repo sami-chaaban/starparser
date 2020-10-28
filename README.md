@@ -52,7 +52,7 @@ starparser --i input.star [options]
 
 * **```--relegate```** Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```). This may not be sufficient to be fully compatible with Relion 3.0; use ```--delete_column``` to remove other bad columns before this (e.g. helix-specific columns), if necessary. Note that the output star file will no longer be compatible with starparser.
 
-* **```--regroup```** Regroup particles such that those with similar defocus values are in the same group (the size of the group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
+* **```--regroup```** Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
 ### Data mining
 
@@ -186,13 +186,21 @@ starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swa
 
 ---
 
-* **Relegate a star file**
+* **Relegate a star file to v3.0**
 
 ```
 starparser --i run_data.star --o run_data_3p0.star --relegate
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered.
+
+* **Regroup a star file**
+
+```
+starparser --i run_data.star --o run_data_regroup200.star --regroup 200
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_regroup200.star** will be output that will be identical to run_data.star except for the \_rlnGroupNumber or \_rlnGroupName columns, which will be renumbered to have 200 particles per group.
 
 ---
 

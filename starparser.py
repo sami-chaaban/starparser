@@ -97,7 +97,11 @@ def setupParserOptions():
     
     query_opts.add_option("-q",
         action="store", dest="parser_query", type="string", default="", metavar='query(ies)',
-        help="Particle query. To enter multiple queries, separate them with a slash: 20200101/20200203.")
+        help="Particle query(ies) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use -e if the query should exactly match the value.")
+
+    query_opts.add_option("-e",
+        action="store_true", dest="parser_exact", default=False,
+        help="Pass this if you want an exact match of the values to the query(ies) provided by -q. For example if you want just to look for \"1\" and ignore \"15\".")
     
     parser.add_option_group(query_opts)
     
@@ -360,8 +364,12 @@ def countqueryparticles(particles,columns,query,quiet):
         print("\nError: you have specified two different columns.\n")
         sys.exit()
     
-    q = "|".join(query)
-    totalquery += len(particles[particles[columns[0]].str.contains(q)].index)
+    if not queryexact:
+        q = "|".join(query)
+        totalquery += len(particles[particles[columns[0]].str.contains(q)].index)
+    else:
+        for q in query:
+            totalquery += len(particles[particles[columns[0]]==q].index)
         
     percentparticles = round(totalquery*100/totalparticles,1)
 
@@ -443,24 +451,29 @@ def delparticles(particles, columns, query):
         print("Error: you have specified two columns. You can't if you're querying to delete.\n")
         sys.exit()
         
-    q = "|".join(query)
-    
-    purgedparticles.drop(purgedparticles[purgedparticles[columns[0]].str.contains(q)].index , 0,inplace=True)
+    if not queryexact:
+        q = "|".join(query)
+        purgedparticles.drop(purgedparticles[purgedparticles[columns[0]].str.contains(q)].index , 0,inplace=True)
+    else:
+        for q in query:
+            purgedparticles.drop(purgedparticles[purgedparticles[columns[0]]==q].index , 0,inplace=True)
     
     return(purgedparticles)
 
 def extractparticles(particles, columns, query):
-
-    extractedparticles = particles.copy()
     
     if len(columns)>1:
         print("Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
-    
-    q = "|".join(query)
-    
-    extractedparticles.drop(extractedparticles[~extractedparticles[columns[0]].str.contains(q)].index, 0,inplace=True)
-    
+
+    if not queryexact:
+        extractedparticles = particles.copy()
+        q = "|".join(query)
+        extractedparticles.drop(extractedparticles[~extractedparticles[columns[0]].str.contains(q)].index, 0,inplace=True)
+    else:
+        toconcat = [particles[particles[columns[0]] == q] for q in query]
+        extractedparticles = pd.concat(toconcat)
+
     extractednumber = len(extractedparticles.index)
     
     return(extractedparticles, extractednumber)
@@ -551,7 +564,7 @@ def regroup(particles, numpergroup):
     roundtotal = int(len(particles.index)/numpergroup)
     leftover = (len(particles.index)) - roundtotal*numpergroup
     for i in range(roundtotal):
-        newgroups.append([i for j in range(numpergroup)])
+        newgroups.append([i+1 for j in range(numpergroup)])
     newgroups.append([newgroups[-1][-1] for i in range(leftover)])
     newgroups = [item for sublist in newgroups for item in sublist]
 
@@ -570,11 +583,7 @@ def regroup(particles, numpergroup):
     regroupedparticles.sort_index(inplace = True)
     regroupedparticles = regroupedparticles[particles.columns]
 
-    numgroups = roundtotal
-    if leftover != 0:
-        numgroups += 1
-
-    return(regroupedparticles, numgroups)
+    return(regroupedparticles, roundtotal)
 
 def classproportion(particles, columns, query):
 
@@ -585,6 +594,10 @@ def classproportion(particles, columns, query):
         sys.exit()
 
     subsetparticles, totalsubset = extractparticles(particles, columns, query)
+
+    if len(subsetparticles.index) == 0:
+        print("\nError: no classes seem to contain the desired queries in the specified column.\n")
+        sys.exit()
 
     classestocheck = list(set(subsetparticles["_rlnClassNumber"]))
     classestocheck_int = [int(i) for i in classestocheck]
@@ -609,7 +622,7 @@ def classproportion(particles, columns, query):
 
     #####################################
     
-    print("\nThere are " + str(len(classestocheck)) + " classe(s). Checking the proportion of " + str(query) + "\n")
+    print("\nThere are " + str(len(classestocheck)) + " classe(s) that contain the queries. Checking the proportion of " + str(query) + "\n")
 
     for i,c in enumerate(classestocheck):
 
@@ -676,8 +689,12 @@ def setparticleoptics(particles,column,query,opticsnumber):
     
     particlesnewoptics = particles.copy()
     
-    for q in query:
+    if not queryexact:
+        q = "|".join(query)
         particlesnewoptics.loc[particles[column[0]].str.contains(q), "_rlnOpticsGroup"] = opticsnumber
+    else:
+        for q in query:
+            particlesnewoptics.loc[particles[column[0]]==q, "_rlnOpticsGroup"] = opticsnumber
         
     return(particlesnewoptics)
         
@@ -710,12 +727,18 @@ def mainloop(params):
     
     global outtype
     outtype = params["parser_outtype"]
+
+    global queryexact
+    queryexact = params["parser_exact"]
+    if queryexact:
+        print("\nYou have asked StarParser to look for exact matches between the queries and values (not just if the query is found somewhere in the values).")
     
     #####################################################################
     
     #Set up jobs that don't require initialization
     
     if params["parser_classdistribution"] != "":
+        queryexact = True
         if params["parser_classdistribution"] == "all":
             plotclassparts(filename, [-1])
         else:
@@ -738,7 +761,7 @@ def mainloop(params):
         
         for c in columns:
             if c not in allparticles.columns:
-                print("Error: the column [" + str(c) + "] does not exist in your star file.")
+                print("\nError: the column [" + str(c) + "] does not exist in your star file.\n")
                 sys.exit()
                 
     else:

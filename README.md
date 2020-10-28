@@ -70,7 +70,9 @@ starparser --i input.star [options]
 
 * **```-c```** Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with ```-q```. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash in using this option.
 
-* **```-q```** Query term to look for in the column specified by ```-c```. To enter multiple queries, separate them with a slash: 20200101/20200203. Note the single dash in using this option.
+* **```-q```** Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query should exactly match the value.
+
+* **```-e```** Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example if you want just to look for "1" and ignore "15" (which has a "1" in it).
 
 ### Output
 
@@ -152,17 +154,17 @@ starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_colu
 starparser --i run_data.star --o run_data_del200702_del200715.star --delete_particles -c _rlnMicrographName -q 200702/200715
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be missing any particle that has either 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days that had the date in the filename.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be missing any particle that has either 200702 or 2000715 within the values of the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days that had the date in the filename.
 
 ---
 
 * **Extract a subset of particles**
 
 ```
-starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1
+starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1 -e
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class #1. In this case, extracting a class here is identical to Subset Selection in Relion (which has more options, including regrouping, etc.).
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class 1. The `-e` option was passed to void extracting any class with the number 1 in it.
 
 ---
 

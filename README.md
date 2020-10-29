@@ -72,7 +72,7 @@ starparser --i input.star [options]
 
 * **```-q```** Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query should exactly match the value.
 
-* **```-e```** Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example if you want just to look for "1" and ignore "15" (which has a "1" in it).
+* **```-e```** Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example, you must pass this if you want just to look for "1" and ignore "15" (which has a "1" in it).
 
 ### Output
 

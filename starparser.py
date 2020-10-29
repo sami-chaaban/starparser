@@ -97,11 +97,11 @@ def setupParserOptions():
     
     query_opts.add_option("-q",
         action="store", dest="parser_query", type="string", default="", metavar='query(ies)',
-        help="Particle query(ies) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use -e if the query should exactly match the value.")
+        help="Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use -e if the query should exactly match the value.")
 
     query_opts.add_option("-e",
-        action="store_true", dest="parser_exact", default=False,
-        help="Pass this if you want an exact match of the values to the query(ies) provided by -q. For example if you want just to look for \"1\" and ignore \"15\".")
+        action="store_true", dest="parser_exact", default=False, metavar="match-exactly",
+        help="Pass this if you want an exact match of the values to the query(ies) provided by -q (e.g. if you want just to look for \"1\" and ignore \"15\".)")
     
     parser.add_option_group(query_opts)
     
@@ -352,7 +352,7 @@ def delcolumn(particles, columns, metadata):
 def countparticles(particles):
 
     totalparticles = len(particles.index)
-    print('\nThere are ' + str(totalparticles) + ' particles in total.\n')    
+    print('\nThere are ' + str(totalparticles) + ' particles in total.\n') 
 
 def countqueryparticles(particles,columns,query,quiet):
 
@@ -381,6 +381,8 @@ def countqueryparticles(particles,columns,query,quiet):
 def plotdefocus(particles):
     
     particles["_rlnDefocusU"] = pd.to_numeric(particles["_rlnDefocusU"], downcast="float")
+
+    numparticles = len(particles.index)
 
     ax = particles["_rlnDefocusU"].plot.hist(bins=400)
     ax.set_xlabel("_rlnDefocusU")
@@ -688,6 +690,8 @@ def makeopticsgroup(particles,metadata,newgroup):
 def setparticleoptics(particles,column,query,opticsnumber):
     
     particlesnewoptics = particles.copy()
+
+    numchanged = countqueryparticles(particles, column, query, True)
     
     if not queryexact:
         q = "|".join(query)
@@ -696,7 +700,7 @@ def setparticleoptics(particles,column,query,opticsnumber):
         for q in query:
             particlesnewoptics.loc[particles[column[0]]==q, "_rlnOpticsGroup"] = opticsnumber
         
-    return(particlesnewoptics)
+    return(particlesnewoptics, numchanged)
         
 ########################################################
     
@@ -731,7 +735,7 @@ def mainloop(params):
     global queryexact
     queryexact = params["parser_exact"]
     if queryexact:
-        print("\nYou have asked StarParser to look for exact matches between the queries and values (not just if the query is found somewhere in the values).")
+        print("\nYou have asked StarParser to look for exact matches between the queries and values.")
     
     #####################################################################
     
@@ -838,10 +842,10 @@ def mainloop(params):
         newoptics, opticsnumber = makeopticsgroup(allparticles,metadata,newgroup)
         metadata[2] = newoptics
         if params["parser_column"] == "" or params["parser_query"] == "":
-            print("\nError: you did not enter a column or query(ies).\n")
+            print("\nError: you did not enter either an optics group name, column name, or query(ies).\n")
             sys.exit()
-        particlesnewoptics = setparticleoptics(allparticles,columns,query,str(opticsnumber))
-        print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for particles that match " + str(query) + " in the column " + str(columns))
+        particlesnewoptics, newopticsnumber = setparticleoptics(allparticles,columns,query,str(opticsnumber))
+        print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for the " + str(newopticsnumber) + " particles that match " + str(query) + " in the column " + str(columns))
         writestar(particlesnewoptics,metadata,params["parser_outname"],False)
         sys.exit()
 

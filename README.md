@@ -54,7 +54,7 @@ starparser --i input.star [options]
 
 * **```--regroup```** Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
-* **```--new_optics```** Provide a new optics group name. Use ```-c``` and ```-q``` to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```)
+* **```--new_optics```** Provide a new optics group name. Use ```-c``` and ```-q``` to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 ### Data mining
 
@@ -70,7 +70,7 @@ starparser --i input.star [options]
 
 * **```--split_unique```** IN PROGRESS. Split the input star file into two new files: those that are unique to the input file in comparison to this one, and those that are shared between both. Specify the column to use to compare as follows: "otherstarfilename/column".
 
-* **```--random```** Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies).
+* **```--random```** Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
 
 
 ### Querying

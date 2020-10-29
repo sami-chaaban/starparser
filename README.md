@@ -321,7 +321,7 @@ starparser --i run_it025_data.star --random 10000 particles.star -c _rlnMicrogra
 
 ## Version
 
-* **1.3** - October 2020
+* **1.4** - October 2020
 
 ## License
 

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.3.")
+        version="%prog 1.4.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
@@ -154,8 +154,6 @@ def parsestar(starfile):
 
     starfilesplit = starfile.split()
 
-    version = starfilesplit[0:3]
-
     opticsstop = 0
 
     for i in range(4,100):
@@ -184,9 +182,9 @@ def parsestar(starfile):
             
             break
             
-    for i in range(opticsstop+3,200):
+    for i in range(opticsstop+5,200,2):
 
-        if starfilesplit[i].replace('.','',1).replace('-','',1).isnumeric() or ".mrc" in starfilesplit[i] or ".tiff" in starfilesplit[i] or ".star" in starfilesplit[i]:
+        if starfilesplit[i][0] != "_":
             
             particlesstop = i
             
@@ -203,6 +201,8 @@ def parsestar(starfile):
     opticstableheaders = []
     for m in opticstable[::2][1:]: 
         opticstableheaders.append(m)
+
+    version = starfilesplit[0:3]
 
     optics = starfilesplit[opticstablestop:opticsstop]
 
@@ -408,7 +408,11 @@ def plotdefocus(particles):
     
 def plotclassparts(filename, classes):
     
-    classes = list(map(int, classes))
+    try:
+        classes = list(map(int, classes))
+    except:
+        print("\n>> Error: could not parse the classes that you passed. Double check that you passed numbers separated by slashes to the --plot_classparts option (e.g. 2/6).\n")
+        sys.exit()
     
     position = filename.find("_it")
     iteration = int(filename[position+3:position+6])
@@ -489,7 +493,7 @@ def extractparticles(particles, columns, query):
         print("\n>> Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
 
-    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
+    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_classproportion"]:
         print("\n----------------------------------------------------------------------")        
         print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
         print("----------------------------------------------------------------------")

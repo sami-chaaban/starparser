@@ -299,6 +299,16 @@ starparser --i run_it025_data.star --compare_particles particles.star/_rlnImageN
 
 ---
 
+* **Extract a random set of specific particles**
+
+```
+starparser --i run_it025_data.star --random 10000 particles.star -c _rlnMicrographName -q DOA3/OAA2
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named DOA3_10000.star and OAA2_10000.star that will have a random set of 10000 particles that match DOA3 and OAA2 in the \_rlnMicrographName column, repsectively.
+
+---
+
 ## Version
 
 * **1.3** - October 2020

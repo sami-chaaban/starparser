@@ -91,7 +91,7 @@ def setupParserOptions():
         help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
 
     info_opts.add_option("--random",
-        action="store", dest="parser_randomset", type="int", default=0, metavar='number',
+        action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
         help="Get a random set of particles totaling the number provided here. Use -c and -q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
 
     parser.add_option_group(info_opts)
@@ -906,14 +906,16 @@ def mainloop(params):
         writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
-    if params["parser_randomset"] != 0:
+    if params["parser_randomset"] != -1:
         numrandom = params["parser_randomset"]
+        if numrandom == 0:
+            print("\n>> Error: you cannot pass 0 particles.\n")
         if numrandom > len(allparticles.index):
-            print("\nError: the number of particles you want to randomly extract cannot be greater than the total number of particles (" + str(len(allparticles.index)) + ").\n")
+            print("\n>> Error: the number of particles you want to randomly extract cannot be greater than the total number of particles (" + str(len(allparticles.index)) + ").\n")
         if params["parser_column"] == "" and params["parser_query"] == "":
             writestar(allparticles.sample(n = numrandom), metadata, params["parser_outname"], relegateflag)
         elif params["parser_column"] == "" or params["parser_query"] == "":
-            print("\nError: check that you have passed the column and query arguments correctly.\n")
+            print("\n>> Error: check that you have passed the column and query arguments correctly.\n")
         else:
             for q in query:
                 print("\n>> Creating a random set of " + str(numrandom) + " particles that match " + q)

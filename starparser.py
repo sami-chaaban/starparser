@@ -79,13 +79,17 @@ def setupParserOptions():
         help="Write all values of a column to a file (filename is the header). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.")
     
     info_opts.add_option("--compare_particles",
-        action="store", dest="parser_compareparts", type="string", default="", metavar='other-starfile-name',
-        help="Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file.")
+        action="store", dest="parser_compareparts", type="string", default="", metavar='starfile-name/column',
+        help="Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file. Specify the column to use to compare as follows: \"starfilename/column\".")
+
+    info_opts.add_option("--split_unique",
+        action="store", dest="parser_splitunique", type="string", default="", metavar='starfile-name/column',
+        help="Split the input star file into two new files: those that are unique to the input file in comparison to this one, and those that are shared between both. Specify the column to use to compare as follows: \"starfilename/column\".")
 
     info_opts.add_option("--new_optics",
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
         help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
-    
+
     parser.add_option_group(info_opts)
     
     query_opts = optparse.OptionGroup(
@@ -829,17 +833,32 @@ def mainloop(params):
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
-    if params["parser_compareparts"] != "":
-        file2 = params["parser_compareparts"]
+    if params["parser_compareparts"] != "" or params["parser_splitunique"] != "":
+        if params["parser_compareparts"] != "":
+            arguments = params["parser_compareparts"].split("/")
+        elif params["parser_splitunique"] != "":
+            arguments = params["parser_splitunique"].split("/")
+        if len(arguments) != 2:
+            print("\n>> Error: you did not pass the arguments correctly. Use \"starfile/column\". Be careful if your filepath has a slash in it.\n")
+            sys.exit()
+        file2 = arguments[0]
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         otherparticles, metadata = getparticles(file2)
-        sharedparticles = len(set(allparticles["_rlnImageName"]) & set(otherparticles["_rlnImageName"]))
-        unsharedfile1 = len(allparticles["_rlnImageName"]) - sharedparticles
-        unsharedfile2 = len(otherparticles["_rlnImageName"]) - sharedparticles
-        print("\n>> " + filename + " and " + file2 + " share " + str(sharedparticles) + " particles.")
-        print(filename + " has " + str(unsharedfile1) + " unique particles and " + file2 + " has " + str(unsharedfile2) + " unique particles.\n")
+        if params["parser_compareparts"] != "":
+            sharedparticles = len(set(allparticles[arguments[1]]) & set(otherparticles[arguments[1]]))
+            unsharedfile1 = len(allparticles[arguments[1]]) - sharedparticles
+            unsharedfile2 = len(otherparticles[arguments[1]]) - sharedparticles
+            print("\n>> Shared: \n" + filename + " and " + file2 + " share " + str(sharedparticles) + " particles in the " + str(arguments[1]) + " column.")
+            print("\n>> Unique: \n" + filename + " has " + str(unsharedfile1) + " unique particles and " + file2 + " has " + str(unsharedfile2) + " unique particles in the " + str(arguments[1]) + " column.\n")
+        elif params["parser_splitunique"] != "":
+            print("SPLITUNIQUE IS IN PROGRESS")
+            sys.exit()
+            #sharedparticles = set(allparticles[arguments[1]]) & set(otherparticles[arguments[1]])
+            writestar(sharedparticles, metadata, "shared.star", relegateflag)
+            print("\n>> Shared: \n" + filename + " and " + file2 + " share " + str(sharedparticles) + " particles in the " + str(arguments[1]) + " column.")
+            print("\n>> Unique: \n" + filename + " has " + str(unsharedfile1) + " unique particles and " + file2 + " has " + str(unsharedfile2) + " unique particles in the " + str(arguments[1]) + " column.\n")            
         sys.exit()
         
     if params["parser_classproportion"]:

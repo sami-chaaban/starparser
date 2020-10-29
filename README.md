@@ -66,7 +66,10 @@ starparser --i input.star [options]
 
 * **```--list_column```** Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 
-* **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file. It uses the \_rlnImageName column to do the comparison.
+* **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file. Specify the column to use to compare as follows: "otherstarfilename/column".
+
+* **```--split_unique```** IN PROGRESS. Split the input star file into two new files: those that are unique to the input file in comparison to this one, and those that are shared between both. Specify the column to use to compare as follows: "otherstarfilename/column".
+
 
 ### Querying
 
@@ -285,12 +288,12 @@ starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q
 * **Compare particles between star files**
 
 ```
-starparser --i run_it025_data.star --compare_particles particles.star
+starparser --i run_it025_data.star --compare_particles particles.star/_rlnImageName
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star and particles.star share 36328 particles.*
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star and particles.star share 36328 particles in the \_rlnImageName column.*
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star has 32792 unique particles and particles.star has 1 unique particles.*
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star has 32792 unique particles and particles.star has 1 unique particles in the \_rlnImageName column.*
 
 ---
 

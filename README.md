@@ -66,9 +66,9 @@ starparser --i input.star [options]
 
 * **```--list_column```** Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 
-* **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file. Specify the column to use to compare as follows: "otherstarfilename/column".
+* **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided by --f based on the column provided here. Also counts the number that are unique to each star file.
 
-* **```--split_unique```** Split the input star file into two new files: those that are unique to the input file in comparison to this one, and those that are shared between both. Specify the column to use to compare as follows: "otherstarfilename/column". Note: your other star file cannot have a slash in it, as it would if it were a path.
+* **```--split_unique```** Split the input star file into two new files: those that are unique to the input file and another file specified by --f based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
 
 * **```--random```** Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
 
@@ -290,7 +290,7 @@ starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q
 * **Compare particles between star files**
 
 ```
-starparser --i run_it025_data.star --compare_particles particles.star/_rlnImageName
+starparser --i run_it025_data.star --compare_particles _rlnImageName --f particles.star
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star and particles.star share 36328 particles in the \_rlnImageName column.*
@@ -302,7 +302,7 @@ starparser --i run_it025_data.star --compare_particles particles.star/_rlnImageN
 * **Extract particles that are unique and shared between two star files**
 
 ```
-starparser --i run_data1.star --split_unique run_data2.star/_rlnMicrographName
+starparser --i run_data1.star --split_unique _rlnMicrographName --f run_data2.star
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2star (unique.star) and only the particles that are shared between them (shared.star) based on the \_rlnMicrographName column.

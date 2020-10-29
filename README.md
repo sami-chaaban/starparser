@@ -89,7 +89,7 @@ starparser --i input.star [options]
 
 ### Miscellaneous
 
-* **```--f```** Name of second file to extract columns from. Used with ```--swap_columns```.
+* **```--f```** Name of second file to extract columns from. Used with ```--swap_columns```, ```compare_particles```, and ```split_unique```.
 
 ---
 

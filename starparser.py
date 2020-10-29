@@ -131,7 +131,7 @@ def setupParserOptions():
     
     extra_opts.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
-        help="Name of second file to extract columns from. Used with --swap_columns.")
+        help="Name of second file to extract columns from. Used with --swap_columns, --compare_particles, and --split_unique.")
     
     parser.add_option_group(extra_opts)
 
@@ -186,7 +186,7 @@ def parsestar(starfile):
             
     for i in range(opticsstop+3,200):
 
-        if starfilesplit[i].replace('.','',1).replace('-','',1).isnumeric() or ".mrc" in starfilesplit[i]:
+        if starfilesplit[i].replace('.','',1).replace('-','',1).isnumeric() or ".mrc" in starfilesplit[i] or ".tiff" in starfilesplit[i]:
             
             particlesstop = i
             
@@ -206,6 +206,8 @@ def parsestar(starfile):
 
     optics = starfilesplit[opticstablestop:opticsstop]
 
+    tablename = starfilesplit[opticsstop+3]
+
     particlestable = starfilesplit[opticsstop+3:particlesstop]
     
     particlestableheaders = []
@@ -214,7 +216,7 @@ def parsestar(starfile):
 
     particles = starfilesplit[particlesstop:]
 
-    return(version,opticstableheaders,optics,particlestableheaders,particles)
+    return(version,opticstableheaders,optics,particlestableheaders,particles,tablename)
 
 #######################################################################################################
 
@@ -234,12 +236,12 @@ def getparticles(filename):
     starfile = file.read()
     file.close()
 
-    version, opticsheaders, optics, particlesheaders, particles = parsestar(starfile)
+    version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
     
     alloptics = makepandas(opticsheaders, optics)
     allparticles = makepandas(particlesheaders, particles)
     
-    metadata = [version,opticsheaders,alloptics,particlesheaders]
+    metadata = [version,opticsheaders,alloptics,particlesheaders,tablename]
 
     return(allparticles, metadata)
 
@@ -283,7 +285,8 @@ def writestar(particles, metadata, outputname, relegate):
     else:
         print("\n>> Removed the optics table and _rlnOpticsGroup.")
 
-    output.write('data_particles\n\n')
+    output.write(metadata[4]) #tablename
+    output.write('\n\n')
     output.write('loop_')
 
     headers = metadata[3]

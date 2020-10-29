@@ -273,7 +273,7 @@ def writestar(particles, metadata, outputname, relegate):
         output.write('\n\n')
 
     else:
-        print("\nRemoved the optics table and _rlnOpticsGroup.")
+        print("\n>> Removed the optics table and _rlnOpticsGroup.")
 
     output.write('data_particles\n\n')
     output.write('loop_')
@@ -291,7 +291,7 @@ def writestar(particles, metadata, outputname, relegate):
 
     output.close()
 
-    print("\n-->Output star file: " + outputname + "\n")
+    print("\n-->> Output star file: " + outputname + "\n")
 
 def getiterationlist(filename):
     
@@ -342,7 +342,7 @@ def delcolumn(particles, columns, metadata):
     
     for c in columns:
         if c not in nocolparticles:
-            print("\nError: the column \"" + c + "\" does not exist.\n")
+            print("\n>> Error: the column \"" + c + "\" does not exist.\n")
             sys.exit()
         nocolparticles.drop(c, 1, inplace=True)
         metadata[3].remove(c)
@@ -361,9 +361,14 @@ def countqueryparticles(particles,columns,query,quiet):
     totalquery = 0
     
     if len(columns)>1:
-        print("\nError: you have specified two different columns.\n")
+        print("\n>> Error: you have specified two different columns.\n")
         sys.exit()
-    
+
+    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
+        print("\n----------------------------------------------------------------------")        
+        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
+        print("----------------------------------------------------------------------")
+
     if not queryexact:
         q = "|".join(query)
         totalquery += len(particles[particles[columns[0]].str.contains(q)].index)
@@ -401,9 +406,9 @@ def plotclassparts(filename, classes):
     numclasses = max(list(map(int, allparticles["_rlnClassNumber"].tolist())))
     iterationfilename = getiterationlist(filename)
     
-    print("\nLooping through iteration 0 to " + str(iteration) + " on " + str(numclasses) + " classes.")
+    print("\n>> Looping through iteration 0 to " + str(iteration) + " on " + str(numclasses) + " classes.")
     if -1 not in classes:
-        print("--Only plotting classes " + str(classes) + ".")
+        print("\n>> Only plotting classes " + str(classes) + ".")
 
     numperclassdf = pd.DataFrame()
 
@@ -450,9 +455,14 @@ def delparticles(particles, columns, query):
     purgedparticles = particles.copy()
     
     if len(columns)>1:
-        print("Error: you have specified two columns. You can't if you're querying to delete.\n")
+        print("\n>> Error: you have specified two columns. You can't if you're querying to delete.\n")
         sys.exit()
-        
+
+    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
+        print("\n----------------------------------------------------------------------")        
+        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
+        print("----------------------------------------------------------------------")
+
     if not queryexact:
         q = "|".join(query)
         purgedparticles.drop(purgedparticles[purgedparticles[columns[0]].str.contains(q)].index , 0,inplace=True)
@@ -465,8 +475,13 @@ def delparticles(particles, columns, query):
 def extractparticles(particles, columns, query):
     
     if len(columns)>1:
-        print("Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
+        print("\n>> Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
+
+    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
+        print("\n----------------------------------------------------------------------")        
+        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
+        print("----------------------------------------------------------------------")
 
     if not queryexact:
         extractedparticles = particles.copy()
@@ -483,14 +498,14 @@ def extractparticles(particles, columns, query):
 def swapcolumns(original_particles, swapfrom_particles, columns):
 
     if len(original_particles.index) != len(swapfrom_particles.index):
-        print("\nError: the star files don't have the same number of particles: " + str(len(original_particles.index)) + " vs " + str(len(swapfrom_particles.index)) + ".\n")
+        print("\n>> Error: the star files don't have the same number of particles: " + str(len(original_particles.index)) + " vs " + str(len(swapfrom_particles.index)) + ".\n")
         sys.exit()
     
     swappedparticles = original_particles.copy()
     
     for c in columns:
         if c not in original_particles:
-            print("\nError: the column \"" + c + "\" does not exist.\n")
+            print("\n>> Error: the column \"" + c + "\" does not exist.\n")
             sys.exit()
         columnindex = original_particles.columns.get_loc(c)
         swappedparticles.drop(c,1, inplace=True)
@@ -532,7 +547,7 @@ def checksubset(particles, params):
         columns = params["parser_column"].split("/")
         subsetparticles, extractednumber = extractparticles(particles, columns, query)
         
-        print("\nCreating a subset of " + str(extractednumber) + " particles that match " + str(query) +               " in the columns " + str(columns) + " (or " + str(round(extractednumber*100/len(particles.index),1)) + "%)")
+        print("\n>> Creating a subset of " + str(extractednumber) + " particles (out of " + str(len(particles.index)) + ", " + str(round(extractednumber*100/len(particles.index),1)) + "%) that match " + str(query) +               " in the columns " + str(columns) + ".")
         
         return(subsetparticles)
     
@@ -592,13 +607,13 @@ def classproportion(particles, columns, query):
     totalqueried = len(query)
     
     if totalqueried < 2:
-        print("\nError: please enter at least two queries separated by a slash.\n")
+        print("\n>> Error: please enter at least two queries separated by a slash.\n")
         sys.exit()
 
     subsetparticles, totalsubset = extractparticles(particles, columns, query)
 
     if len(subsetparticles.index) == 0:
-        print("\nError: no classes seem to contain the desired queries in the specified column.\n")
+        print("\n>> Error: no classes seem to contain the desired queries in the specified column.\n")
         sys.exit()
 
     classestocheck = list(set(subsetparticles["_rlnClassNumber"]))
@@ -624,7 +639,7 @@ def classproportion(particles, columns, query):
 
     #####################################
     
-    print("\nThere are " + str(len(classestocheck)) + " classe(s) that contain the queries. Checking the proportion of " + str(query) + "\n")
+    print("\n>> There are " + str(len(classestocheck)) + " classes that contain the queries. Checking the proportion of " + str(query) + "\n")
 
     for i,c in enumerate(classestocheck):
 
@@ -671,7 +686,7 @@ def classproportion(particles, columns, query):
 def outputfig(fig, name):
     
     fig.savefig(name + "." + outtype)
-    print("\n-->Output to " + name + "." + outtype + ".\n")
+    print("\n-->> Output to " + name + "." + outtype + ".\n")
     
 def makeopticsgroup(particles,metadata,newgroup):
     
@@ -726,7 +741,7 @@ def mainloop(params):
     filename = params['file']
 
     if not os.path.isfile(filename):
-        print("\nError: \"" + filename + "\" does not exist.\n")
+        print("\n>> Error: \"" + filename + "\" does not exist.\n")
         sys.exit();
     
     global outtype
@@ -735,7 +750,7 @@ def mainloop(params):
     global queryexact
     queryexact = params["parser_exact"]
     if queryexact:
-        print("\nYou have asked StarParser to look for exact matches between the queries and values.")
+        print("\n>> You have asked StarParser to look for exact matches between the queries and values.")
     
     #####################################################################
     
@@ -765,7 +780,7 @@ def mainloop(params):
         
         for c in columns:
             if c not in allparticles.columns:
-                print("\nError: the column [" + str(c) + "] does not exist in your star file.\n")
+                print("\n>> Error: the column [" + str(c) + "] does not exist in your star file.\n")
                 sys.exit()
                 
     else:
@@ -788,14 +803,14 @@ def mainloop(params):
     if params["parser_delcolumn"] != "":
         columns = params["parser_delcolumn"].split("/")
         newparticles, metadata = delcolumn(allparticles, columns, metadata)
-        print("\nRemoved the columns " + str(columns))
+        print("\n>> Removed the columns " + str(columns))
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
     if params["parser_delparticles"]:
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
-        print("\nRemoved " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
+        print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
@@ -805,34 +820,34 @@ def mainloop(params):
             sys.exit()
         file2 = params["parser_file2"]
         if not os.path.isfile(file2):
-            print("\nError: \"" + file2 + "\" does not exist.\n")
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         otherparticles, metadata = getparticles(file2)
         columstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
-        print("\nSwapped in " + str(columstoswap) + " from " + file2)
+        print("\n>> Swapped in " + str(columstoswap) + " from " + file2)
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
     if params["parser_compareparts"] != "":
         file2 = params["parser_compareparts"]
         if not os.path.isfile(file2):
-            print("\nError: \"" + file2 + "\" does not exist.\n")
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         otherparticles, metadata = getparticles(file2)
         sharedparticles = len(set(allparticles["_rlnImageName"]) & set(otherparticles["_rlnImageName"]))
         unsharedfile1 = len(allparticles["_rlnImageName"]) - sharedparticles
         unsharedfile2 = len(otherparticles["_rlnImageName"]) - sharedparticles
-        print("\n" + filename + " and " + file2 + " share " + str(sharedparticles) + " particles.")
+        print("\n>> " + filename + " and " + file2 + " share " + str(sharedparticles) + " particles.")
         print(filename + " has " + str(unsharedfile1) + " unique particles and " + file2 + " has " + str(unsharedfile2) + " unique particles.\n")
         sys.exit()
         
     if params["parser_classproportion"]:
         if params["parser_query"] == "":
-            print("\nError: you have not entered a query.\n")
+            print("\n>> Error: you have not entered a query.\n")
             sys.exit()
         elif params["parser_column"] == "":
-            print("\nError: you have not entered a column.\n")
+            print("\n>> Error: you have not entered a column.\n")
             sys.exit()
         classproportion(allparticles, columns, query)
         sys.exit()
@@ -842,29 +857,29 @@ def mainloop(params):
         newoptics, opticsnumber = makeopticsgroup(allparticles,metadata,newgroup)
         metadata[2] = newoptics
         if params["parser_column"] == "" or params["parser_query"] == "":
-            print("\nError: you did not enter either an optics group name, column name, or query(ies).\n")
+            print("\n>> Error: you did not enter either an optics group name, column name, or query(ies).\n")
             sys.exit()
         particlesnewoptics, newopticsnumber = setparticleoptics(allparticles,columns,query,str(opticsnumber))
-        print("\nCreated optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for the " + str(newopticsnumber) + " particles that match " + str(query) + " in the column " + str(columns))
+        print("\n>> Created optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for the " + str(newopticsnumber) + " particles that match " + str(query) + " in the column " + str(columns))
         writestar(particlesnewoptics,metadata,params["parser_outname"],False)
         sys.exit()
 
     if params["parser_limitparticles"] != "":
         parsedinput = params["parser_limitparticles"].split("/")
         if len(parsedinput) > 3:
-            print("\nError: provide argument in this format: column/operator/value (e.g. _rlnDefocusU/lt/40000).")
+            print("\n>> Error: provide argument in this format: column/operator/value (e.g. _rlnDefocusU/lt/40000).")
             sys.exit()
         columntocheck = parsedinput[0]
         operator = parsedinput[1]
         limit = float(parsedinput[2])
         if operator not in ["lt", "gt"]:
-            print("\nError: use \"lt\" or \"gt\" as the operator for less than and greater than, respectively.")
+            print("\n>> Error: use \"lt\" or \"gt\" as the operator for less than and greater than, respectively.")
             sys.exit()
         limitedparticles = limitparticles(allparticles, columntocheck, limit, operator)
         if operator == "lt":
-            print("\nExtracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values less than " + str(limit))
+            print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values less than " + str(limit))
         elif operator == "gt":
-            print("\nExtracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values greater than " + str(limit))
+            print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values greater than " + str(limit))
         writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
@@ -880,7 +895,7 @@ def mainloop(params):
     
     if params["parser_uniquemics"]:
         totalmics = len(particles2use["_rlnMicrographName"].unique())
-        print("\nThere are " + str(totalmics) + " unique micrographs in this dataset.\n")
+        print("\n>> There are " + str(totalmics) + " unique micrographs in this dataset.\n")
         sys.exit()
 
     if params["parser_extractparticles"]:
@@ -898,13 +913,13 @@ def mainloop(params):
     if params["parser_writecol"] != "":
         colstowrite = params["parser_writecol"].split("/")
         outputs = writecol(particles2use, colstowrite)
-        print("\nWrote entries from " + str(colstowrite) + "\n-->Output files: " + str(outputs) + " \n")
+        print("\n>> Wrote entries from " + str(colstowrite) + "\n-->> Output files: " + str(outputs) + " \n")
         sys.exit()
         
     if params["parser_regroup"] != "":
         numpergroup = params["parser_regroup"]
         regroupedparticles, numgroups = regroup(particles2use, numpergroup)
-        print("\nRegrouped: " + str(numpergroup) + " particles per group with similar defocus values (" + str(numgroups) + " groups in total).")
+        print("\n>> Regrouped: " + str(numpergroup) + " particles per group with similar defocus values (" + str(numgroups) + " groups in total).")
         writestar(regroupedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 

@@ -58,7 +58,7 @@ def setupParserOptions():
         help="Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.")
 
     modify_opts.add_option("--regroup",
-        action="store", dest="parser_regroup", type="int", default=50, metavar='particles-per-group',
+        action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
         help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
 
     parser.add_option_group(modify_opts)
@@ -68,11 +68,11 @@ def setupParserOptions():
     
     info_opts.add_option("--count_particles",
         action="store_true", dest="parser_countme", default=False,
-        help="Count particles and print the result. Can be used with -c and -q for a subset count, otherwise counts all.")
+        help="Count particles and print the result. Use -c and -q to count a subset of particles, otherwise counts all.")
     
     info_opts.add_option("--count_mics",
         action="store_true", dest="parser_uniquemics", default=False,
-        help="Count the number of unique micrographs. Can be used with -c and -q for a subset count, otherwise counts all.")
+        help="Count the number of unique micrographs. Use -c and -q to count from a subset of particles, otherwise counts all.")
     
     info_opts.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
@@ -89,6 +89,10 @@ def setupParserOptions():
     info_opts.add_option("--new_optics",
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
         help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
+
+    info_opts.add_option("--random",
+        action="store", dest="parser_randomset", type="int", default=0, metavar='number',
+        help="Get a random set of particles totaling the number provided here. Use -c and -q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
 
     parser.add_option_group(info_opts)
     
@@ -901,6 +905,26 @@ def mainloop(params):
             print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values greater than " + str(limit))
         writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    if params["parser_randomset"] != 0:
+        numrandom = params["parser_randomset"]
+        if numrandom > len(allparticles.index):
+            print("\nError: the number of particles you want to randomly extract cannot be greater than the total number of particles (" + str(len(allparticles.index)) + ").\n")
+        if params["parser_column"] == "" and params["parser_query"] == "":
+            writestar(allparticles.sample(n = numrandom), metadata, params["parser_outname"], relegateflag)
+        elif params["parser_column"] == "" or params["parser_query"] == "":
+            print("\nError: check that you have passed the column and query arguments correctly.\n")
+        else:
+            for q in query:
+                print("\n>> Creating a random set of " + str(numrandom) + " particles that match " + q)
+                randomsettowrite, totalnum = extractparticles(allparticles,columns,[q])
+                if totalnum < numrandom and totalnum != 0:
+                    print("\n>> Warning: the query " + q + " has less particles than the requested number!\n")
+                elif totalnum == 0:
+                    print("\n>> Error: the query " + q + " has 0 particles in the specified column.\n")
+                    sys.exit()
+                writestar(randomsettowrite.sample(n = numrandom), metadata, q+"_"+str(numrandom)+".star", relegateflag)
+        sys.exit()
         
     #######################################################################
     
@@ -935,7 +959,7 @@ def mainloop(params):
         print("\n>> Wrote entries from " + str(colstowrite) + "\n-->> Output files: " + str(outputs) + " \n")
         sys.exit()
         
-    if params["parser_regroup"] != "":
+    if params["parser_regroup"] != 0:
         numpergroup = params["parser_regroup"]
         regroupedparticles, numgroups = regroup(particles2use, numpergroup)
         print("\n>> Regrouped: " + str(numpergroup) + " particles per group with similar defocus values (" + str(numgroups) + " groups in total).")

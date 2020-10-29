@@ -70,6 +70,8 @@ starparser --i input.star [options]
 
 * **```--split_unique```** IN PROGRESS. Split the input star file into two new files: those that are unique to the input file in comparison to this one, and those that are shared between both. Specify the column to use to compare as follows: "otherstarfilename/column".
 
+* **```--random```** Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies).
+
 
 ### Querying
 

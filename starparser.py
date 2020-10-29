@@ -33,10 +33,6 @@ def setupParserOptions():
     modify_opts = optparse.OptionGroup(
         parser, 'Modification Options')
     
-    modify_opts.add_option("--extract_particles",
-        action="store_true", dest="parser_extractparticles", default=False,
-        help="Write a star file with particles that match a column header (-c) and query (-q).")
-    
     modify_opts.add_option("--delete_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name',
         help="Delete column and renumber headers. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
@@ -44,11 +40,7 @@ def setupParserOptions():
     modify_opts.add_option("--delete_particles",
         action="store_true", dest="parser_delparticles", default=False,
         help="Delete particles. Pick a column header (-c) and query (-q) to delete particles that match it.")
-    
-    modify_opts.add_option("--limit_particles",
-        action="store", dest="parser_limitparticles", type="string", default = "", metavar='limit',
-        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/operator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
-    
+     
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
@@ -65,6 +57,14 @@ def setupParserOptions():
     
     info_opts = optparse.OptionGroup(
         parser, 'Data Mining Options')
+
+    info_opts.add_option("--extract_particles",
+        action="store_true", dest="parser_extractparticles", default=False,
+        help="Write a star file with particles that match a column header (-c) and query (-q).")
+
+    info_opts.add_option("--limit_particles",
+        action="store", dest="parser_limitparticles", type="string", default = "", metavar='limit',
+        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/operator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
     
     info_opts.add_option("--count_particles",
         action="store_true", dest="parser_countme", default=False,
@@ -857,12 +857,12 @@ def mainloop(params):
             print("\n>> Shared: \n" + filename + " and " + file2 + " share " + str(sharedparticles) + " particles in the " + str(arguments[1]) + " column.")
             print("\n>> Unique: \n" + filename + " has " + str(unsharedfile1) + " unique particles and " + file2 + " has " + str(unsharedfile2) + " unique particles in the " + str(arguments[1]) + " column.\n")
         elif params["parser_splitunique"] != "":
-            print("SPLITUNIQUE IS IN PROGRESS")
-            sys.exit()
-            #sharedparticles = set(allparticles[arguments[1]]) & set(otherparticles[arguments[1]])
+            unsharedparticles = allparticles[~allparticles[arguments[1]].isin(otherparticles[arguments[1]])]
+            print("\n>> " + str(len(unsharedparticles.index)) + " particles unique to " + filename + " in the " + arguments[1] + " column.")
+            writestar(unsharedparticles, metadata, "unique.star", relegateflag)
+            sharedparticles = allparticles[allparticles[arguments[1]].isin(otherparticles[arguments[1]])]
+            print("\n>> " + str(len(sharedparticles.index)) + " particles shared by " + filename + " and " +  file2 + " in the " + arguments[1] + " column.")
             writestar(sharedparticles, metadata, "shared.star", relegateflag)
-            print("\n>> Shared: \n" + filename + " and " + file2 + " share " + str(sharedparticles) + " particles in the " + str(arguments[1]) + " column.")
-            print("\n>> Unique: \n" + filename + " has " + str(unsharedfile1) + " unique particles and " + file2 + " has " + str(unsharedfile2) + " unique particles in the " + str(arguments[1]) + " column.\n")            
         sys.exit()
         
     if params["parser_classproportion"]:

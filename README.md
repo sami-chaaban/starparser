@@ -68,7 +68,7 @@ starparser --i input.star [options]
 
 * **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided here. Also counts the number that are unique to each star file. Specify the column to use to compare as follows: "otherstarfilename/column".
 
-* **```--split_unique```** IN PROGRESS. Split the input star file into two new files: those that are unique to the input file in comparison to this one, and those that are shared between both. Specify the column to use to compare as follows: "otherstarfilename/column".
+* **```--split_unique```** Split the input star file into two new files: those that are unique to the input file in comparison to this one, and those that are shared between both. Specify the column to use to compare as follows: "otherstarfilename/column". Note: your other star file cannot have a slash in it, as it would if it were a path.
 
 * **```--random```** Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
 
@@ -165,26 +165,6 @@ starparser --i run_data.star --o run_data_del200702_del200715.star --delete_part
 
 ---
 
-* **Extract a subset of particles**
-
-```
-starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1 -e
-```
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class 1. The `-e` option was passed to void extracting any class with the number 1 in it.
-
----
-
-* **Extract particles with limited defoci**
-
-```
-starparser --i run_data.star --o run_data_under4um.star --limit_particles _rlnDefocusU/lt/40000
-```
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_under4um.star** will be output with only particles that have defocus estimations below 4 microns.
-
----
-
 * **Swap columns**
 
 ```
@@ -224,6 +204,26 @@ starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsna
 ---
 
 ### Data mining
+
+* **Extract a subset of particles**
+
+```
+starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1 -e
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class 1. The `-e` option was passed to void extracting any class with the number 1 in it.
+
+---
+
+* **Extract particles with limited defoci**
+
+```
+starparser --i run_data.star --o run_data_under4um.star --limit_particles _rlnDefocusU/lt/40000
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_under4um.star** will be output with only particles that have defocus estimations below 4 microns.
+
+---
 
 * **Count specific particles**
 
@@ -296,6 +296,16 @@ starparser --i run_it025_data.star --compare_particles particles.star/_rlnImageN
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star and particles.star share 36328 particles in the \_rlnImageName column.*
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star has 32792 unique particles and particles.star has 1 unique particles in the \_rlnImageName column.*
+
+---
+
+* **Extract particles that are unique and shared between two star files**
+
+```
+starparser --i run_data1.star --split_unique run_data2.star/_rlnMicrographName
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2star (unique.star) and only the particles that are shared between them (shared.star) based on the \_rlnMicrographName column.
 
 ---
 

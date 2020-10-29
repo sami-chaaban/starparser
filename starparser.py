@@ -84,7 +84,7 @@ def setupParserOptions():
 
     info_opts.add_option("--new_optics",
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
-        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated; change the values to the correct ones in the output star file.")
+        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
     
     parser.add_option_group(info_opts)
     
@@ -366,7 +366,7 @@ def countqueryparticles(particles,columns,query,quiet):
 
     if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
         print("\n----------------------------------------------------------------------")        
-        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
+        print("\n>> Warning: it looks like this column has integers but you haven't specified the \"exact\" option (-e, see documentation). Make sure that this is the behaviour you intended.\n")
         print("----------------------------------------------------------------------")
 
     if not queryexact:

@@ -186,7 +186,7 @@ def parsestar(starfile):
             
     for i in range(opticsstop+3,200):
 
-        if starfilesplit[i].replace('.','',1).replace('-','',1).isnumeric() or ".mrc" in starfilesplit[i] or ".tiff" in starfilesplit[i]:
+        if starfilesplit[i].replace('.','',1).replace('-','',1).isnumeric() or ".mrc" in starfilesplit[i] or ".tiff" in starfilesplit[i] or ".star" in starfilesplit[i]:
             
             particlesstop = i
             

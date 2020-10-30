@@ -18,7 +18,7 @@ starparser --i input.star [options]
 
 * You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`.
 
-* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table, particle table, and particle list with tab delimited columns, (e.g. it does not work on *\*\_model.star* files).
+* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table followed by another data table (e.g. particle table), and particle list with tab-delimited columns, (e.g. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. Note that the term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
 
 ## Options
 
@@ -77,9 +77,9 @@ starparser --i input.star [options]
 
 * **```-c```** Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with ```-q```. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash in using this option.
 
-* **```-q```** Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column.
+* **```-q```** Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column. Note the single dash in using this option.
 
-* **```-e```** Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example, you must pass this if you want just to look for "1" and ignore "15" (which has a "1" in it).
+* **```-e```** Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example, you must pass this if you want just to look for "1" and ignore "15" (which has a "1" in it). Note the single dash in using this option.
 
 ### Output
 
@@ -89,7 +89,7 @@ starparser --i input.star [options]
 
 ### Miscellaneous
 
-* **```--f```** Name of second file to extract columns from. Used with ```--swap_columns```, ```compare_particles```, and ```split_unique```.
+* **```--f```** The name of another star file. Used with ```--swap_columns```, ```compare_particles```, and ```split_unique```.
 
 ---
 
@@ -149,9 +149,9 @@ starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 2
 * **Delete columns**
 
 ```
-starparser --i run_data.star --o run_data_delCTFMax_delCTFFoM.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
+starparser --i run_data.star --o run_data_del.star --delete_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_delCTFMax_delCTFFoM.star** will be identical to run_data.star except will be missing those two columns. The headers in the particles table will be renumbered.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del.star** will be identical to run_data.star except will be missing those two columns. The headers in the particles table will be renumbered.
 
 ---
 

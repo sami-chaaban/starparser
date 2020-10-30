@@ -82,7 +82,7 @@ def setupParserOptions():
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
         help="Write all values of a column to a file (filename is the header). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.")
     
-    info_opts.add_option("--compare_particles",
+    info_opts.add_option("--compare",
         action="store", dest="parser_compareparts", type="string", default="", metavar='column-name',
         help="Count the number of particles that are shared between the input star file and the one provided by --f based on the column provided here. Also counts the number that are unique to each star file.")
 
@@ -131,7 +131,7 @@ def setupParserOptions():
     
     extra_opts.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
-        help="Name of second file to extract columns from. Used with --swap_columns, --compare_particles, and --split_unique.")
+        help="Name of second file to extract columns from. Used with --swap_columns, --compare, and --split_unique.")
     
     parser.add_option_group(extra_opts)
 

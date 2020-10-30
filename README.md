@@ -18,7 +18,7 @@ starparser --i input.star [options]
 
 * You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`.
 
-* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table followed by another data table (e.g. particle table), and particle list with tab-delimited columns, (e.g. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. Note that the term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
+* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns, (e.g. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. Note that the term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
 
 ## Options
 

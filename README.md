@@ -24,7 +24,7 @@ starparser --i input.star [options]
 
 * **```-h```** Show a list of  all the options.
 
-* **```--i```** Input star file.
+* **```--i```** *```filename```* Input star file.
 
 ### Plotting
 
@@ -40,17 +40,17 @@ starparser --i input.star [options]
 
 *See below for examples on how to use these options*
 
-* **```--delete_column```** Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
+* **```--delete_column```** *```columns```* Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
 * **```--delete_particles```** Delete particles that match a query (specified with ```-q```) within a column header (specified with ```-c```), and write to a new star file (default output.star, or specified with ```--o```).
 
-* **```--swap_columns```** Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
+* **```--swap_columns```** *```columns```* Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--relegate```** Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```). This may not be sufficient to be fully compatible with Relion 3.0; use ```--delete_column``` to remove other bad columns before this (e.g. helix-specific columns), if necessary. Note that the output star file will no longer be compatible with starparser.
 
-* **```--regroup```** Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
+* **```--regroup```** *```particles-per-group```* Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
-* **```--new_optics```** Provide a new optics group name. Use ```-c``` and ```-q``` to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
+* **```--new_optics```** *```optics-group-name```* Provide a new optics group name. Use ```-c``` and ```-q``` to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 ### Data mining
 
@@ -58,38 +58,38 @@ starparser --i input.star [options]
 
 * **```--extract_particles```** Find particles that match a column header (```-c```) and query (```-q```) and write them to a new star file (default output.star, or specified with ```--o```).
 
-* **```--limit_particles```** Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
+* **```--limit_particles```** *```limit```* Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
 
 * **```--count_particles```** Count particles and print the result. Can be used with ```-c``` and ```-q``` to count only a subset of particles that match the query, otherwise counts all.
 
 * **```--count_mics```** Count the number of unique micrographs. Can be used with ```-c``` and ```-q``` to count only a subset of particles that match the query, otherwise counts all.
 
-* **```--list_column```** Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
+* **```--list_column```** *```columns```* Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 
 * **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided by --f based on the column provided here. Also counts the number that are unique to each star file.
 
-* **```--split_unique```** Split the input star file into two new files: those that are unique to the input file and another file specified by --f based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
+* **```--split_unique```** *```column```* Split the input star file into two new files: those that are unique to the input file and another file specified by --f based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
 
-* **```--random```** Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
+* **```--random```** *```number-of-particles```* Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
 
 
 ### Querying
 
-* **```-c```** Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with ```-q```. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash in using this option.
+* **```-c```** *```columns```* Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with ```-q```. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash in using this option.
 
-* **```-q```** Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column. Note the single dash in using this option.
+* **```-q```** *```query```* Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column. Note the single dash in using this option.
 
 * **```-e```** Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example, you must pass this if you want just to look for "1" and ignore "15" (which has a "1" in it). Note the single dash in using this option.
 
 ### Output
 
-* **```--o```** Output file name. Default is output.star.
+* **```--o```** *```filename```* Output file name. Default is output.star.
 
-* **```--t```** File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.
+* **```--t```** *```filetype```* File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.
 
 ### Miscellaneous
 
-* **```--f```** The name of another star file. Used with ```--swap_columns```, ```compare_particles```, and ```split_unique```.
+* **```--f```** *```filename```* The name of another star file. Used with ```--swap_columns```, ```compare_particles```, and ```split_unique```.
 
 ---
 

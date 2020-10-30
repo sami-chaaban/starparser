@@ -40,13 +40,9 @@ starparser --i input.star [options]
 
 *See below for examples on how to use these options*
 
-* **```--extract_particles```** Find particles that match a column header (```-c```) and query (```-q```) and write them to a new star file (default output.star, or specified with ```--o```).
-
 * **```--delete_column```** Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
 
 * **```--delete_particles```** Delete particles that match a query (specified with ```-q```) within a column header (specified with ```-c```), and write to a new star file (default output.star, or specified with ```--o```).
-
-* **```--limit_particles```** Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
 
 * **```--swap_columns```** Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
@@ -59,6 +55,10 @@ starparser --i input.star [options]
 ### Data mining
 
 *See below for examples on how to use these options*
+
+* **```--extract_particles```** Find particles that match a column header (```-c```) and query (```-q```) and write them to a new star file (default output.star, or specified with ```--o```).
+
+* **```--limit_particles```** Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
 
 * **```--count_particles```** Count particles and print the result. Can be used with ```-c``` and ```-q``` to count only a subset of particles that match the query, otherwise counts all.
 

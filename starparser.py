@@ -53,6 +53,10 @@ def setupParserOptions():
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
         help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
 
+    modify_opts.add_option("--new_optics",
+        action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
+        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
+
     parser.add_option_group(modify_opts)
     
     info_opts = optparse.OptionGroup(
@@ -85,10 +89,6 @@ def setupParserOptions():
     info_opts.add_option("--split_unique",
         action="store", dest="parser_splitunique", type="string", default="", metavar='column-name',
         help="Split the input star file into two new files: those that are unique to the input file in comparison to the one provided by --f, and those that are shared between both. Specify the column to use for the comparison here.")
-
-    info_opts.add_option("--new_optics",
-        action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
-        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',

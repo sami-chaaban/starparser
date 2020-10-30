@@ -66,7 +66,7 @@ starparser --i input.star [options]
 
 * **```--list_column```** *```columns```* Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 
-* **```--compare_particles```** *```column```* Count the number of particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Also counts the number that are unique to each star file.
+* **```--compare```** *```column```* Count the number of particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Also counts the number that are unique to each star file.
 
 * **```--split_unique```** *```column```* Split the input star file into two new files: those that are unique to the input file and another file specified by ```--f``` based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
 
@@ -89,7 +89,7 @@ starparser --i input.star [options]
 
 ### Miscellaneous
 
-* **```--f```** *```filename```* The name of another star file. Used with ```--swap_columns```, ```compare_particles```, and ```split_unique```.
+* **```--f```** *```filename```* The name of another star file. Used with ```--swap_columns```, ```--compare```, and ```---split_unique```.
 
 ---
 
@@ -290,7 +290,7 @@ starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q
 * **Compare particles between star files**
 
 ```
-starparser --i run_it025_data.star --compare_particles _rlnImageName --f particles.star
+starparser --i run_it025_data.star --compare _rlnImageName --f particles.star
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star and particles.star share 36328 particles in the \_rlnImageName column.*

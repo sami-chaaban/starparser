@@ -66,9 +66,9 @@ starparser --i input.star [options]
 
 * **```--list_column```** *```columns```* Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 
-* **```--compare_particles```** Count the number of particles that are shared between the input star file and the one provided by --f based on the column provided here. Also counts the number that are unique to each star file.
+* **```--compare_particles```** *```column```* Count the number of particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Also counts the number that are unique to each star file.
 
-* **```--split_unique```** *```column```* Split the input star file into two new files: those that are unique to the input file and another file specified by --f based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
+* **```--split_unique```** *```column```* Split the input star file into two new files: those that are unique to the input file and another file specified by ```--f``` based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
 
 * **```--random```** *```number-of-particles```* Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
 

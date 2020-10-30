@@ -109,7 +109,7 @@ starparser --i run_data.star --plot_defocus
 
 ---
 
-* Plot a histogram of defocus values from a subset of micrographs that contain "200826" or "200827".
+* Plot a histogram of defocus values from a subset of micrographs that contain the term "200826" or "200827".
 
 ```
 starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
@@ -131,7 +131,7 @@ starparser --i run_it025_data.star --plot_classparts all
 
 ---
 
-* Plot the proportion of particles in each class that belong to 200702 versus 200826 within the \_rlnMicrographName column.
+* Plot the proportion of particles in each class that belong to particles with the term 200702 versus those with the term 200826 in the \_rlnMicrographName column.
 
 ```
 starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
@@ -158,10 +158,10 @@ starparser --i run_data.star --o run_data_del.star --delete_column _rlnCtfMaxRes
 * **Delete a subset of particles**
 
 ```
-starparser --i run_data.star --o run_data_del200702_del200715.star --delete_particles -c _rlnMicrographName -q 200702/200715
+starparser --i run_data.star --o run_data_del.star --delete_particles -c _rlnMicrographName -q 200702/200715
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del200702_del200715.star** will be identical to run_data.star except will be missing any particle that has either 200702 or 2000715 within the values of the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days that had the date in the filename.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del.star** will be identical to run_data.star except will be missing any particles that have the term 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to delete particles from specific data-collection days that had the date in the filename.
 
 ---
 
@@ -199,7 +199,7 @@ starparser --i run_data.star --o run_data_regroup200.star --regroup 200
 starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsname -c _rlnMicrographName -q 10090
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_newoptics.star** will be output that will be identical to run_data.star except that a new optics group called *myopticsname* will be created in the optics table and particles with 10090 in the \_rlnMicrographName column will have modified \_rlnOpticsGroup and/or \_rlnOpticsName columns to match the new optics group.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_newoptics.star** will be output that will be identical to run_data.star except that a new optics group called *myopticsname* will be created in the optics table and particles with the term 10090 in the \_rlnMicrographName column will have modified \_rlnOpticsGroup and/or \_rlnOpticsName columns to match the new optics group.
 
 ---
 
@@ -211,7 +211,7 @@ starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsna
 starparser --i run_data.star --o run_data_c1.star --extract_particles -c _rlnClassNumber -q 1 -e
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class 1. The `-e` option was passed to void extracting any class with the number 1 in it.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class 1. The `-e` option was passed to avoid extracting any class with the number 1 in it, such as "10", "11", etc.
 
 ---
 

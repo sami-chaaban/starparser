@@ -5,10 +5,10 @@ Use this script to manipulate Relion 3.1 star files, including counting, plottin
 Usage:
 
 ```
-python3 starparser.py --i input.star [options]
+python starparser.py --i input.star [options]
 ```
 
-Alternatively, add an alias to your .cshrc (`alias starparser 'python3 /home/scripts/starparser.py'`) and run the script with:
+Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/scripts/starparser.py'`) and run the script with:
 
 ```
 starparser --i input.star [options]

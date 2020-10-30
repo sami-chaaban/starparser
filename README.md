@@ -60,9 +60,9 @@ starparser --i input.star [options]
 
 * **```--limit_particles```** *```limit```* : Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
 
-* **```--count_particles```** : Count particles and print the result. Can be used with ```-c``` and ```-q``` to count only a subset of particles that match the query, otherwise counts all.
+* **```--count_particles```** : Count particles and print the result. Can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query, otherwise counts all.
 
-* **```--count_mics```** : Count the number of unique micrographs. Can be used with ```-c``` and ```-q``` to count only a subset of particles that match the query, otherwise counts all.
+* **```--count_mics```** : Count the number of unique micrographs. Can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query, otherwise counts all.
 
 * **```--list_column```** *```columns```* : Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 

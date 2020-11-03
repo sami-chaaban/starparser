@@ -24,7 +24,7 @@ starparser --i input.star [options]
 
 * **```-h```** : Show a list of  all the options.
 
-* **```--i```***``` filename```* : Input star file.
+* **```--i```** *```filename```* : Input star file.
 
 ### Plotting
 

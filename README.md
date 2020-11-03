@@ -2,7 +2,7 @@
 
 Use this script to manipulate Relion 3.1 star files, including counting, plotting, extracting, and removing data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below.
 
-Usage:
+**Usage:**
 
 ```
 python starparser.py --i input.star [options]
@@ -24,7 +24,7 @@ starparser --i input.star [options]
 
 * **```-h```** : Show a list of  all the options.
 
-* **```--i```** *```filename```* : Input star file.
+* **```--i```***``` filename```* : Input star file.
 
 ### Plotting
 

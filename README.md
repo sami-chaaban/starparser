@@ -183,6 +183,8 @@ starparser --i run_data.star --o run_data_3p0.star --relegate
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered.
 
+---
+
 * **Regroup a star file**
 
 ```

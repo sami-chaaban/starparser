@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.4.")
+        version="%prog 1.5.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
@@ -93,6 +93,10 @@ def setupParserOptions():
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
         help="Get a random set of particles totaling the number provided here. Use -c and -q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
+
+    info_opts.add_option("--split",
+        action="store", dest="parser_split", type="int", default=-1, metavar='number',
+        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.")
 
     parser.add_option_group(info_opts)
     
@@ -731,6 +735,42 @@ def setparticleoptics(particles,column,query,opticsnumber):
             particlesnewoptics.loc[particles[column[0]]==q, "_rlnOpticsGroup"] = opticsnumber
         
     return(particlesnewoptics, numchanged)
+
+def splitparts(particles,numsplits):
+
+    totalparticles = len(particles.index)
+
+    splitnum = int(totalparticles/numsplits)
+
+    start = 0
+    end = splitnum
+
+    splitstars = []
+
+    for i in range(numsplits):
+
+        currentmic = particles["_rlnMicrographName"][end]
+        
+        j = end
+
+        if j != totalparticles:
+
+            while particles["_rlnMicrographName"][j] == particles["_rlnMicrographName"][end]:
+                j+=1
+                if j == totalparticles:
+                    break
+
+        end = j
+
+        splitstars.append(particles.iloc[start:end,:])
+
+        start = j
+        end = j+splitnum
+
+        if end > totalparticles-1:
+            end = totalparticles-1
+
+    return(splitstars)
         
 ########################################################
     
@@ -937,7 +977,21 @@ def mainloop(params):
                     sys.exit()
                 writestar(randomsettowrite.sample(n = numrandom), metadata, q+"_"+str(numrandom)+".star", relegateflag)
         sys.exit()
-        
+
+    if params["parser_split"] != -1:
+        numsplits = params["parser_split"]
+        if numsplits == 1:
+            print("\n>> Error: you cannot split into 1 part.\n")
+            sys.exit()
+        if numsplits > len(allparticles.index):
+            print("\n>> Error: you cannot split into more parts than there are particles.\n")
+            sys.exit()
+        splitstars = splitparts(allparticles,numsplits)
+        print("\n")
+        for i,s in enumerate(splitstars):
+            print("There are " + str(len(s.index)) + " particles in file " + str(i+1))
+            writestar(s, metadata, "split_"+str(i+1)+".star", relegateflag)
+
     #######################################################################
     
     #setup SUBSET for remaining functions if necessary

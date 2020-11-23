@@ -72,6 +72,7 @@ starparser --i input.star [options]
 
 * **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
 
+* **```--split```** *```number-of-splits```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.
 
 ### Querying
 
@@ -321,9 +322,19 @@ starparser --i run_it025_data.star --random 10000 particles.star -c _rlnMicrogra
 
 ---
 
+* **Split a star file**
+
+```
+starparser --i particles.star --split 3
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Three new star files called split_1.star, split_2.star, and split_3.star will be created with roughly equal numbers of particles. In this case, particles.star has 69120 particles and the split star files have 23053, 23042, and 23025 particles, respectively.
+
+---
+
 ## Version
 
-* **1.4** - October 2020
+* **1.5** - November 2020
 
 ## License
 

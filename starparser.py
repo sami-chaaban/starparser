@@ -57,6 +57,10 @@ def setupParserOptions():
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
         help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
 
+    modify_opts.add_option("--replace_column",
+        action="store", dest="parser_replacecol", type="string", default="", metavar='column-name',
+        help="Replace all entries of the passed column with those of a file provided by --f. The file should be a single column of values that totals the number of particles in the star file.")
+
     parser.add_option_group(modify_opts)
     
     info_opts = optparse.OptionGroup(
@@ -771,6 +775,12 @@ def splitparts(particles,numsplits):
             end = totalparticles-1
 
     return(splitstars)
+
+def replacecolumn(particles,replacecol,newcol):
+        columnindex = particles.columns.get_loc(replacecol)
+        particles.drop(replacecol, 1, inplace=True)
+        particles.insert(columnindex, replacecol, newcol)
+        return(particles)
         
 ########################################################
     
@@ -989,8 +999,22 @@ def mainloop(params):
         splitstars = splitparts(allparticles,numsplits)
         print("\n")
         for i,s in enumerate(splitstars):
-            print("There are " + str(len(s.index)) + " particles in file " + str(i+1))
+            print(">> There are " + str(len(s.index)) + " particles in file " + str(i+1))
             writestar(s, metadata, "split_"+str(i+1)+".star", relegateflag)
+        sys.exit()
+
+    if params["parser_replacecol"] != "":
+        replacecol = params["parser_replacecol"]
+        newcolfile = params["parser_file2"]
+        with open(newcolfile) as f:
+            newcol = [int(line.split()[0]) for line in f]
+        if len(newcol) != len(allparticles.index):
+            print("\n>> Error: the number of values do not match.\n")
+            sys.exit()
+        print("\n>> Replacing values in the column " + replacecol + " with those in " + newcolfile)
+        replacedstar = replacecolumn(allparticles,replacecol,newcol)
+        writestar(replacedstar, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
 
     #######################################################################
     

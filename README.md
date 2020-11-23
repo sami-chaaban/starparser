@@ -52,6 +52,8 @@ starparser --i input.star [options]
 
 * **```--new_optics```** *```optics-group-name```* : Provide a new optics group name. Use ```-c``` and ```-q``` to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
+* **```--replace_column```** *```column-name```* : Replace all entries of the passed column with those of a file provided by ``--f``. The file should be a single column of values that totals the number of particles in the star file (see the output of ```--list_column``` for an example). The result is written to a new star file (default output.star, or specified with ```--o```).
+
 ### Data mining
 
 *See below for examples on how to use these options*
@@ -90,7 +92,7 @@ starparser --i input.star [options]
 
 ### Miscellaneous
 
-* **```--f```** *```filename```* : The name of another star file. Used with ```--swap_columns```, ```--compare```, and ```---split_unique```.
+* **```--f```** *```filename```* : The name of another star file. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
 
 ---
 
@@ -203,6 +205,16 @@ starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsna
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_newoptics.star** will be output that will be identical to run_data.star except that a new optics group called *myopticsname* will be created in the optics table and particles with the term 10090 in the \_rlnMicrographName column will have modified \_rlnOpticsGroup and/or \_rlnOpticsName columns to match the new optics group.
+
+---
+
+* **Replace values in a column with those of a text file**
+
+```
+starparser --i particles.star --replace_column _rlnOpticsGroup --f newoptics.txt --o particles_newoptics.star
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **particles_newoptics.star** will be output that will be identical to particles.star except for the \_rlnOpticsGroup column, which will have the values found in newoptics.txt.
 
 ---
 

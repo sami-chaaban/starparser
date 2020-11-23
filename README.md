@@ -92,7 +92,7 @@ starparser --i input.star [options]
 
 ### Miscellaneous
 
-* **```--f```** *```filename```* : The name of another star file. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
+* **```--f```** *```filename```* : The name of another file to get information from. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
 
 ---
 

@@ -12,6 +12,10 @@ def setupParserOptions():
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
         help="Input file name.")
+
+    parser.add_option("--v3p0",
+        action="store_true", dest="parser_3p0", default=False,
+        help="Pass this if the file lacks an optics group, such as Relion 3.0 files.")
     
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
@@ -371,7 +375,7 @@ def delcolumn(particles, columns, metadata):
 def countparticles(particles):
 
     totalparticles = len(particles.index)
-    print('\nThere are ' + str(totalparticles) + ' particles in total.\n') 
+    print('\n>> There are ' + str(totalparticles) + ' particles in total.\n') 
 
 def countqueryparticles(particles,columns,query,quiet):
 
@@ -832,8 +836,22 @@ def mainloop(params):
     #########################################################################
     
     #Initialize stuff
-    
-    allparticles, metadata = getparticles(filename)
+
+    if params["parser_3p0"]:
+        file = open(filename,mode='r')
+        starfile = file.read()
+        file.close()
+        print("\n>> Creating a dummy optics table to read this star file.")
+        tempoptics = "\n# version 30001\n\ndata_optics\n\nloop_\n_rlnOpticsGroupName #1\n_rlnOpticsGroup #2\n_rlnVoltage #3\n_rlnImagePixelSize #4\nopticsGroup1\t1\t300.000000\t1.000000\n\n\n# version 30001\n\ndata_particles\n\n"
+        looploc = starfile.find("loop_")
+        starfile = tempoptics + starfile[looploc:]
+        version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
+        alloptics = makepandas(opticsheaders, optics)
+        allparticles = makepandas(particlesheaders, particles)
+        metadata = [version,opticsheaders,alloptics,particlesheaders,tablename]
+        relegateflag = True
+    else:
+        allparticles, metadata = getparticles(filename)
 
     totalparticles = len(allparticles.index)
     
@@ -857,7 +875,8 @@ def mainloop(params):
     #####################################################################
         
     #Set up jobs that don't require a subset (faster this way)
-    
+
+
     if params["parser_countme"] and params["parser_column"] != "" and params["parser_query"] != "":
         countqueryparticles(allparticles, columns, query, False)
         sys.exit()

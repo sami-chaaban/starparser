@@ -836,15 +836,14 @@ def mainloop(params):
         file = open(filename,mode='r')
         starfile = file.read()
         file.close()
-        tempoptics = "\n# version 30001\n\ndata_optics\n\nloop_\n_rlnOpticsGroupName #1\n_rlnOpticsGroup #2\n_rlnVoltage #3\n_rlnImagePixelSize #4\nopticsGroup1\t1\t300.000000\t1.000000\n\n\n# version 30001\n\ndata_particles\n\n"
+        tempinsertion = "\n# version 30000\n\ndata_optics\n\nloop_\n_rlnOpticsGroupName #1\n_rlnOpticsGroup #2\n_rlnVoltage #3\n_rlnImagePixelSize #4\nopticsGroup1\t1\t300.000000\t1.000000\n\n\n# version 30000\n\ndata_particles\n\n"
         looploc = starfile.find("loop_")
-        starfile = tempoptics + starfile[looploc:]
+        starfile = tempinsertion + starfile[looploc:]
         print("\n>> Created a dummy optics table to read this star file.")
         version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
         alloptics = makepandas(opticsheaders, optics)
         allparticles = makepandas(particlesheaders, particles)
         metadata = [version,opticsheaders,alloptics,particlesheaders,tablename]
-        relegateflag = True
     else:
         allparticles, metadata = getparticles(filename)
 
@@ -864,8 +863,11 @@ def mainloop(params):
     else:
         
         columns = ""
-        
-    relegateflag = params["parser_relegate"]
+
+    if params["parser_3p0"]:
+        relegateflag = True
+    else:
+        relegateflag = params["parser_relegate"]
     
     #####################################################################
         
@@ -1035,8 +1037,11 @@ def mainloop(params):
     #setup SUBSET for remaining functions if necessary
     
     if relegateflag:
-        newparticles, metadata = delcolumn(allparticles, ["_rlnOpticsGroup"], metadata)
-        particles2use = checksubset(newparticles, params)
+        if "_rlnOpticsGroup" in allparticles.columns:
+                newparticles, metadata = delcolumn(allparticles, ["_rlnOpticsGroup"], metadata)
+                particles2use = checksubset(newparticles, params)
+        else:
+            particles2use = checksubset(allparticles, params)
     else:      
         particles2use = checksubset(allparticles, params)
     

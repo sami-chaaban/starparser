@@ -30,7 +30,7 @@ starparser --i input.star [options]
 
 * **```--f```** *```filename```* : The name of another file to get information from. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
 
-* **```--v3p0```** : Pass this if the file lacks an optics table, such as those from Relion 3.0. It will create a dummy optics table before moving on. This option does not work with ```--class_proportion``` or commands that use a second file with ```--f```.
+* **```--v3p0```** : Pass this if the star file lacks an optics table, such as those from Relion 3.0. It will create a dummy optics table before moving on. This option does not work with ```--class_proportion``` or commands that require parsing a second file.
 
 ### Plotting
 

@@ -100,7 +100,7 @@ starparser --i input.star [options]
 
 ## Examples
 
-The following examples run the `starparser` command assuming an alias has been created as described above, otherwise, run it with `python3 starparser.py`.
+The following examples run the `starparser` command assuming an alias has been created as described above. Otherwise, run it with `python3 starparser.py`.
 
 ### Plotting
 

@@ -7,11 +7,15 @@ import matplotlib.pyplot as plt
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.5.")
+        version="%prog 1.6.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
         help="Input file name.")
+
+    parser.add_option("--f",
+        action="store", dest="parser_file2", default="", metavar='other-starfile-name',
+        help="Name of second file to extract columns from. Used with --swap_columns, --compare, and --split_unique.")
 
     parser.add_option("--v3p0",
         action="store_true", dest="parser_3p0", default=False,
@@ -137,15 +141,6 @@ def setupParserOptions():
         help="File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.")
     
     parser.add_option_group(output_opts)
-
-    extra_opts = optparse.OptionGroup(
-        parser, 'Miscellaneous Options')
-    
-    extra_opts.add_option("--f",
-        action="store", dest="parser_file2", default="", metavar='other-starfile-name',
-        help="Name of second file to extract columns from. Used with --swap_columns, --compare, and --split_unique.")
-    
-    parser.add_option_group(extra_opts)
 
     options,args = parser.parse_args()
 
@@ -574,7 +569,7 @@ def checksubset(particles, params):
         columns = params["parser_column"].split("/")
         subsetparticles, extractednumber = extractparticles(particles, columns, query)
         
-        print("\n>> Creating a subset of " + str(extractednumber) + " particles (out of " + str(len(particles.index)) + ", " + str(round(extractednumber*100/len(particles.index),1)) + "%) that match " + str(query) +               " in the columns " + str(columns) + ".")
+        print("\n>> Created a subset of " + str(extractednumber) + " particles (out of " + str(len(particles.index)) + ", " + str(round(extractednumber*100/len(particles.index),1)) + "%) that match " + str(query) +               " in the columns " + str(columns) + ".")
         
         return(subsetparticles)
     
@@ -841,10 +836,10 @@ def mainloop(params):
         file = open(filename,mode='r')
         starfile = file.read()
         file.close()
-        print("\n>> Creating a dummy optics table to read this star file.")
         tempoptics = "\n# version 30001\n\ndata_optics\n\nloop_\n_rlnOpticsGroupName #1\n_rlnOpticsGroup #2\n_rlnVoltage #3\n_rlnImagePixelSize #4\nopticsGroup1\t1\t300.000000\t1.000000\n\n\n# version 30001\n\ndata_particles\n\n"
         looploc = starfile.find("loop_")
         starfile = tempoptics + starfile[looploc:]
+        print("\n>> Created a dummy optics table to read this star file.")
         version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
         alloptics = makepandas(opticsheaders, optics)
         allparticles = makepandas(particlesheaders, particles)

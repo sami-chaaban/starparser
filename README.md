@@ -24,7 +24,13 @@ starparser --i input.star [options]
 
 * **```-h```** : Show a list of  all the options.
 
+### Input
+
 * **```--i```** *```filename```* : Input star file.
+
+* **```--f```** *```filename```* : The name of another file to get information from. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
+
+* **```--v3p0```** : Pass this if the file lacks an optics table, such as those from Relion 3.0. It will create a dummy optics table before moving on. This option does not work with ```--class_proportion``` or commands that use a second file with ```--f```.
 
 ### Plotting
 
@@ -89,10 +95,6 @@ starparser --i input.star [options]
 * **```--o```** *```filename```* : Output file name. Default is output.star.
 
 * **```--t```** *```filetype```* : File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.
-
-### Miscellaneous
-
-* **```--f```** *```filename```* : The name of another file to get information from. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
 
 ---
 
@@ -346,7 +348,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.5** - November 2020
+* **1.6** - November 2020
 
 ## License
 

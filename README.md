@@ -114,17 +114,6 @@ starparser --i run_data.star --plot_defocus
 
 ---
 
-* Plot a histogram of defocus values from a subset of micrographs that contain the term "200826" or "200827".
-
-```
-starparser --i run_data.star --plot_defocus -c _rlnMicrographName -q 200826/200827
-```
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Defocus_histogram.png**:
-![Defocus plot](./Examples/Defocus_histogram_subset.png "Defocus plot")
-
----
-
 * Plot the number of particles per class for the 25 iterations of a Class3D job.
 
 ```

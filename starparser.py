@@ -110,6 +110,10 @@ def setupParserOptions():
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
         help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.")
 
+    # info_opts.add_option("--find_nearest",
+    #     action="store", dest="parser_findnear", type="int", default=-1, metavar='column-name',
+    #     help=".")    
+
     parser.add_option_group(info_opts)
     
     query_opts = optparse.OptionGroup(
@@ -1058,10 +1062,6 @@ def mainloop(params):
         plotdefocus(particles2use)
         sys.exit()
         
-    if relegateflag:
-        writestar(particles2use, metadata, params["parser_outname"], relegateflag)
-        sys.exit()
-        
     if params["parser_writecol"] != "":
         colstowrite = params["parser_writecol"].split("/")
         outputs = writecol(particles2use, colstowrite)
@@ -1073,6 +1073,10 @@ def mainloop(params):
         regroupedparticles, numgroups = regroup(particles2use, numpergroup)
         print("\n>> Regrouped: " + str(numpergroup) + " particles per group with similar defocus values (" + str(numgroups) + " groups in total).")
         writestar(regroupedparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if relegateflag:
+        writestar(particles2use, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
 if __name__ == "__main__":

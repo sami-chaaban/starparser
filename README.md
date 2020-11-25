@@ -36,7 +36,7 @@ starparser --i input.star [options]
 
 *See below for examples on how to use these options*
 
-* **```--plot_defocus```** : Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. Use ```--t``` to change filetype (see the *Output* options).
+* **```--plot_defocus```** : Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. The number of bins is calculated using the Freedman-Diaconis rule. Use ```--t``` to change filetype (see the *Output* options).
 
 * **```--plot_classparts```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a slash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
@@ -78,7 +78,7 @@ starparser --i input.star [options]
 
 * **```--split_unique```** *```column```* : Split the input star file into two new files: those that are unique to the input file and another file specified by ```--f``` based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
 
-* **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```-o```).
+* **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```--o```).
 
 * **```--split```** *```number-of-splits```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.
 

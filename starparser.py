@@ -1065,6 +1065,7 @@ def mainloop(params):
     if params["parser_replacecol"] != "":
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f that has the list of values.\n")
+            sys.exit()
         replacecol = params["parser_replacecol"]
         newcolfile = params["parser_file2"]
         with open(newcolfile) as f:

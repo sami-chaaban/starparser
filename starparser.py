@@ -1067,6 +1067,9 @@ def mainloop(params):
             print("\n>> Error: provide a second file with --f that has the list of values.\n")
             sys.exit()
         replacecol = params["parser_replacecol"]
+        if replacecol not in allparticles.columns:
+                print("\n>> Error: the column " + str(c) + " does not exist in your star file.\n")
+                sys.exit()
         newcolfile = params["parser_file2"]
         with open(newcolfile) as f:
             newcol = [int(line.split()[0]) for line in f]

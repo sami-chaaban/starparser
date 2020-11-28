@@ -46,11 +46,11 @@ starparser --i input.star [options]
 
 *See below for examples on how to use these options*
 
-* **```--delete_column```** *```columns```* : Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX.
+* **```--delete_column```** *```columns```* : Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. "*\_rlnMicrographName*". To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*".
 
 * **```--delete_particles```** : Delete particles that match a query (specified with ```-q```) within a column header (specified with ```-c```), and write to a new star file (default output.star, or specified with ```--o```).
 
-* **```--swap_columns```** *```columns```* : Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
+* **```--swap_columns```** *```columns```* : Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use StarParser on the output file, you need to use ```--v3p0```.
 
@@ -58,7 +58,7 @@ starparser --i input.star [options]
 
 * **```--new_optics```** *```optics-group-name```* : Provide a new optics group name. Use ```-c``` and ```-q``` to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
-* **```--replace_column```** *```column-name```* : Replace all entries of the passed column with those of a file provided by ``--f``. The file should be a single column of values that totals the number of particles in the star file. This is useful when used in conjunction with ```--list_column```, which outputs column values for easy editing before reinsertion with ```--replace_column```. The result is written to a new star file (default output.star, or specified with ```--o```).
+* **```--replace_column```** *```column-name```* : Replace all entries of the column with those of a file provided by ``--f``. The file should be a single column of values that totals the number of particles in the star file. This is useful when used in conjunction with ```--list_column```, which outputs column values for easy editing before reinsertion with ```--replace_column```. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 ### Data mining
 
@@ -66,7 +66,7 @@ starparser --i input.star [options]
 
 * **```--extract_particles```** : Find particles that match a column header (```-c```) and query (```-q```) and write them to a new star file (default output.star, or specified with ```--o```).
 
-* **```--limit_particles```** *```limit```* : Extract particles that match a specific operator ("lt" for less than, "gt" for greater than). The argument to pass is "column/operator/value" (e.g. "\_rlnDefocusU/lt/40000" for defocus values less than 40000).
+* **```--limit_particles```** *```limit```* : Extract particles that match a specific operator ("*lt*" for less than, "*gt*" for greater than). The argument to pass is "column/operator/value" (e.g. "*\_rlnDefocusU/lt/40000*" for defocus values less than 40000).
 
 * **```--count_particles```** : Count particles and print the result. Can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query, otherwise counts all.
 
@@ -82,9 +82,11 @@ starparser --i input.star [options]
 
 * **```--split```** *```number-of-splits```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.
 
+* **```--sortby```** *```column-name```* : Sort the column in ascending order and output a new file to output.star (or specified with ```--o```). By default, it will sort based on the column containing text. Add a slash followed by "*n*" if the column instead contains numeric values (e.g. "*\_rlnClassNumber/n*"). 
+
 ### Querying
 
-* **```-c```** *```columns```* : Column query. E.g. \_rlnMicrographName. This is used to look for a specific query specified with ```-q```. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Note the single dash in using this option.
+* **```-c```** *```columns```* : Column query. E.g. "*\_rlnMicrographName*". This is used to look for a specific query specified with ```-q```. To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note the single dash in using this option.
 
 * **```-q```** *```query```* : Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column. Note the single dash in using this option.
 

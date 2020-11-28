@@ -109,11 +109,11 @@ def setupParserOptions():
 
     info_opts.add_option("--split",
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
-        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.")
+        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.")   
 
-    info_opts.add_option("--find_nearest",
-        action="store", dest="parser_findnear", type="string", default="", metavar='column-name',
-        help="IN PROGRESS.")    
+    info_opts.add_option("--sortby",
+        action="store", dest="parser_sort", type="string", default="", metavar='column-name',
+        help="Sort particles by this column.")   
 
     parser.add_option_group(info_opts)
     
@@ -785,44 +785,6 @@ def replacecolumn(particles,replacecol,newcol):
     particles.drop(replacecol, 1, inplace=True)
     particles.insert(columnindex, replacecol, newcol)
     return(particles)
-
-def findnearest(coreparticles, nearparticles):
-
-    print("\n--find_nearest : IN PROGRESS.\n")
-    sys.exit()
-
-    coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
-    corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
-    coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
-    nearxloc = nearparticles.columns.get_loc("_rlnCoordinateX")+1
-    nearyloc = nearparticles.columns.get_loc("_rlnCoordinateX")+1
-
-    loneparticles = 0
-
-    nearestdistance = []
-
-    for coreparticle in coreparticles.itertuples():
-        x1 = float(coreparticle[corexloc])
-        y1 = float(coreparticle[coreyloc])
-        mic = coreparticle[coremicloc]
-        if nearparticles[nearparticles["_rlnMicrographName"].str.contains(mic)].empty:
-            loneparticles += 1
-        else:
-            distances = []
-            for nearparticle in nearparticles[nearparticles["_rlnMicrographName"].str.contains(mic)].itertuples():
-                x2 = float(nearparticle[nearxloc])
-                y2 = float(nearparticle[nearyloc])
-                distance = math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
-                distances.append(distance)
-                nearestdistance.append(min(distances))
-    print(np.mean(nearestdistance))
-
-    print(nearestdistance)
-
-    ax = plt.subplot(111)
-    plt.hist(nearestdistance, bins=400)
-    fig = ax.get_figure()
-    outputfig(fig, "Test")
         
 ########################################################
     
@@ -1068,8 +1030,8 @@ def mainloop(params):
             sys.exit()
         replacecol = params["parser_replacecol"]
         if replacecol not in allparticles.columns:
-                print("\n>> Error: the column " + str(c) + " does not exist in your star file.\n")
-                sys.exit()
+            print("\n>> Error: the column " + str(replacecol) + " does not exist in your star file.\n")
+            sys.exit()
         newcolfile = params["parser_file2"]
         with open(newcolfile) as f:
             newcol = [int(line.split()[0]) for line in f]
@@ -1081,17 +1043,25 @@ def mainloop(params):
         writestar(replacedstar, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
-    if params["parser_findnear"] != "":
-        outputcolumn = params["parser_findnear"]
-        if params["parser_file2"] == "":
-            print("\n>> Error: provide a second file with --f to match particles.\n")
+    if params["parser_sort"] != "":
+        inputparams = params["parser_sort"].split("/")
+        sortcol = inputparams[0]
+        if sortcol not in allparticles.columns:
+            print("\n>> Error: the column " + str(sortcol) + " does not exist in your star file.\n")
             sys.exit()
-        file2 = params["parser_file2"]
-        if not os.path.isfile(file2):
-            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
-            sys.exit();
-        otherparticles, metadata = getparticles(file2)
-        findnearest(allparticles, otherparticles)
+        if len(inputparams) == 1:
+            print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains text.")
+            writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
+        elif inputparams[1] == "s":
+            print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains text.")
+            writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
+        elif inputparams[1] == "n":
+            allparticles[sortcol] = allparticles[sortcol].apply(pd.to_numeric)
+            print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains numeric values.")
+            writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
+        else:
+            print("\n>> Error: use \"s\" or \"n\" after the slash to specify string or numeric.\n")
+        sys.exit()
 
     #######################################################################
     

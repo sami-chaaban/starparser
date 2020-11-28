@@ -56,7 +56,7 @@ def setupParserOptions():
     
     modify_opts.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,
-        help="Remove optics table and optics column. This may not be sufficient to be fully compatible with Relion 3.0. Use --delete_column to remove other bad columns before this, if necessary.")
+        help="Remove optics table and optics column and write to a new star file so that it is compatible with Relion 3.0.")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
@@ -113,7 +113,7 @@ def setupParserOptions():
 
     info_opts.add_option("--sortby",
         action="store", dest="parser_sort", type="string", default="", metavar='column-name',
-        help="Sort particles by this column.")   
+        help="Sort the column in ascending order and output a new file. By default, it will sort based on the column containing text. Add a slash followed by \"n\" if the column instead contains numeric values (e.g. _rlnClassNumber/n).")   
 
     parser.add_option_group(info_opts)
     

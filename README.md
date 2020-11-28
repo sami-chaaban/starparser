@@ -30,8 +30,6 @@ starparser --i input.star [options]
 
 * **```--f```** *```filename```* : The name of another file to get information from. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
 
-* **```--v3p0```** : Pass this if the star file lacks an optics table, such as those from Relion 3.0. It will create a dummy optics table before moving on. This option does not work with ```--class_proportion``` or commands that require parsing a second file.
-
 ### Plotting
 
 *See below for examples on how to use these options*
@@ -52,7 +50,7 @@ starparser --i input.star [options]
 
 * **```--swap_columns```** *```columns```* : Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
-* **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use StarParser on the output file, you will need to then pass ```--v3p0```.
+* **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use StarParser on the output file, you will need to then pass ```--opticsless```.
 
 * **```--regroup```** *```particles-per-group```* : Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
@@ -91,6 +89,10 @@ starparser --i input.star [options]
 * **```-q```** *```query```* : Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column. Note the single dash in using this option.
 
 * **```-e```** : Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example, you must pass this if you want just to look for "1" and ignore "15" (which has a "1" in it). Note the single dash in using this option.
+
+### Other
+
+* **```--opticsless```** : Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--class_proportion``` or commands that require parsing a second file.
 
 ### Output
 
@@ -171,13 +173,13 @@ starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swa
 
 ---
 
-* **Relegate a star file to v3.0**
+* **Relegate a star file to be compatible with Relion 3.0**
 
 ```
 starparser --i run_data.star --o run_data_3p0.star --relegate
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered accordingly.
 
 ---
 

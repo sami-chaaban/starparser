@@ -17,10 +17,6 @@ def setupParserOptions():
     parser.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
         help="Name of second file to extract columns from. Used with --swap_columns, --compare, and --split_unique.")
-
-    parser.add_option("--v3p0",
-        action="store_true", dest="parser_3p0", default=False,
-        help="Pass this if the file lacks an optics group, such as Relion 3.0 files.")
     
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
@@ -147,6 +143,17 @@ def setupParserOptions():
     
     parser.add_option_group(output_opts)
 
+    other_opts = optparse.OptionGroup(
+        parser, 'Other Options')
+
+    other_opts.add_option("--opticsless",
+        action="store_true", dest="parser_optless", default=False,
+        help="Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files.")
+
+    parser.add_option_group(other_opts)
+
+    ########
+
     options,args = parser.parse_args()
 
     if len(sys.argv) < 4:
@@ -253,6 +260,21 @@ def getparticles(filename):
     alloptics = makepandas(opticsheaders, optics)
     allparticles = makepandas(particlesheaders, particles)
     
+    metadata = [version,opticsheaders,alloptics,particlesheaders,tablename]
+
+    return(allparticles, metadata)
+
+def getparticles_dummyoptics(filename):
+
+    file = open(filename,mode='r')
+    starfile = file.read()
+    file.close()
+    tempinsertion = "\n# version 30000\n\ndata_optics\n\nloop_\n_rlnOpticsGroupName #1\n_rlnOpticsGroup #2\n_rlnVoltage #3\n_rlnImagePixelSize #4\nopticsGroup1\t1\t300.000000\t1.000000\n\n\n# version 30000\n\ndata_images\n\n"
+    looploc = starfile.find("loop_")
+    starfile = tempinsertion + starfile[looploc:]
+    version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
+    alloptics = makepandas(opticsheaders, optics)
+    allparticles = makepandas(particlesheaders, particles)
     metadata = [version,opticsheaders,alloptics,particlesheaders,tablename]
 
     return(allparticles, metadata)
@@ -837,18 +859,9 @@ def mainloop(params):
     
     #Initialize variables
 
-    if params["parser_3p0"]: #add dummy optics table
-        file = open(filename,mode='r')
-        starfile = file.read()
-        file.close()
-        tempinsertion = "\n# version 30000\n\ndata_optics\n\nloop_\n_rlnOpticsGroupName #1\n_rlnOpticsGroup #2\n_rlnVoltage #3\n_rlnImagePixelSize #4\nopticsGroup1\t1\t300.000000\t1.000000\n\n\n# version 30000\n\ndata_images\n\n"
-        looploc = starfile.find("loop_")
-        starfile = tempinsertion + starfile[looploc:]
+    if params["parser_optless"]: #add dummy optics table
+        allparticles, metadata = getparticles_dummyoptics(filename)
         print("\n>> Created a dummy optics table to read this star file.")
-        version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
-        alloptics = makepandas(opticsheaders, optics)
-        allparticles = makepandas(particlesheaders, particles)
-        metadata = [version,opticsheaders,alloptics,particlesheaders,tablename]
     else:
         allparticles, metadata = getparticles(filename)
 
@@ -869,7 +882,7 @@ def mainloop(params):
         
         columns = ""
 
-    if params["parser_3p0"]:
+    if params["parser_optless"]:
         relegateflag = True
     else:
         relegateflag = params["parser_relegate"]

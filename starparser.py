@@ -129,6 +129,15 @@ def setupParserOptions():
         help="Pass this if you want an exact match of the values to the query(ies) provided by -q (e.g. if you want just to look for \"1\" and ignore \"15\".)")
     
     parser.add_option_group(query_opts)
+
+    other_opts = optparse.OptionGroup(
+        parser, 'Other Options')
+
+    other_opts.add_option("--opticsless",
+        action="store_true", dest="parser_optless", default=False,
+        help="Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files.")
+
+    parser.add_option_group(other_opts)
     
     output_opts = optparse.OptionGroup(
         parser, 'Output Options')
@@ -142,15 +151,6 @@ def setupParserOptions():
         help="File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.")
     
     parser.add_option_group(output_opts)
-
-    other_opts = optparse.OptionGroup(
-        parser, 'Other Options')
-
-    other_opts.add_option("--opticsless",
-        action="store_true", dest="parser_optless", default=False,
-        help="Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files.")
-
-    parser.add_option_group(other_opts)
 
     ########
 

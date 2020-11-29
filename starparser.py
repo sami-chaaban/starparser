@@ -4,11 +4,12 @@ import pandas as pd
 import optparse
 import matplotlib.pyplot as plt
 import math
+import numpy as np
 
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.6.")
+        version="%prog 1.7.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
@@ -49,10 +50,6 @@ def setupParserOptions():
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
-    
-    modify_opts.add_option("--relegate",
-        action="store_true", dest="parser_relegate", default=False,
-        help="Remove optics table and optics column and write to a new star file so that it is compatible with Relion 3.0.")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
@@ -65,6 +62,10 @@ def setupParserOptions():
     modify_opts.add_option("--replace_column",
         action="store", dest="parser_replacecol", type="string", default="", metavar='column-name',
         help="Replace all entries of the passed column with those of a file provided by --f. The file should be a single column of values that totals the number of particles in the star file.")
+
+    modify_opts.add_option("--relegate",
+        action="store_true", dest="parser_relegate", default=False,
+        help="Remove optics table and optics column and write to a new star file so that it is compatible with Relion 3.0.")
 
     parser.add_option_group(modify_opts)
     
@@ -97,7 +98,11 @@ def setupParserOptions():
 
     info_opts.add_option("--split_unique",
         action="store", dest="parser_splitunique", type="string", default="", metavar='column-name',
-        help="Split the input star file into two new files: those that are unique to the input file in comparison to the one provided by --f, and those that are shared between both. Specify the column to use for the comparison here.")
+        help="Split the input star file into two new files: one with particles that are unique to the input file in comparison to the one provided by --f, and one that has particles that are shared between both. Specify the column to use for the comparison here.")
+
+    info_opts.add_option("--split_proximal",
+        action="store", dest="parser_splitproximal", type="float", default=-1, metavar='distance',
+        help="Match particles in the input star file to the closest particle from a second star file provided by --f; those that are closer than the distance provided here will be output to particles_close.star and those that are further will be output to particles_far.star. It will also output a histogram of nearest distances to Particles_distances.png.")
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
@@ -336,7 +341,7 @@ def writestar(particles, metadata, outputname, relegate):
 
     output.close()
 
-    print("\n-->> Output star file: " + outputname + "\n")
+    print("-->> Output star file: " + outputname + "\n")
 
 def getiterationlist(filename):
     
@@ -735,7 +740,7 @@ def classproportion(particles, columns, query):
 def outputfig(fig, name):
     
     fig.savefig(name + "." + outtype)
-    print("\n-->> Output to " + name + "." + outtype + ".\n")
+    print("\n-->> Output figure to " + name + "." + outtype + ".\n")
     
 def makeopticsgroup(particles,metadata,newgroup):
     
@@ -807,6 +812,60 @@ def replacecolumn(particles,replacecol,newcol):
     particles.drop(replacecol, 1, inplace=True)
     particles.insert(columnindex, replacecol, newcol)
     return(particles)
+
+def splitproximal(coreparticles,nearparticles,threshdist):
+
+        coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
+        coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
+        corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
+        coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
+        corenameloc = coreparticles.columns.get_loc("_rlnImageName")+1
+        nearmicrographs = nearparticles.groupby(["_rlnMicrographName"])
+        nearxloc = nearparticles.columns.get_loc("_rlnCoordinateX")+1
+        nearyloc = nearparticles.columns.get_loc("_rlnCoordinateY")+1
+
+        noparts=[]
+        farparts=[]
+        alldistances=[]
+
+        for coremicrograph in coremicrographs:
+            
+            try:
+                nearmicrograph = nearmicrographs.get_group(coremicrograph[0])
+            except:
+                for coreparticle in coremicrograph[1].itertuples():
+                    noparts.append(coreparticle[corenameloc])
+                continue 
+            
+            for coreparticle in coremicrograph[1].itertuples():
+                x1 = float(coreparticle[corexloc])
+                y1 = float(coreparticle[coreyloc])
+                
+                nearparticlelocs=[]
+                [nearparticlelocs.append([float(n[nearxloc]),float(n[nearyloc])]) for n in nearmicrograph.itertuples()]
+                nearparticlelocs = np.asarray(nearparticlelocs)
+                distances = np.sqrt(np.sum((nearparticlelocs - [x1,y1])**2, axis=1))
+
+                mindistance = np.min(distances)
+                nearest = np.argmin(distances)
+                alldistances.append(mindistance)
+
+                if mindistance > threshdist:
+                    farparts.append(coreparticle[corenameloc])
+
+        farparticles = coreparticles.copy()
+        farparticles = farparticles[farparticles['_rlnImageName'].isin(farparts)]
+
+        closeparticles = coreparticles.copy()
+        closeparticles = closeparticles[~closeparticles['_rlnImageName'].isin(farparts)]
+
+        if len(noparts) != 0:
+            farparticles = farparticles[~farparticles['_rlnImageName'].isin(noparts)]
+            closeparticles = closeparticles[~closeparticles['_rlnImageName'].isin(noparts)]
+
+        print("\n>> Created subsets with particles that are closer or further than " + str(threshdist) + " pixels. Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
+
+        return(farparticles, closeparticles, alldistances)
         
 ########################################################
     
@@ -957,6 +1016,33 @@ def mainloop(params):
             writestar(unsharedparticles, metadata, "unique.star", relegateflag)
             print("\n>> " + str(len(sharedparticles.index)) + " particles shared by " + filename + " and " +  file2 + " in the " + columntocheckunique + " column.")
             writestar(sharedparticles, metadata, "shared.star", relegateflag)
+        sys.exit()
+
+    if params["parser_splitproximal"] != 0:
+        threshdist = float(params["parser_splitproximal"])
+        if threshdist < 0:
+             print("\n>> Error: distance cannot be negative.\n")    
+             sys.exit()       
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file to check the particle distances with --f.\n")
+            sys.exit()
+        if not os.path.isfile(params["parser_file2"]):
+            print("\n>> Error: \"" + params["parser_file2"] + "\" does not exist.\n")
+            sys.exit();
+
+        nearparticles, nearmetadata = getparticles(params["parser_file2"])
+        farparticles, closeparticles, distances = splitproximal(allparticles, nearparticles, threshdist)
+
+        fig = plt.figure()
+        plt.hist(distances, bins='fd', color = 'k', alpha=0.5)
+        plt.axvline(x=threshdist, linestyle='--', color = 'maroon')
+        plt.ylabel('Frequency')
+        plt.xlabel('Nearest distance')
+        outputfig(fig, "Particle_distances")
+
+        writestar(closeparticles, metadata, "particles_close.star", relegateflag)
+        writestar(farparticles, metadata, "particles_far.star", relegateflag)
+
         sys.exit()
         
     if params["parser_classproportion"]:

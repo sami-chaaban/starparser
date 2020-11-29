@@ -50,13 +50,13 @@ starparser --i input.star [options]
 
 * **```--swap_columns```** *```columns```* : Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
-* **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use StarParser on the output file, you will need to then pass ```--opticsless```.
-
 * **```--regroup```** *```particles-per-group```* : Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
 * **```--new_optics```** *```optics-group-name```* : Provide a new optics group name. Use ```-c``` and ```-q``` to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--replace_column```** *```column-name```* : Replace all entries of the column with those of a file provided by ``--f``. The file should be a single column of values that totals the number of particles in the star file. This is useful when used in conjunction with ```--list_column```, which outputs column values for easy editing before reinsertion with ```--replace_column```. The result is written to a new star file (default output.star, or specified with ```--o```).
+
+* **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use StarParser on the output file, you will need to then pass ```--opticsless```.
 
 ### Data mining
 
@@ -74,7 +74,9 @@ starparser --i input.star [options]
 
 * **```--compare```** *```column```* : Count the number of particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Also counts the number that are unique to each star file.
 
-* **```--split_unique```** *```column```* : Split the input star file into two new files: those that are unique to the input file and another file specified by ```--f``` based on column provided here, and those that are shared between both. It will output shared.star and unique.star.
+* **```--split_unique```** *```column```* : Split the input star file into two new files: one with particles that are unique to the input file in comparison to the one provided by --f, and one that has particles that are shared between both. Specify the column to use for the comparison here. It will output shared.star and unique.star.
+
+* **```--split_proximal```** *```distance```* : Match particles in the input star file to the closest particle from a second star file provided by ```--f```; those that are closer than the distance provided here will be output to particles_close.star and those that are further will be output to particles_far.star. It will also output a histogram of nearest distances to Particles_distances.png. Use ```--t``` to change filetype (see the *Output* options)
 
 * **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```--o```).
 
@@ -341,7 +343,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.6** - November 2020
+* **1.7** - November 2020
 
 ## License
 

@@ -16,9 +16,9 @@ starparser --i input.star [options]
 
 ## Getting Started
 
-* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`.
+* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`. It has only been tested on **pandas** version 1.1.3.
 
-* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns, (e.g. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. Note that the term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
+* Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns, (e.g. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. Note that the term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file. If the star file lacks an optics table, as with those from Relion 3.0, you can use the ```--opticsless``` option to parse it.
 
 ## Options
 
@@ -28,7 +28,7 @@ starparser --i input.star [options]
 
 * **```--i```** *```filename```* : Input star file.
 
-* **```--f```** *```filename```* : The name of another file to get information from. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, and ```--replace_column```.
+* **```--f```** *```filename```* : The name of another file to get information from. Used with ```--swap_columns```, ```--compare```, ```--split_unique```, ```--split_proximal```, and ```--replace_column```.
 
 ### Plotting
 
@@ -82,7 +82,7 @@ starparser --i input.star [options]
 
 * **```--split```** *```number-of-splits```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.
 
-* **```--sortby```** *```column-name```* : Sort the column in ascending order and output a new file to output.star (or specified with ```--o```). By default, it will sort based on the column containing text. Add a slash followed by "*n*" if the column instead contains numeric values (e.g. "*\_rlnClassNumber/n*"). 
+* **```--sortby```** *```column-name```* : Sort the column in ascending order and output a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. "*\_rlnClassNumber/n*"); otherwise, it will sort the values as text. 
 
 ### Querying
 

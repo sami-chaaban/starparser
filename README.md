@@ -121,7 +121,7 @@ starparser --i run_data.star --plot_defocus
 * Plot the number of particles per class for the 25 iterations of a Class3D job.
 
 ```
-starparser --i run_it025_data.star --plot_classparts all
+starparser --i run_it025_data.star --plot_class_iterations all
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Class_distribution.png**:
@@ -132,7 +132,7 @@ starparser --i run_it025_data.star --plot_classparts all
 * Plot the proportion of particles in each class that belong to particles with the term 200702 versus those with the term 200826 in the \_rlnMicrographName column.
 
 ```
-starparser --i run_it025_data.star --class_proportion -c _rlnMicrographName -q 200702/200826
+starparser --i run_it025_data.star --plot_class_proportions -c _rlnMicrographName -q 200702/200826
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  The percentage in each class will be displayed in terminal.
@@ -300,22 +300,10 @@ starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q
 * **Compare particles between star files**
 
 ```
-starparser --i run_it025_data.star --compare _rlnImageName --f particles.star
-```
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star and particles.star share 36328 particles in the \_rlnImageName column.*
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *run_it025_data.star has 32792 unique particles and particles.star has 1 unique particles in the \_rlnImageName column.*
-
----
-
-* **Extract particles that are unique and shared between two star files**
-
-```
 starparser --i run_data1.star --split_unique _rlnMicrographName --f run_data2.star
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2star (unique.star) and only the particles that are shared between them (shared.star) based on the \_rlnMicrographName column.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2.star (unique.star) and only the particles that are shared between them (shared.star) based on the \_rlnMicrographName column.
 
 ---
 

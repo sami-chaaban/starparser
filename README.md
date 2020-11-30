@@ -36,9 +36,9 @@ starparser --i input.star [options]
 
 * **```--plot_defocus```** : Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. The number of bins is calculated using the Freedman-Diaconis rule. Use ```--t``` to change filetype (see the *Output* options).
 
-* **```--plot_classparts```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a slash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
+* **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a slash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
-* **```--class_proportion```** : Find the proportion of particle sets that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
+* **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
 
 ### Modifying
 
@@ -72,17 +72,15 @@ starparser --i input.star [options]
 
 * **```--list_column```** *```columns```* : Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query, otherwise lists all items.
 
-* **```--compare```** *```column```* : Count the number of particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Also counts the number that are unique to each star file.
+* **```--find_shared```** *```column```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 
-* **```--split_unique```** *```column```* : Split the input star file into two new files: one with particles that are unique to the input file in comparison to the one provided by --f, and one that has particles that are shared between both. Specify the column to use for the comparison here. It will output shared.star and unique.star.
-
-* **```--split_proximal```** *```distance```* : Match particles in the input star file to the closest particle from a second star file provided by ```--f```; those that are closer than the distance provided here will be output to particles_close.star and those that are further will be output to particles_far.star. It will also output a histogram of nearest distances to Particles_distances.png. Use ```--t``` to change filetype (see the *Output* options)
+* **```--find_nearby```** *```distance```* : Find the nearest particle in a micrograph between the input star file and a second star file provided by ```--f```; those that are closer than the distance provided here will be output to particles_close.star and those that are further will be output to particles_far.star. It will also output a histogram of nearest distances to Particles_distances.png. Use ```--t``` to change filetype (see the *Output* options)
 
 * **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column. In this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```--o```).
 
-* **```--split```** *```number-of-splits```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.
+* **```--split```** *```number-of-splits```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain exactly the same number of particles.
 
-* **```--sortby```** *```column-name```* : Sort the column in ascending order and output a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. "*\_rlnClassNumber/n*"); otherwise, it will sort the values as text. 
+* **```--sort_by```** *```column-name```* : Sort the column in ascending order and output a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. "*\_rlnClassNumber/n*"); otherwise, it will sort the values as text. 
 
 ### Querying
 
@@ -343,7 +341,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.7** - November 2020
+* **1.8** - November 2020
 
 ## License
 

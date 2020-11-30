@@ -9,7 +9,7 @@ import numpy as np
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.7.")
+        version="%prog 1.8.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
@@ -17,7 +17,7 @@ def setupParserOptions():
 
     parser.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
-        help="Name of second file to extract columns from. Used with --swap_columns, --compare, and --split_unique.")
+        help="Name of second file to extract columns from. Used with --swap_columns, --find_shared, and --find_nearby.")
     
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
@@ -26,11 +26,11 @@ def setupParserOptions():
         action="store_true", dest="parser_plotdefocus", default=False,
         help="Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all. Use --t to change filetype.")
     
-    plot_opts.add_option("--plot_classparts",
+    plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
         help="Plot the number of particles per class for all iterations up to the one provided in the input. Type \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
     
-    plot_opts.add_option("--class_proportion",
+    plot_opts.add_option("--plot_class_proportions",
         action="store_true", dest="parser_classproportion", default=False,
         help="Plot the proportion of particles that match different queries in each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
 
@@ -92,17 +92,13 @@ def setupParserOptions():
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
         help="Write all values of a column to a file (filename is the header). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.")
     
-    info_opts.add_option("--compare",
-        action="store", dest="parser_compareparts", type="string", default="", metavar='column-name',
-        help="Count the number of particles that are shared between the input star file and the one provided by --f based on the column provided here. Also counts the number that are unique to each star file.")
+    info_opts.add_option("--find_shared",
+        action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
+        help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.")
 
-    info_opts.add_option("--split_unique",
-        action="store", dest="parser_splitunique", type="string", default="", metavar='column-name',
-        help="Split the input star file into two new files: one with particles that are unique to the input file in comparison to the one provided by --f, and one that has particles that are shared between both. Specify the column to use for the comparison here.")
-
-    info_opts.add_option("--split_proximal",
-        action="store", dest="parser_splitproximal", type="float", default=-1, metavar='distance',
-        help="Match particles in the input star file to the closest particle from a second star file provided by --f; those that are closer than the distance provided here will be output to particles_close.star and those that are further will be output to particles_far.star. It will also output a histogram of nearest distances to Particles_distances.png.")
+    info_opts.add_option("--find_nearby",
+        action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
+        help="Find the nearest particle in a micrograph between the input star file and a second star file provided by --f; those that are closer than the distance provided here will be output to particles_close.star and those that are further will be output to particles_far.star. It will also output a histogram of nearest distances to Particles_distances.png.")
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
@@ -110,11 +106,11 @@ def setupParserOptions():
 
     info_opts.add_option("--split",
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
-        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain equivalent numbers of particles.")   
+        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain exactly the same number of particles")
 
-    info_opts.add_option("--sortby",
+    info_opts.add_option("--sort_by",
         action="store", dest="parser_sort", type="string", default="", metavar='column-name',
-        help="Sort the column in ascending order and output a new file. By default, it will sort based on the column containing text. Add a slash followed by \"n\" if the column instead contains numeric values (e.g. _rlnClassNumber/n).")   
+        help="Sort the column in ascending order and output a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"_rlnClassNumber/n\"); otherwise, it will sort the values as text.")   
 
     parser.add_option_group(info_opts)
     
@@ -813,7 +809,7 @@ def replacecolumn(particles,replacecol,newcol):
     particles.insert(columnindex, replacecol, newcol)
     return(particles)
 
-def splitproximal(coreparticles,nearparticles,threshdist):
+def findnearby(coreparticles,nearparticles,threshdist):
 
         coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
         coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
@@ -867,7 +863,10 @@ def splitproximal(coreparticles,nearparticles,threshdist):
 
         return(farparticles, closeparticles, alldistances)
         
-########################################################
+################################################################################################################
+################################################################################################################
+################################################################################################################
+################################################################################################################
     
 def mainloop(params):
     
@@ -987,17 +986,8 @@ def mainloop(params):
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
-    if params["parser_compareparts"] != "" or params["parser_splitunique"] != "":
-        if params["parser_compareparts"] != "":
-            if params["parser_file2"] == "":
-                print("\n>> Error: enter a second file with --f.\n")
-                sys.exit()
-            columntocheckunique = params["parser_compareparts"]
-        elif params["parser_splitunique"] != "":
-            if params["parser_file2"] == "":
-                print("\n>> Error: enter a second file with --f\n")
-                sys.exit()
-            columntocheckunique = params["parser_splitunique"]
+    if params["params_findshared"] != "":
+        columntocheckunique = params["params_findshared"]
         if columntocheckunique not in allparticles.columns:
             print("\n>> Error: could not find the " + columntocheckunique + " column in " + filename + ".\n")
             sys.exit()
@@ -1008,18 +998,15 @@ def mainloop(params):
         otherparticles, metadata = getparticles(file2)
         unsharedparticles = allparticles[~allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         sharedparticles = allparticles[allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
-        if params["parser_compareparts"] != "":
+        if params["params_findshared"] != "":
             print("\n>> Shared: \n" + filename + " and " + file2 + " share " + str(len(sharedparticles.index)) + " particles in the " + str(columntocheckunique) + " column.")
             print("\n>> Unique: \n" + filename + " has " + str(len(unsharedparticles.index)) + " unique particles and " + file2 + " has " + str(len(otherparticles.index) - len(sharedparticles.index)) + " unique particles in the " + str(columntocheckunique) + " column.\n")
-        elif params["parser_splitunique"] != "":
-            print("\n>> " + str(len(unsharedparticles.index)) + " particles unique to " + filename + " in the " + columntocheckunique + " column.")
             writestar(unsharedparticles, metadata, "unique.star", relegateflag)
-            print("\n>> " + str(len(sharedparticles.index)) + " particles shared by " + filename + " and " +  file2 + " in the " + columntocheckunique + " column.")
             writestar(sharedparticles, metadata, "shared.star", relegateflag)
         sys.exit()
 
-    if params["parser_splitproximal"] != 0:
-        threshdist = float(params["parser_splitproximal"])
+    if params["parser_findnearby"] != 0:
+        threshdist = float(params["parser_findnearby"])
         if threshdist < 0:
              print("\n>> Error: distance cannot be negative.\n")    
              sys.exit()       
@@ -1031,7 +1018,7 @@ def mainloop(params):
             sys.exit();
 
         nearparticles, nearmetadata = getparticles(params["parser_file2"])
-        farparticles, closeparticles, distances = splitproximal(allparticles, nearparticles, threshdist)
+        farparticles, closeparticles, distances = findnearby(allparticles, nearparticles, threshdist)
 
         fig = plt.figure()
         plt.hist(distances, bins='fd', color = 'k', alpha=0.5)

@@ -32,8 +32,6 @@ starparser --i input.star [options]
 
 ### Plotting
 
-*See below for examples on how to use these options*
-
 * **```--histogram```** : Plot values of a column as a histogram. Use ```-c``` and ```-q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
 
 * **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a slash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
@@ -41,8 +39,6 @@ starparser --i input.star [options]
 * **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
 
 ### Modifying
-
-*See below for examples on how to use these options*
 
 * **```--delete_column```** *```columns```* : Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. "*\_rlnMicrographName*". To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that "relion_star_handler --remove_column" also does this.
 
@@ -59,8 +55,6 @@ starparser --i input.star [options]
 * **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use StarParser on the output file, you will need to then pass ```--opticsless```.
 
 ### Data mining
-
-*See below for examples on how to use these options*
 
 * **```--extract_particles```** : Find particles that match a column header (```-c```) and query (```-q```) and write them to a new star file (default output.star, or specified with ```--o```).
 

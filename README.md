@@ -34,7 +34,7 @@ starparser --i input.star [options]
 
 *See below for examples on how to use these options*
 
-* **```--plot_defocus```** : Plot defocus to Defocus_histogram.png based on values in the column \_rlnDefocusU. Can be used with ```-c``` and ```-q``` for a subset, otherwise plots all. The number of bins is calculated using the Freedman-Diaconis rule. Use ```--t``` to change filetype (see the *Output* options).
+* **```--histogram```** : Plot values of a column as a histogram. Use ```-c``` and ```-q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule.
 
 * **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a slash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
@@ -110,10 +110,10 @@ The following examples run the `starparser` command assuming an alias has been c
 
 * Plot a histogram of defocus values.
 ```
-starparser --i run_data.star --plot_defocus
+starparser --i run_data.star --histogram _rlnDefocusU
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Defocus_histogram.png**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **DefocusU.png**:
 ![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
 
 ---

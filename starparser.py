@@ -22,9 +22,9 @@ def setupParserOptions():
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
 
-    plot_opts.add_option("--plot_defocus",
-        action="store_true", dest="parser_plotdefocus", default=False,
-        help="Plot defocus to Defocus_histogram.png. Can be used with -c and -q for a subset count, otherwise plots all. Use --t to change filetype.")
+    plot_opts.add_option("--histogram",
+        action="store", dest="parser_plot", default="", metavar="column-name",
+        help="Plot values of a column as a histogram. Use -c and -q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
@@ -429,17 +429,17 @@ def countqueryparticles(particles,columns,query,quiet):
 
     return(totalquery)
         
-def plotdefocus(particles):
+def plotcol(particles, column):
     
-    particles["_rlnDefocusU"] = pd.to_numeric(particles["_rlnDefocusU"], downcast="float")
+    particles[column] = pd.to_numeric(particles[column], downcast="float")
 
     numparticles = len(particles.index)
 
-    ax = particles["_rlnDefocusU"].plot.hist(bins='fd')
-    ax.set_xlabel("_rlnDefocusU")
+    ax = particles[column].plot.hist(bins='fd')
+    ax.set_xlabel(column[4:])
     
     fig = ax.get_figure()
-    outputfig(fig, "Defocus_histogram")
+    outputfig(fig, column[4:])
     
 def plotclassparts(filename, classes):
     
@@ -986,8 +986,8 @@ def mainloop(params):
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
-    if params["params_findshared"] != "":
-        columntocheckunique = params["params_findshared"]
+    if params["parser_findshared"] != "":
+        columntocheckunique = params["parser_findshared"]
         if columntocheckunique not in allparticles.columns:
             print("\n>> Error: could not find the " + columntocheckunique + " column in " + filename + ".\n")
             sys.exit()
@@ -998,14 +998,14 @@ def mainloop(params):
         otherparticles, metadata = getparticles(file2)
         unsharedparticles = allparticles[~allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         sharedparticles = allparticles[allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
-        if params["params_findshared"] != "":
+        if params["parser_findshared"] != "":
             print("\n>> Shared: \n" + filename + " and " + file2 + " share " + str(len(sharedparticles.index)) + " particles in the " + str(columntocheckunique) + " column.")
             print("\n>> Unique: \n" + filename + " has " + str(len(unsharedparticles.index)) + " unique particles and " + file2 + " has " + str(len(otherparticles.index) - len(sharedparticles.index)) + " unique particles in the " + str(columntocheckunique) + " column.\n")
             writestar(unsharedparticles, metadata, "unique.star", relegateflag)
             writestar(sharedparticles, metadata, "shared.star", relegateflag)
         sys.exit()
 
-    if params["parser_findnearby"] != 0:
+    if params["parser_findnearby"] != -1:
         threshdist = float(params["parser_findnearby"])
         if threshdist < 0:
              print("\n>> Error: distance cannot be negative.\n")    
@@ -1171,8 +1171,16 @@ def mainloop(params):
         writestar(particles2use, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
-    if params["parser_plotdefocus"]:
-        plotdefocus(particles2use)
+    if params["parser_plot"] != "":
+        columntoplot = params["parser_plot"]
+        if columntoplot not in particles2use:
+            print("\n>> Error: the column \"" + columntoplot + "\" does not exist.\n")
+            sys.exit()
+        try:
+            plotcol(particles2use, columntoplot)
+        except:
+            print("\n>> Error: could not plot the column \"" + columntoplot + "\", maybe it's not numeric.\n")
+            sys.exit()
         sys.exit()
         
     if params["parser_writecol"] != "":

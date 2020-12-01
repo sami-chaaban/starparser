@@ -124,7 +124,7 @@ starparser --i run_data.star --histogram _rlnDefocusU
 starparser --i run_it025_data.star --plot_class_iterations all
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Class_distribution.png**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.png**:
 ![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
 
 ---
@@ -137,7 +137,7 @@ starparser --i run_it025_data.star --plot_class_proportions -c _rlnMicrographNam
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  The percentage in each class will be displayed in terminal.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output **Class_proportion.png**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_proportion.png**:
 ![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
 
 ---

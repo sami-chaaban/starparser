@@ -40,7 +40,7 @@ def setupParserOptions():
         parser, 'Modification Options')
     
     modify_opts.add_option("--delete_column",
-        action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name',
+        action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',
         help="Delete column and renumber headers. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
     
     modify_opts.add_option("--delete_particles",
@@ -98,7 +98,7 @@ def setupParserOptions():
 
     info_opts.add_option("--find_nearby",
         action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
-        help="Find the nearest particle in a micrograph between the input star file and a second star file provided by --f; those that are closer than the distance provided here will be output to particles_close.star and those that are further will be output to particles_far.star. It will also output a histogram of nearest distances to Particles_distances.png.")
+        help="Find the nearest particle in a second star file provided by --f; particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',

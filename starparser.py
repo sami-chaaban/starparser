@@ -46,7 +46,11 @@ def setupParserOptions():
     modify_opts.add_option("--delete_particles",
         action="store_true", dest="parser_delparticles", default=False,
         help="Delete particles. Pick a column header (-c) and query (-q) to delete particles that match it.")
-     
+
+    modify_opts.add_option("--replace_column",
+        action="store", dest="parser_replacecol", type="string", default="", metavar='column-name',
+        help="Replace all entries of a column with a list of values found in the file provided by --f. The file should be a single column and should have an equivalent number to the star file.")     
+
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
@@ -58,10 +62,6 @@ def setupParserOptions():
     modify_opts.add_option("--new_optics",
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
         help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
-
-    modify_opts.add_option("--replace_column",
-        action="store", dest="parser_replacecol", type="string", default="", metavar='column-name',
-        help="Replace all entries of the passed column with those of a file provided by --f. The file should be a single column of values that totals the number of particles in the star file.")
 
     modify_opts.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,

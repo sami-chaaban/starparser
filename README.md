@@ -14,9 +14,9 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/scri
 starparser --i input.star [options]
 ```	
 
-## Getting Started
+## Prerequisites
 
-* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`. It has only been tested on **pandas** version 1.1.3.
+* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`. (Note: it has only been tested on **pandas** version 1.1.3.)
 
 * Your input file needs to be a standard **Relion 3.1** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns, (e.g. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. Note that the term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file. If the star file lacks an optics table, as with those from Relion 3.0, you can add the ```--opticsless``` option to parse it.
 

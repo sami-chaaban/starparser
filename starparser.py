@@ -17,7 +17,7 @@ def setupParserOptions():
 
     parser.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
-        help="Name of second file to extract columns from. Used with --swap_columns, --find_shared, and --find_nearby.")
+        help="Name of second file to extract columns from. Used with --swap_columns, --find_shared, and --extract_nearby.")
     
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
@@ -96,9 +96,13 @@ def setupParserOptions():
         action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
         help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.")
 
-    info_opts.add_option("--find_nearby",
+    info_opts.add_option("--extract_nearby",
         action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
-        help="Find the nearest particle in a second star file provided by --f; particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
+        help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
+
+    info_opts.add_option("--retrieve_nearby",
+        action="store", dest="parser_retrievenearby", type="string", default="", metavar='distance/column-name',
+        help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Outputs to particles_retrieved.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph).")
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
@@ -843,7 +847,6 @@ def findnearby(coreparticles,nearparticles,threshdist):
                 distances = np.sqrt(np.sum((nearparticlelocs - [x1,y1])**2, axis=1))
 
                 mindistance = np.min(distances)
-                nearest = np.argmin(distances)
                 alldistances.append(mindistance)
 
                 if mindistance > threshdist:
@@ -862,6 +865,58 @@ def findnearby(coreparticles,nearparticles,threshdist):
         print("\n>> Created subsets with particles that are closer or further than " + str(threshdist) + " pixels. Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
 
         return(farparticles, closeparticles, alldistances)
+
+def stealnearby(coreparticles,nearparticles,threshdist,columntoretrieve):
+
+        coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
+        coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
+        corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
+        coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
+        corenameloc = coreparticles.columns.get_loc("_rlnImageName")+1
+        coreCOLloc = coreparticles.columns.get_loc(columntoretrieve)+1
+        nearmicrographs = nearparticles.groupby(["_rlnMicrographName"])
+        nearxloc = nearparticles.columns.get_loc("_rlnCoordinateX")+1
+        nearyloc = nearparticles.columns.get_loc("_rlnCoordinateY")+1
+        nearCOLloc = nearparticles.columns.get_loc(columntoretrieve)+1
+
+        noparts=[]
+        farparts=[]
+        alldistances=[]
+
+        stolenparticles = coreparticles.copy()
+
+        for coremicrograph in coremicrographs:
+            
+            try:
+                nearmicrograph = nearmicrographs.get_group(coremicrograph[0])
+            except:
+                for coreparticle in coremicrograph[1].itertuples():
+                    noparts.append(coreparticle[corenameloc])
+                continue 
+            
+            for coreparticle in coremicrograph[1].itertuples():
+                x1 = float(coreparticle[corexloc])
+                y1 = float(coreparticle[coreyloc])
+                nearparticlelocs=[]
+                [nearparticlelocs.append([float(n[nearxloc]),float(n[nearyloc])]) for n in nearmicrograph.itertuples()]
+                nearparticlelocs = np.asarray(nearparticlelocs)
+                distances = np.sqrt(np.sum((nearparticlelocs - [x1,y1])**2, axis=1))
+                mindistance = np.min(distances)
+
+                if mindistance > threshdist:
+                    farparts.append(coreparticle[corenameloc])
+                else:
+                    nearestid = np.argmin(distances)
+                    nearcoldata = nearmicrograph.iloc[nearestid][columntoretrieve]
+                    stolenparticles.iloc[coreparticle[0]][columntoretrieve] = nearcoldata
+
+        stolenparticles = stolenparticles[~stolenparticles['_rlnImageName'].isin(farparts)]
+        if len(noparts) != 0:
+            stolenparticles = stolenparticles[~stolenparticles['_rlnImageName'].isin(noparts)]
+
+        print("\n>> Retrieved " + columntoretrieve + " values from particles within " + str(threshdist) + " pixels. \n>> " + str(len(stolenparticles.index)) + " out of " + str(len(coreparticles.index)) + " were successfully processed. " + str(len(farparts)) + " particles were too far and " + str(len(noparts)) + " particles did not have neighbours.\n")
+
+        return(stolenparticles)
         
 ################################################################################################################
 ################################################################################################################
@@ -1030,6 +1085,34 @@ def mainloop(params):
         writestar(closeparticles, metadata, "particles_close.star", relegateflag)
         writestar(farparticles, metadata, "particles_far.star", relegateflag)
 
+        sys.exit()
+
+    if params["parser_retrievenearby"] != "":
+        retrieveparams = params["parser_retrievenearby"].split("/")
+        if len(retrieveparams) < 2 or len(retrieveparams) > 2:
+            print("\n>> Error: provide argument in this format: distance/column (e.g. 300/_rlnClassNumber).")
+            sys.exit()
+        columntoretrieve = retrieveparams[1]
+        threshdist = float(retrieveparams[0])
+        if threshdist < 0:
+             print("\n>> Error: distance cannot be negative.\n")    
+             sys.exit()       
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to retrieve values from.\n")
+            sys.exit()
+        if not os.path.isfile(params["parser_file2"]):
+            print("\n>> Error: \"" + params["parser_file2"] + "\" does not exist.\n")
+            sys.exit();
+        if columntoretrieve not in allparticles:
+            print("\n>> Error: " + columntoretrieve + " does not exist in the input star file.\n")
+            sys.exit()
+        nearparticles, nearmetadata = getparticles(params["parser_file2"])
+        if columntoretrieve not in nearparticles:
+            print("\n>> Error: " + columntoretrieve + " does not exist in the second star file.\n")
+            sys.exit()
+
+        stolenparticles = stealnearby(allparticles, nearparticles, threshdist, columntoretrieve)
+        writestar(stolenparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
     if params["parser_classproportion"]:

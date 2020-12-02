@@ -820,6 +820,7 @@ def findnearby(coreparticles,nearparticles,threshdist):
         corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
         coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
         corenameloc = coreparticles.columns.get_loc("_rlnImageName")+1
+        
         nearmicrographs = nearparticles.groupby(["_rlnMicrographName"])
         nearxloc = nearparticles.columns.get_loc("_rlnCoordinateX")+1
         nearyloc = nearparticles.columns.get_loc("_rlnCoordinateY")+1
@@ -873,15 +874,13 @@ def fetchnearby(coreparticles,nearparticles,threshdist,columntoretrieve):
         corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
         coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
         corenameloc = coreparticles.columns.get_loc("_rlnImageName")+1
-        coreCOLloc = coreparticles.columns.get_loc(columntoretrieve)+1
+
         nearmicrographs = nearparticles.groupby(["_rlnMicrographName"])
         nearxloc = nearparticles.columns.get_loc("_rlnCoordinateX")+1
         nearyloc = nearparticles.columns.get_loc("_rlnCoordinateY")+1
-        nearCOLloc = nearparticles.columns.get_loc(columntoretrieve)+1
 
         noparts=[]
         farparts=[]
-        alldistances=[]
 
         stolenparticles = coreparticles.copy()
 

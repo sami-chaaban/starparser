@@ -34,7 +34,7 @@ starparser --i input.star [options]
 
 * **```--histogram```** *```column-name```*: Plot values of a column as a histogram. Use ```-c``` and ```-q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
 
-* **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a slash (e.g. 1/2/5). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
+* **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" to plot all classes, or separate the classes that you want with a slash (e.g. "*1/2/5*"). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
 * **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
 
@@ -46,7 +46,7 @@ starparser --i input.star [options]
 
 * **```--replace_column```** *```column-name```* : Replace all entries of a column with a list of values found in the file provided by ```--f```. The file should be a single column and should have an equivalent number to the star file. This is useful when used in conjunction with ```--list_column```, which outputs column values for easy editing before reinsertion with ```--replace_column```. The result is written to a new star file (default output.star, or specified with ```--o```).
 
-* **```--swap_columns```** *```column-name(s)```* : Swap columns from another star file (specified with ```--f```). E.g. \_rlnMicrographName. To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
+* **```--swap_columns```** *```column-name(s)```* : Swap columns from another star file (specified with ```--f```). For example, pass "*\_rlnMicrographName*" to swap that column. To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that the columns should be in the same position in both files and the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--regroup```** *```particles-per-group```* : Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
@@ -60,11 +60,11 @@ starparser --i input.star [options]
 
 * **```--limit_particles```** *```limit```* : Extract particles that match a specific operator ("*lt*" for less than, "*gt*" for greater than). The argument to pass is "column/operator/value" (e.g. "*\_rlnDefocusU/lt/40000*" for defocus values less than 40000). If possible, use Relion Subset Selection to do this.
 
-* **```--count_particles```** : Count particles and print the result. Can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
+* **```--count_particles```** : Count particles and print the result. This can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
 
-* **```--count_mics```** : Count the number of unique micrographs. Can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
+* **```--count_mics```** : Count the number of unique micrographs. This can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
 
-* **```--list_column```** *```columns```* : Write all values of a column to a file (filename will be the name of that column). E.g. \_rlnMicrographName will write to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. Can be used with ```-c``` and ```-q``` to only write out values that match the query (see the *Querying* options), otherwise lists all items.
+* **```--list_column```** *```columns```* : Write all values of a column to a file (filename will be the name of that column). For example, passing "\_rlnMicrographName" will write all values of that column to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. This can be used with ```-c``` and ```-q``` to only write out values that match the query (see the *Querying* options), otherwise lists all items.
 
 * **```--find_shared```** *```column```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 

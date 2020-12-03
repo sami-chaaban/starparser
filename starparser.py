@@ -913,7 +913,7 @@ def fetchnearby(coreparticles,nearparticles,threshdist,columntoretrieve):
         if len(noparts) != 0:
             stolenparticles = stolenparticles[~stolenparticles['_rlnImageName'].isin(noparts)]
 
-        print("\n>> Fetched " + columntoretrieve + " values from particles within " + str(threshdist) + " pixels. \n>> " + str(len(stolenparticles.index)) + " out of " + str(len(coreparticles.index)) + " were successfully processed. " + str(len(farparts)) + " particles were too far and " + str(len(noparts)) + " particles did not have neighbours.\n")
+        print("\n>> Fetched " + columntoretrieve + " values from particles within " + str(threshdist) + " pixels. \n>> " + str(len(stolenparticles.index)) + " out of " + str(len(coreparticles.index)) + " (" + str(round(100*(len(stolenparticles.index)/len(coreparticles.index)),1)) + "%) " + "were successfully fetched. " + str(len(farparts)) + " were too far and " + str(len(noparts)) + " did not have neighbours.\n")
 
         return(stolenparticles)
         

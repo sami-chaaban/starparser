@@ -17,7 +17,7 @@ def setupParserOptions():
 
     parser.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
-        help="Name of second file to extract columns from. Used with --swap_columns, --find_shared, and --extract_nearby.")
+        help="Name of second file to extract columns from, if necessary.")
     
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
@@ -111,6 +111,10 @@ def setupParserOptions():
     info_opts.add_option("--split",
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
         help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain exactly the same number of particles")
+
+    info_opts.add_option("--split_optics",
+        action="store_true", dest="parser_splitoptics", default=False,
+        help="Split the input star file into independent star files for each optics group. The files will have the names of the optics group.")
 
     info_opts.add_option("--sort_by",
         action="store", dest="parser_sort", type="string", default="", metavar='column-name',
@@ -399,11 +403,6 @@ def delcolumn(particles, columns, metadata):
     
     return(nocolparticles, metadata)
 
-def countparticles(particles):
-
-    totalparticles = len(particles.index)
-    print('\n>> There are ' + str(totalparticles) + ' particles in total.\n') 
-
 def countqueryparticles(particles,columns,query,quiet):
 
     totalparticles = len(particles.index)
@@ -450,7 +449,7 @@ def plotclassparts(filename, classes):
     try:
         classes = list(map(int, classes))
     except:
-        print("\n>> Error: could not parse the classes that you passed. Double check that you passed numbers separated by slashes to the --plot_classparts option (e.g. 2/6).\n")
+        print("\n>> Error: could not parse the classes that you passed. Double check that you passed numbers separated by slashes to the --plot_class_iterations option (e.g. 2/6).\n")
         sys.exit()
     
     position = filename.find("_it")
@@ -532,7 +531,7 @@ def extractparticles(particles, columns, query):
         print("\n>> Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
 
-    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_classproportion"]:
+    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_classproportion"] and not params["parser_splitoptics"]:
         print("\n----------------------------------------------------------------------")        
         print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
         print("----------------------------------------------------------------------")
@@ -807,6 +806,15 @@ def splitparts(particles,numsplits):
 
     return(splitstars)
 
+
+def splitbyoptics(particles,metadata):
+
+    for n,o in zip(metadata[2]["_rlnOpticsGroup"],metadata[2]["_rlnOpticsGroupName"]):
+        subsetoptics, subsetopticslength = extractparticles(particles,["_rlnOpticsGroup"],[n])
+        newmetadata = [metadata[0], metadata[1], metadata[2][metadata[2]["_rlnOpticsGroupName"] == o], metadata[3], metadata[4]]
+        print("\n>> Optics group " + str(n) + " has " + str(subsetopticslength) + " particles.")
+        writestar(subsetoptics, newmetadata, o+".star", False)
+
 def replacecolumn(particles,replacecol,newcol):
     columnindex = particles.columns.get_loc(replacecol)
     particles.drop(replacecol, 1, inplace=True)
@@ -1008,7 +1016,7 @@ def mainloop(params):
         countqueryparticles(allparticles, columns, query, False)
         sys.exit()
     elif params["parser_countme"]:
-        countparticles(allparticles)
+        print('\n>> There are ' + str(totalparticles) + ' particles in total.\n') 
         sys.exit()
         
     if params["parser_delcolumn"] != "":
@@ -1190,6 +1198,10 @@ def mainloop(params):
         for i,s in enumerate(splitstars):
             print(">> There are " + str(len(s.index)) + " particles in file " + str(i+1))
             writestar(s, metadata, "split_"+str(i+1)+".star", relegateflag)
+        sys.exit()
+
+    if params["parser_splitoptics"]:
+        splitbyoptics(allparticles,metadata)
         sys.exit()
 
     if params["parser_replacecol"] != "":

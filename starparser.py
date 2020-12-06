@@ -962,6 +962,8 @@ def mainloop(params):
     queryexact = params["parser_exact"]
     if queryexact:
         print("\n>> You have asked StarParser to look for exact matches between the queries and values.")
+    elif params["parser_splitoptics"]:
+        queryexact = True
     
     #####################################################################
     

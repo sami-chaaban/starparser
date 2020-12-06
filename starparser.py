@@ -809,10 +809,11 @@ def splitparts(particles,numsplits):
 
 def splitbyoptics(particles,metadata):
 
+    print("")
     for n,o in zip(metadata[2]["_rlnOpticsGroup"],metadata[2]["_rlnOpticsGroupName"]):
         subsetoptics, subsetopticslength = extractparticles(particles,["_rlnOpticsGroup"],[n])
         newmetadata = [metadata[0], metadata[1], metadata[2][metadata[2]["_rlnOpticsGroupName"] == o], metadata[3], metadata[4]]
-        print("\n>> Optics group " + str(n) + " has " + str(subsetopticslength) + " particles.")
+        print(">> Optics group " + str(n) + " has " + str(subsetopticslength) + " particles.")
         writestar(subsetoptics, newmetadata, o+".star", False)
 
 def replacecolumn(particles,replacecol,newcol):

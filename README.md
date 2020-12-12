@@ -68,7 +68,7 @@ starparser --i input.star [options]
 
 * **```--find_shared```** *```column```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 
-* **```--extract_nearby```** *```distance```* : Find the nearest particle in a second star file provided by ```--f```; particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png. Use ```--t``` to change filetype (see the *Output* options).
+* **```--extract_nearby```** *```distance```* : Find the nearest particle in a second star file provided by ```--f```; particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the *Output* options).
 
 * **```--fetch_nearby```** *```distance/column-name```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. "*300/\_rlnClassNumber*"). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph).
 
@@ -90,7 +90,7 @@ starparser --i input.star [options]
 
 ### Other
 
-* **```--opticsless```** : Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--class_proportion``` or commands that require parsing a second file.
+* **```--opticsless```** : Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--plot_class_proportion``` or commands that require parsing a second file.
 
 ### Output
 
@@ -321,13 +321,13 @@ starparser --i run_it025_data.star --random 10000 particles.star -c _rlnMicrogra
 starparser --i particles.star --split 3
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Three new star files called split_1.star, split_2.star, and split_3.star will be created with roughly equal numbers of particles. In this case, particles.star has 69120 particles and the split star files have 23053, 23042, and 23025 particles, respectively.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Three new star files called split_1.star, split_2.star, and split_3.star will be created with roughly equal numbers of particles. In this example, particles.star has 69120 particles and the split star files have 23053, 23042, and 23025 particles, respectively.
 
 ---
 
 ## Version
 
-* **1.8** - November 2020
+* **1.8** - December 2020
 
 ## License
 

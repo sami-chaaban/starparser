@@ -100,7 +100,7 @@ def setupParserOptions():
         action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
         help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
 
-    info_opts.add_option("--fetch_nearby",
+    info_opts.add_option("--fetch_from_nearby",
         action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name',
         help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph).")
 
@@ -428,7 +428,7 @@ def countqueryparticles(particles,columns,query,quiet):
     percentparticles = round(totalquery*100/totalparticles,1)
 
     if not quiet:
-        print('\nThere are ' + str(totalquery) + ' particles that match ' + str(query) + ' in the specified columns (out of ' + str(totalparticles) + ', or ' + str(percentparticles) + '%).\n')
+        print('\n>> There are ' + str(totalquery) + ' particles that match ' + str(query) + ' in the specified columns (out of ' + str(totalparticles) + ', or ' + str(percentparticles) + '%).\n')
 
     return(totalquery)
         
@@ -872,7 +872,7 @@ def findnearby(coreparticles,nearparticles,threshdist):
             farparticles = farparticles[~farparticles['_rlnImageName'].isin(noparts)]
             closeparticles = closeparticles[~closeparticles['_rlnImageName'].isin(noparts)]
 
-        print("\n>> Created subsets with particles that are closer or further than " + str(threshdist) + " pixels. Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
+        print("\n>> Created subsets with particles that are closer or further than " + str(threshdist) + " pixels from the closest particle in the second star file. Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
 
         return(farparticles, closeparticles, alldistances)
 

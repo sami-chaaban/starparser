@@ -64,13 +64,13 @@ starparser --i input.star [options]
 
 * **```--count_mics```** : Count the number of unique micrographs. This can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
 
-* **```--list_column```** *```columns```* : Write all values of a column to a file (filename will be the name of that column). For example, passing "\_rlnMicrographName" will write all values of that column to MicrographName.txt. To enter multiple columns, separate them with a slash: \_rlnMicrographName/\_rlnCoordinateX. This can be used with ```-c``` and ```-q``` to only write out values that match the query (see the *Querying* options), otherwise lists all items.
+* **```--list_column```** *```columns```* : Write all values of a column to a file (filename will be the name of that column). For example, passing "\_rlnMicrographName" will write all values of that column to MicrographName.txt. To enter multiple columns, separate them with a slash: ***"\_rlnMicrographName/\_rlnCoordinateX"***. This can be used with ```-c``` and ```-q``` to only write out values that match the query (see the *Querying* options), otherwise lists all items.
 
 * **```--find_shared```** *```column```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 
-* **```--extract_nearby```** *```distance```* : Find the nearest particle in a second star file provided by ```--f```; particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the *Output* options).
+* **```--extract_nearby```** *```distance```* : For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbour closer than the distance provided here will be output to particles_close.star, and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the *Output* options).
 
-* **```--fetch_nearby```** *```distance/column-name```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. "*300/\_rlnClassNumber*"). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph).
+* **```--fetch_from_nearby```** *```distance/column-name```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. "*300/\_rlnClassNumber*"). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph).
 
 * **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```-c``` and ```-q``` to extract a random set of each passed query in the specified column (see the *Querying* options); in this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```--o```).
 
@@ -127,6 +127,17 @@ starparser --i run_it025_data.star --plot_class_iterations all
 
 ---
 
+* Plot the number of particles per class for the 25 iterations of a Class3D job for a subset of classes.
+
+```
+starparser --i run_it025_data.star --plot_class_iterations 1/3/6
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.png**:
+![Particles per class plot](./Examples/Class_distribution_subset.png "Particles per class plot")
+
+---
+
 * Plot the proportion of particles in each class that belong to particles with the term 200702 versus those with the term 200826 in the \_rlnMicrographName column.
 
 ```
@@ -161,6 +172,16 @@ starparser --i run_data.star --o run_data_del.star --delete_particles -c _rlnMic
 
 ---
 
+* **Replace values in a column with those of a text file**
+
+```
+starparser --i particles.star --replace_column _rlnOpticsGroup --f newoptics.txt --o particles_newoptics.star
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **particles_newoptics.star** will be output that will be identical to particles.star except for the \_rlnOpticsGroup column, which will have the values found in newoptics.txt.
+
+---
+
 * **Swap columns**
 
 ```
@@ -168,16 +189,6 @@ starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swa
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_swapped.star** will be output that will be identical to run_data.star except for the columns in the input, which will instead be swapped in from run_data_2.star. This is useful for sourcing alignments from early global refinements.
-
----
-
-* **Relegate a star file to be compatible with Relion 3.0**
-
-```
-starparser --i run_data.star --o run_data_3p0.star --relegate
-```
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered accordingly.
 
 ---
 
@@ -201,13 +212,13 @@ starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsna
 
 ---
 
-* **Replace values in a column with those of a text file**
+* **Relegate a star file to be compatible with Relion 3.0**
 
 ```
-starparser --i particles.star --replace_column _rlnOpticsGroup --f newoptics.txt --o particles_newoptics.star
+starparser --i run_data.star --o run_data_3p0.star --relegate
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **particles_newoptics.star** will be output that will be identical to particles.star except for the \_rlnOpticsGroup column, which will have the values found in newoptics.txt.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered accordingly.
 
 ---
 
@@ -295,10 +306,10 @@ starparser --i run_data.star --list_column _rlnDefocusU -c _rlnMicrographName -q
 
 ---
 
-* **Compare particles between star files**
+* **Compare particles between star files and extract those that are shared and unique**
 
 ```
-starparser --i run_data1.star --split_unique _rlnMicrographName --f run_data2.star
+starparser --i run_data1.star --find_shared _rlnMicrographName --f run_data2.star
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2.star (unique.star) and only the particles that are shared between them (shared.star) based on the \_rlnMicrographName column.
@@ -308,7 +319,7 @@ starparser --i run_data1.star --split_unique _rlnMicrographName --f run_data2.st
 * **Extract a random set of specific particles**
 
 ```
-starparser --i run_it025_data.star --random 10000 particles.star -c _rlnMicrographName -q DOA3/OAA2
+starparser --i run_it025_data.star --random 10000 -c _rlnMicrographName -q DOA3/OAA2
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named DOA3_10000.star and OAA2_10000.star that will have a random set of 10000 particles that match DOA3 and OAA2 in the \_rlnMicrographName column, respectively.

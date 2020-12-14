@@ -64,9 +64,9 @@ starparser --i input.star [options]
 
 * **```--count_mics```** : Count the number of unique micrographs. This can be used with ```-c``` and ```-q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
 
-* **```--list_column```** *```columns```* : Write all values of a column to a file. For example, passing "\_rlnMicrographName" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *"\_rlnMicrographName/\_rlnCoordinateX"* outputs MicrographName.txt and CoordinateX.txt). This can be used with ```-c``` and ```-q``` to only consider values that match the query (see the *Querying* options), otherwise it lists all values.
+* **```--list_column```** *```column-name(s)```* : Write all values of a column to a file. For example, passing "\_rlnMicrographName" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *"\_rlnMicrographName/\_rlnCoordinateX"* outputs MicrographName.txt and CoordinateX.txt). This can be used with ```-c``` and ```-q``` to only consider values that match the query (see the *Querying* options), otherwise it lists all values.
 
-* **```--find_shared```** *```column```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
+* **```--find_shared```** *```column-name```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 
 * **```--extract_if_nearby```** *```distance```* : For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbour closer than the distance provided here will be output to particles_close.star, and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the *Output* options).
 
@@ -82,9 +82,9 @@ starparser --i input.star [options]
 
 ### Querying
 
-* **```-c```** *```columns```* : Column query term(s). E.g. "*\_rlnMicrographName*". This is used to look for a specific query specified with ```-q```. In cases where you can enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note the single dash in using this option.
+* **```-c```** *```column-name(s)```* : Column query term(s). E.g. "*\_rlnMicrographName*". This is used to look for a specific query specified with ```-q```. In cases where you can enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note the single dash in using this option.
 
-* **```-q```** *```query```* : Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column. Note the single dash in using this option.
+* **```-q```** *```query(ies)```* : Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```-e``` if the query(ies) should exactly match the values in the column. Note the single dash in using this option.
 
 * **```-e```** : Pass this if you want an exact match of the values to the query(ies) provided by ```-q```. For example, you must pass this if you want just to look for "1" and ignore "15" (which has a "1" in it). Note the single dash in using this option.
 

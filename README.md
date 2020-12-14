@@ -36,7 +36,7 @@ starparser --i input.star [options]
 
 * **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" after the option to plot all classes, or separate the classes that you want with a slash (e.g. "*1/2/5*"). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
-* **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
+* **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```-q```, separated by slashes) must be provided along with the column to search in (```-c```) (See the *Querying* options). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
 
 ### Modifying
 

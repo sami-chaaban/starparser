@@ -90,13 +90,13 @@ def setupParserOptions():
     
     info_opts.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
-        help="Write all values of a column to a file (filename is the header). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX. Can be used with -c and -q for a subset count, otherwise lists all items.")
+        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with -c and -q to only consider values that match the query, otherwise it lists all values.")
     
     info_opts.add_option("--find_shared",
         action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
         help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.")
 
-    info_opts.add_option("--extract_nearby",
+    info_opts.add_option("--extract_if_nearby",
         action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
         help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbour in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
 

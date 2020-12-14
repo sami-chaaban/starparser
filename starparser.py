@@ -1030,6 +1030,9 @@ def mainloop(params):
         sys.exit()
         
     if params["parser_delparticles"]:
+        if params["parser_query"] == "" or params["parser_column"] == "":
+            print("\n>> Error: provide a column (-c) and query (-q) to find specific particles to remove.\n")
+            sys.exit()
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
@@ -1217,7 +1220,7 @@ def mainloop(params):
             sys.exit()
         newcolfile = params["parser_file2"]
         with open(newcolfile) as f:
-            newcol = [int(line.split()[0]) for line in f]
+            newcol = [line.split()[0] for line in f]
         if len(newcol) != len(allparticles.index):
             print("\n>> Error: the number of values do not match.\n")
             sys.exit()
@@ -1280,8 +1283,12 @@ def mainloop(params):
             sys.exit()
         sys.exit()
         
-    if params["parser_writecol"] != "":
+    if params["parser_writecol"] != "": 
         colstowrite = params["parser_writecol"].split("/")
+        for col in colstowrite:
+            if col not in particles2use:
+                print("\n>> Error: the column \"" + str(col) + "\" does not exist in your star file.\n")
+                sys.exit()
         outputs = writecol(particles2use, colstowrite)
         print("\n>> Wrote entries from " + str(colstowrite) + "\n-->> Output files: " + str(outputs) + " \n")
         sys.exit()

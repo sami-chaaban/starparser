@@ -679,18 +679,13 @@ def classproportion(particles, columns, query):
     for c in classestocheck:
 
         sub_subsetparticles, totalclasssubsubset = extractparticles(subsetparticles,["_rlnClassNumber"], [c])
-
         percentparts = []
 
         for q in query:
-
             totalclasspartsinsubset = countqueryparticles(sub_subsetparticles, columns, [q], True)
-
             percentparts.append(totalclasspartsinsubset*100 / totalclasssubsubset)
 
         percentparts_lst.append(percentparts)
-
-    #####################################
     
     print("\n>> There are " + str(len(classestocheck)) + " classes that contain the queries. Checking the proportion of " + str(query) + ".")
 
@@ -1042,7 +1037,7 @@ def mainloop(params):
         
     if params["parser_swapcolumns"] != "":
         if params["parser_file2"] == "":
-            print("\n>> Error: provide a second file to swap columns from with --f.\n")
+            print("\n>> Error: provide a second file with --f to swap columns from.\n")
             sys.exit()
         file2 = params["parser_file2"]
         if not os.path.isfile(file2):
@@ -1060,6 +1055,9 @@ def mainloop(params):
         if columntocheckunique not in allparticles.columns:
             print("\n>> Error: could not find the " + columntocheckunique + " column in " + filename + ".\n")
             sys.exit()
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to compare to.\n")
+            sys.exit()
         file2 = params["parser_file2"]
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
@@ -1068,10 +1066,10 @@ def mainloop(params):
         unsharedparticles = allparticles[~allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         sharedparticles = allparticles[allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         if params["parser_findshared"] != "":
-            print("\n>> Shared: \n" + filename + " and " + file2 + " share " + str(len(sharedparticles.index)) + " particles in the " + str(columntocheckunique) + " column.")
-            print("\n>> Unique: \n" + filename + " has " + str(len(unsharedparticles.index)) + " unique particles and " + file2 + " has " + str(len(otherparticles.index) - len(sharedparticles.index)) + " unique particles in the " + str(columntocheckunique) + " column.\n")
-            writestar(unsharedparticles, metadata, "unique.star", relegateflag)
+            print("\nShared: \n-------\n" + str(len(sharedparticles.index)) + " particles are shared between " + filename + " and " + file2 + " in the " + str(columntocheckunique) + " column.\n")
             writestar(sharedparticles, metadata, "shared.star", relegateflag)
+            print("Unique: \n-------\n·" + filename + ": " + str(len(unsharedparticles.index)) + " particles (these will be written to unique.star)\n·" + file2 + ": " + str(len(otherparticles.index) - len(sharedparticles.index)) + " particles\n")
+            writestar(unsharedparticles, metadata, "unique.star", relegateflag)
         sys.exit()
 
     if params["parser_findnearby"] != -1:

@@ -9,7 +9,7 @@ import numpy as np
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.8.")
+        version="%prog 1.9.")
 
     parser.add_option("--i",
         action="store", dest="file", metavar='starfile-name',
@@ -413,7 +413,7 @@ def countqueryparticles(particles,columns,query,quiet):
         print("\n>> Error: you have specified two different columns.\n")
         sys.exit()
 
-    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
+    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_classproportion"]:
         print("\n----------------------------------------------------------------------")        
         print("\n>> Warning: it looks like this column has integers but you haven't specified the \"exact\" option (-e, see documentation). Make sure that this is the behaviour you intended.\n")
         print("----------------------------------------------------------------------")
@@ -692,15 +692,16 @@ def classproportion(particles, columns, query):
 
     #####################################
     
-    print("\n>> There are " + str(len(classestocheck)) + " classes that contain the queries. Checking the proportion of " + str(query) + "\n")
+    print("\n>> There are " + str(len(classestocheck)) + " classes that contain the queries. Checking the proportion of " + str(query) + ".")
 
     for i,c in enumerate(classestocheck):
 
         print("\nClass " + c)
+        print("--------")
 
         for j,q in enumerate(query):
 
-            print("-" + q + ": " + str(round(percentparts_lst[i][j],1)) + "%")
+            print("·" + q + ": " + str(round(percentparts_lst[i][j],1)) + "%")
 
     print("\n")
 

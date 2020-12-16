@@ -12,7 +12,7 @@ def setupParserOptions():
         version="%prog 1.9.")
 
     parser.add_option("--i",
-        action="store", dest="file", metavar='starfile-name',
+        action="store", dest="file", default="", metavar='starfile-name',
         help="Input file name.")
 
     parser.add_option("--f",
@@ -948,6 +948,10 @@ def mainloop(params):
     #Essential variables
     
     filename = params['file']
+
+    if params['file'] == "":
+        print("\n>> Error: enter a star file with --i.\n")
+        sys.exit();
 
     if not os.path.isfile(filename):
         print("\n>> Error: \"" + filename + "\" does not exist.\n")

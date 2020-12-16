@@ -726,9 +726,10 @@ def classproportion(particles, columns, query):
 
         plt.bar(classestocheck, percentparts_reordered[q], 0.32)
 
-    plt.legend(list(reversed(query)))
+    plt.legend(list(reversed(query)), bbox_to_anchor=(1.04,1))
     plt.ylabel('Percent of particles')
     plt.xlabel('Class Number')
+    plt.tight_layout()
     
     outputfig(fig, "Class_proportion")
 

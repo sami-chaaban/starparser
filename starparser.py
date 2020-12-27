@@ -9,7 +9,7 @@ import numpy as np
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.9.")
+        version="%prog 1.10.")
 
     parser.add_option("--i",
         action="store", dest="file", default="", metavar='starfile-name',
@@ -24,7 +24,7 @@ def setupParserOptions():
 
     plot_opts.add_option("--histogram",
         action="store", dest="parser_plot", default="", metavar="column-name",
-        help="Plot values of a column as a histogram. Use -c and -q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
+        help="Plot values of a column as a histogram. Use --c and --q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
@@ -32,7 +32,7 @@ def setupParserOptions():
     
     plot_opts.add_option("--plot_class_proportions",
         action="store_true", dest="parser_classproportion", default=False,
-        help="Plot the proportion of particles that match different queries in each class. At least two queries (-q, separated by slashes) must be provided along with the column to search in (-c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
+        help="Plot the proportion of particles that match different queries in each class. At least two queries (--q, separated by slashes) must be provided along with the column to search in (--c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
 
     parser.add_option_group(plot_opts)
     
@@ -45,7 +45,7 @@ def setupParserOptions():
     
     modify_opts.add_option("--delete_particles",
         action="store_true", dest="parser_delparticles", default=False,
-        help="Delete particles. Pick a column header (-c) and query (-q) to delete particles that match it.")
+        help="Delete particles. Pick a column header (--c) and query (--q) to delete particles that match it.")
 
     modify_opts.add_option("--replace_column",
         action="store", dest="parser_replacecol", type="string", default="", metavar='column-name',
@@ -61,7 +61,7 @@ def setupParserOptions():
 
     modify_opts.add_option("--new_optics",
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
-        help="Provide a new optics group name. Use -c and -q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
+        help="Provide a new optics group name. Use --c and --q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
 
     modify_opts.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,
@@ -74,7 +74,7 @@ def setupParserOptions():
 
     info_opts.add_option("--extract_particles",
         action="store_true", dest="parser_extractparticles", default=False,
-        help="Write a star file with particles that match a column header (-c) and query (-q).")
+        help="Write a star file with particles that match a column header (--c) and query (--q).")
 
     info_opts.add_option("--limit_particles",
         action="store", dest="parser_limitparticles", type="string", default = "", metavar='limit',
@@ -82,15 +82,15 @@ def setupParserOptions():
     
     info_opts.add_option("--count_particles",
         action="store_true", dest="parser_countme", default=False,
-        help="Count particles and print the result. Use -c and -q to count a subset of particles, otherwise counts all.")
+        help="Count particles and print the result. Use --c and --q to count a subset of particles, otherwise counts all.")
     
     info_opts.add_option("--count_mics",
         action="store_true", dest="parser_uniquemics", default=False,
-        help="Count the number of unique micrographs. Use -c and -q to count from a subset of particles, otherwise counts all.")
+        help="Count the number of unique micrographs. Use --c and --q to count from a subset of particles, otherwise counts all.")
     
     info_opts.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
-        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with -c and -q to only consider values that match the query, otherwise it lists all values.")
+        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
     
     info_opts.add_option("--find_shared",
         action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
@@ -106,7 +106,7 @@ def setupParserOptions():
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
-        help="Get a random set of particles totaling the number provided here. Use -c and -q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
+        help="Get a random set of particles totaling the number provided here. Use --c and --q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
 
     info_opts.add_option("--split",
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
@@ -125,17 +125,17 @@ def setupParserOptions():
     query_opts = optparse.OptionGroup(
         parser, 'Query Options')
     
-    query_opts.add_option("-c",
+    query_opts.add_option("--c",
         action="store", dest="parser_column", type="string", default="", metavar='column-name(s)',
         help="Column query. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
     
-    query_opts.add_option("-q",
+    query_opts.add_option("--q",
         action="store", dest="parser_query", type="string", default="", metavar='query(ies)',
-        help="Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use -e if the query should exactly match the value.")
+        help="Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use --e if the query should exactly match the value.")
 
-    query_opts.add_option("-e",
+    query_opts.add_option("--e",
         action="store_true", dest="parser_exact", default=False, metavar="match-exactly",
-        help="Pass this if you want an exact match of the values to the query(ies) provided by -q (e.g. if you want just to look for \"1\" and ignore \"15\".)")
+        help="Pass this if you want an exact match of the values to the query(ies) provided by --q (e.g. if you want just to look for \"1\" and ignore \"15\".)")
     
     parser.add_option_group(query_opts)
 
@@ -194,7 +194,7 @@ def parsestar(starfile):
             
     if opticsstop == 0:
         
-        print('Error: Could not find end of optics table. Exiting.')
+        print('\n>> Error: Could not find the end of the optics table.\n')
         
         sys.exit()
 
@@ -220,7 +220,7 @@ def parsestar(starfile):
 
     if particlesstop == 0:
 
-        print('Error: Could not find end of particles table. Exiting.')
+        print('\n>> Error: Could not find the end of the particles table.\n')
 
         sys.exit()
         
@@ -326,7 +326,9 @@ def writestar(particles, metadata, outputname, relegate):
         output.write('\n\n')
 
     else:
-        print("\n>> Removed the optics table and _rlnOpticsGroup.")
+
+        if not params["parser_optless"]:
+            print("\n>> Removed the optics table and _rlnOpticsGroup.\n")
 
     output.write(metadata[4]) #tablename
     output.write('\n\n')
@@ -415,7 +417,7 @@ def countqueryparticles(particles,columns,query,quiet):
 
     if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_classproportion"]:
         print("\n----------------------------------------------------------------------")        
-        print("\n>> Warning: it looks like this column has integers but you haven't specified the \"exact\" option (-e, see documentation). Make sure that this is the behaviour you intended.\n")
+        print("\n>> Warning: it looks like this column has integers but you haven't specified the \"exact\" option (--e, see documentation). Make sure that this is the behaviour you intended.\n")
         print("----------------------------------------------------------------------")
 
     if not queryexact:
@@ -453,7 +455,11 @@ def plotclassparts(filename, classes):
         sys.exit()
     
     position = filename.find("_it")
-    iteration = int(filename[position+3:position+6])
+    try:
+        iteration = int(filename[position+3:position+6])
+    except:
+        print("\n>> Error: could not find the iteration number in the filename. The file should be similar to \"run_it025_data.star\".\n")
+        sys.exit()
     classdistribution = []
     allparticles, metadata = getparticles(filename)
     numclasses = max(list(map(int, allparticles["_rlnClassNumber"].tolist())))
@@ -513,7 +519,7 @@ def delparticles(particles, columns, query):
 
     if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
         print("\n----------------------------------------------------------------------")        
-        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
+        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (--e). Make sure that this is the behaviour you intended.\n")
         print("----------------------------------------------------------------------")
 
     if not queryexact:
@@ -533,7 +539,7 @@ def extractparticles(particles, columns, query):
 
     if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_classproportion"] and not params["parser_splitoptics"]:
         print("\n----------------------------------------------------------------------")        
-        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (-e). Make sure that this is the behaviour you intended.\n")
+        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (--e). Make sure that this is the behaviour you intended.\n")
         print("----------------------------------------------------------------------")
 
     if not queryexact:
@@ -558,10 +564,13 @@ def swapcolumns(original_particles, swapfrom_particles, columns):
     
     for c in columns:
         if c not in original_particles:
-            print("\n>> Error: the column \"" + c + "\" does not exist.\n")
+            print("\n>> Error: the column \"" + c + "\" does not exist in the original star file.\n")
+            sys.exit()
+        if c not in swapfrom_particles:
+            print("\n>> Error: the column \"" + c + "\" does not exist in the second star file.\n")
             sys.exit()
         columnindex = original_particles.columns.get_loc(c)
-        swappedparticles.drop(c,1, inplace=True)
+        swappedparticles.drop(c,1,inplace=True)
         swappedparticles.insert(columnindex, c, swapfrom_particles[c].values.tolist())
     
     return(swappedparticles)
@@ -660,7 +669,7 @@ def classproportion(particles, columns, query):
     totalqueried = len(query)
     
     if totalqueried < 2:
-        print("\n>> Error: please enter at least two queries separated by a slash.\n")
+        print("\n>> Error: enter at least two queries separated by a slash.\n")
         sys.exit()
 
     subsetparticles, totalsubset = extractparticles(particles, columns, query)
@@ -935,13 +944,16 @@ def mainloop(params):
     #Sanity check
     
     if 'file' not in params:
-        print("Error: no filename entered. See documentation with starparse.py -h.")
+        print("\n>> Error: no filename entered. See the help page (-h).\n")
         sys.exit()
         
     if "_rlnOpticsGroup" in params["parser_column"] and params["parser_relegate"]:
-        print("Error: cannot have the relegate option and the delete OpticsGroup column at the same time (the former will do the latter already).")
+        print("\n>> Error: cannot have the relegate option and the delete OpticsGroup column at the same time (the former will do the latter already).\n")
         sys.exit()
-        
+
+    if params["parser_outtype"] not in ["png", "pdf", "jpg"]:
+        print("\n>> Error: choose between png, pdf, and jpg for the plot filetype.\n")
+        sys.exit()
         
     ################################################################
     
@@ -963,7 +975,7 @@ def mainloop(params):
     global queryexact
     queryexact = params["parser_exact"]
     if queryexact:
-        print("\n>> You have asked StarParser to look for exact matches between the queries and values.")
+        print("\n>> You have asked starparser to look for exact matches between the queries and values.")
     elif params["parser_splitoptics"]:
         queryexact = True
     
@@ -1032,7 +1044,7 @@ def mainloop(params):
         
     if params["parser_delparticles"]:
         if params["parser_query"] == "" or params["parser_column"] == "":
-            print("\n>> Error: provide a column (-c) and query (-q) to find specific particles to remove.\n")
+            print("\n>> Error: provide a column (--c) and query (--q) to find specific particles to remove.\n")
             sys.exit()
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
@@ -1048,7 +1060,7 @@ def mainloop(params):
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
-        otherparticles, metadata = getparticles(file2)
+        otherparticles, metadata2 = getparticles(file2)
         columstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
         print("\n>> Swapped in " + str(columstoswap) + " from " + file2)
@@ -1305,9 +1317,11 @@ def mainloop(params):
         sys.exit()
 
     #This has to be at the end so it only runs if it is the only passed argument.
-    if relegateflag:
+    if relegateflag and not params["parser_optless"]:
         writestar(particles2use, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    print("\n>> Pass an option for starparser. See the help page (-h).\n")
 
 if __name__ == "__main__":
     params = setupParserOptions()

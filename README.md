@@ -68,7 +68,7 @@ starparser --i input.star [options]
 
 * **```--extract_if_nearby```** *```distance```* : For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbour closer than the distance provided here will be output to particles_close.star, and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the *Output* options).
 
-* **```--fetch_from_nearby```** *```distance/column-name```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. "*300/\_rlnClassNumber*"). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph).
+* **```--fetch_from_nearby```** *```distance/column-name(s)```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. "*300/\_rlnClassNumber*" or "100/\_rlnAnglePsi/\_rlnHelicalTubeID"). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbour will be skipped (i.e. if the second star file lacks particles in that micrograph).
 
 * **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```--c``` and ```--q``` to extract a random set of each passed query in the specified column (see the *Querying* options); in this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```--o```).
 
@@ -336,7 +336,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.10** - December 2020
+* **1.11** - December 2020
 
 ## License
 

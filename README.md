@@ -52,7 +52,7 @@ starparser --i input.star [options]
 
 * **```--new_optics```** *```optics-group-name```* : Provide a new optics group name. Use ```--c``` and ```--q``` to specify which particles belong to this optics group (see the *Querying* options). The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
-* **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use StarParser on the output file, you will need to then pass ```--opticsless```.
+* **```--relegate```** : Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--delete_column``` to remove other bad columns (e.g. helix-specific columns). If you want to use starparser on the output file, you will need to then pass ```--opticsless```.
 
 ### Data mining
 

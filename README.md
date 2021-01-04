@@ -14,11 +14,13 @@ Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/scri
 starparser --i input.star [options]
 ```	
 
-## Prerequisites
+## Requirements
 
 * You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`. (Note: it has only been tested on **pandas** version 1.1.3.) You can then run the **starparser.py** script directly or with an alias.
 
-* Your input file needs to be a standard **Relion** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns (i.e. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. Note that the term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file. If the star file lacks an optics table, as with those from Relion 3.0, you can add the ```--opticsless``` option to parse it.
+* Your input file needs to be a standard **Relion** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns (i.e. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc.
+
+* The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file. If the star file lacks an optics table, as with those from Relion 3.0, you can add the ```--opticsless``` option to parse it.
 
 ## Options
 
@@ -64,7 +66,7 @@ starparser --i input.star [options]
 
 * **```--count_mics```** : Count the number of unique micrographs. This can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
 
-* **```--list_column```** *```column-name(s)```* : Write all values of a column to a file. For example, passing "\_rlnMicrographName" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *"\_rlnMicrographName/\_rlnCoordinateX"* outputs MicrographName.txt and CoordinateX.txt). This can be used with ```--c``` and ```--q``` to only consider values that match the query (see the *Querying* options), otherwise it lists all values.
+* **```--list_column```** *```column-name(s)```* : Write all values of a column to a file. For example, passing "*\_rlnMicrographName*" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *"\_rlnMicrographName/\_rlnCoordinateX"* outputs MicrographName.txt and CoordinateX.txt). This can be used with ```--c``` and ```--q``` to only consider values that match the query (see the *Querying* options), otherwise it lists all values.
 
 * **```--find_shared```** *```column-name```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 
@@ -78,7 +80,7 @@ starparser --i input.star [options]
 
 * **```--split_optics```** : Split the input star file into independent star files for each optics group. The files will have the names of the optics group.
 
-* **```--sort_by```** *```column-name```* : Sort the column in ascending order and output a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. "*\_rlnClassNumber/n*"); otherwise, it will sort the values as text. 
+* **```--sort_by```** *```column-name```* : Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. "*\_rlnClassNumber/n*"); otherwise, it will sort the values as text. 
 
 ### Querying
 

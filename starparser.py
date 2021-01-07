@@ -744,14 +744,18 @@ def classproportion(particles, columns, query):
 
         percentparts_reordered.append([item[q] for item in percentparts_cumulative])
 
-    fig = plt.figure()
+    if len(classestocheck)/3.5 < 6:
+        figwidth = 6
+    else:
+        figwidth = len(classestocheck)/3.5
+    fig = plt.figure(figsize=(figwidth,5))
 
     for q in list(reversed(range(totalqueried))):
 
         plt.bar(classestocheck, percentparts_reordered[q], 0.32)
 
     plt.legend(list(reversed(query)), bbox_to_anchor=(1.04,1))
-    plt.ylabel('Percent of particles')
+    plt.ylabel('Percent of Particles')
     plt.xlabel('Class Number')
     plt.tight_layout()
     

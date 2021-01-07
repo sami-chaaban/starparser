@@ -28,7 +28,7 @@ starparser --i input.star [options]
 
 * **```--i```** *```filename```* : Input star file.
 
-* **```--f```** *```filename```* : The name of another file to get information from if necessary.
+* **```--f```** *```filename```* : The name of another file to get information from, if necessary.
 
 ### Plotting
 

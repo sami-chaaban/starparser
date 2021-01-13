@@ -995,7 +995,7 @@ def mainloop(params):
     queryexact = params["parser_exact"]
     if queryexact:
         print("\n>> You have asked starparser to look for exact matches between the queries and values.")
-    elif params["parser_splitoptics"]:
+    elif params["parser_splitoptics"] or params["parser_classdistribution"] or params["parser_classproportion"]:
         queryexact = True
     
     #####################################################################
@@ -1003,7 +1003,6 @@ def mainloop(params):
     #Set up jobs that don't require initialization
     
     if params["parser_classdistribution"] != "":
-        queryexact = True
         if params["parser_classdistribution"] == "all":
             plotclassparts(filename, [-1])
         else:

@@ -552,7 +552,7 @@ def extractparticles(particles, columns, query):
         print("\n>> Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
 
-    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_classproportion"] and not params["parser_splitoptics"]:
+    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_splitoptics"] and not params["parser_classproportion"]:
         print("\n----------------------------------------------------------------------")        
         print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (--e). Make sure that this is the behavior you intended.\n")
         print("----------------------------------------------------------------------")
@@ -702,7 +702,8 @@ def classproportion(particles, columns, query):
 
     for c in classestocheck:
 
-        sub_subsetparticles, totalclasssubsubset = extractparticles(subsetparticles,["_rlnClassNumber"], [c])
+        sub_subsetparticles = subsetparticles[subsetparticles["_rlnClassNumber"] == c]
+        totalclasssubsubset = len(sub_subsetparticles)
         percentparts = []
 
         for q in query:
@@ -995,7 +996,7 @@ def mainloop(params):
     queryexact = params["parser_exact"]
     if queryexact:
         print("\n>> You have asked starparser to look for exact matches between the queries and values.")
-    elif params["parser_splitoptics"] or params["parser_classdistribution"] or params["parser_classproportion"]:
+    elif params["parser_splitoptics"] or params["parser_classdistribution"]:
         queryexact = True
     
     #####################################################################

@@ -3,7 +3,6 @@ import os.path
 import pandas as pd
 import optparse
 import matplotlib.pyplot as plt
-import math
 import numpy as np
 
 def setupParserOptions():
@@ -46,6 +45,10 @@ def setupParserOptions():
     modify_opts.add_option("--delete_particles",
         action="store_true", dest="parser_delparticles", default=False,
         help="Delete particles. Pick a column header (--c) and query (--q) to delete particles that match it.")
+
+    modify_opts.add_option("--delete_mics_fromlist",
+        action="store_true", dest="parser_delmics", default=False,
+        help="Delete particles that belong to micrographs that have a match in a second file provided by --f.")
 
     modify_opts.add_option("--insert_column",
         action="store", dest="parser_insertcol", type="string", default="", metavar='column-name',
@@ -544,6 +547,12 @@ def delparticles(particles, columns, query):
         for q in query:
             purgedparticles.drop(purgedparticles[purgedparticles[columns[0]]==q].index , 0,inplace=True)
     
+    return(purgedparticles)
+
+def delmics(particles, micstodelete):
+    purgedparticles = particles.copy()
+    m = "|".join(micstodelete)
+    purgedparticles.drop(purgedparticles[purgedparticles["_rlnMicrographName"].str.contains(m)].index , 0,inplace=True)    
     return(purgedparticles)
 
 def extractparticles(particles, columns, query):
@@ -1068,6 +1077,25 @@ def mainloop(params):
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
+        writestar(newparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_delmics"]:
+        if params["parser_query"] != "" or params["parser_column"] != "":
+            print("\n>> Error: you cannot provide a query to the delete_mics_fromlist option.\n")
+            sys.exit()
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to match micrographs.\n")
+            sys.exit()
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
+            sys.exit();
+        with open(file2) as f:
+            micstodelete = [line.split()[0] for line in f]
+        newparticles = delmics(allparticles,micstodelete)
+        purgednumber = len(allparticles.index) - len(newparticles.index)
+        print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched the micrographs in " + file2 + ".")
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         

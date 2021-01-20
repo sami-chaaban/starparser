@@ -44,6 +44,8 @@ starparser --i input.star [options]
 
 * **```--delete_particles```** : Delete particles that match a query (specified with ```--q```) within a column header (specified with ```--c```; see the *Querying* options), and write to a new star file (default output.star, or specified with ```--o```).
 
+* **```--delete_mics_fromlist```** : Delete particles that belong to micrographs that have a match in a second file provided by ```--f```, and write to a new star file (default output.star, or specified with ```--o```).
+
 * **```--insert_column```** *```column-name```* : Insert a new column that doesn't already exist with the values found in the file provided by ```--f```. The file should be a single column and should have an equivalent number to the star file. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--replace_column```** *```column-name```* : Replace all entries of a column with a list of values found in the file provided by ```--f```. The file should be a single column and should have an equivalent number to the star file. This is useful when used in conjunction with ```--list_column```, which outputs column values for easy editing before reinsertion with ```--replace_column```. The result is written to a new star file (default output.star, or specified with ```--o```).

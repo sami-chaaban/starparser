@@ -58,6 +58,14 @@ def setupParserOptions():
         action="store", dest="parser_replacecol", type="string", default="", metavar='column-name',
         help="Replace all entries of a column with a list of values found in the file provided by --f. The file should be a single column and should have an equivalent number to the star file.")     
 
+    modify_opts.add_option("--copy_column",
+        action="store", dest="parser_copycol", type="string", default="", metavar='source-column/target-column',
+        help="Replace all entries of a target column with those of a source column in the same star file. If the target column exists, its values will be replaced. If the target does not exist, a new column will be made. The argument to pass is source-column/target-column (e.g. _rlnAngleTiltPrior/_rlnAngleTilt)")     
+
+    modify_opts.add_option("--reset_column",
+        action="store", dest="parser_resetcol", type="string", default="", metavar='column-name/new-value',
+        help="Change all values of a column to the one provided here. The argument to pass is column-name/new-value (e.g. _rlnOriginX/0).")
+
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
@@ -856,6 +864,23 @@ def replacecolumn(particles,replacecol,newcol):
     particles.insert(columnindex, replacecol, newcol)
     return(particles)
 
+def copycolumn(particles,sourcecol,targetcol,metadata):
+    if targetcol not in particles:
+        print("\n>> Creating a new column: " + targetcol + ".")
+        metadata[3].append(targetcol)
+    else:
+        print("\n>> Replacing values in " + targetcol + " with " + sourcecol + ".")
+
+    particles[targetcol] = particles[sourcecol]
+
+    return(particles)
+
+def resetcolumn(particles,column,value):
+
+    print("\n>> Replacing all values in " + column + " with " + value + ".")
+    particles[column]=value
+    return(particles)
+
 def findnearby(coreparticles,nearparticles,threshdist):
 
     coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
@@ -1315,6 +1340,34 @@ def mainloop(params):
         print("\n>> Replacing values in the column " + replacecol + " with those in " + newcolfile + ".")
         replacedstar = replacecolumn(allparticles,replacecol,newcol)
         writestar(replacedstar, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_copycol"] != "":
+
+        inputparams = params["parser_copycol"].split("/")
+        if len(inputparams) != 2:
+            print("\n>> Error: you should provide columns in the form of source-column/target-column.\n")
+            sys.exit()
+        sourcecol, targetcol = inputparams
+        if sourcecol not in allparticles:
+            print("\n>> Error: " + sourcecol + " does not exist in the star file.\n")
+            sys.exit()
+        copiedstar = copycolumn(allparticles,sourcecol,targetcol,metadata)
+        writestar(copiedstar, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_resetcol"] != "":
+
+        inputparams = params["parser_resetcol"].split("/")
+        if len(inputparams) != 2:
+            print("\n>> Error: you should provide columns in the form of column-name/value.\n")
+            sys.exit()
+        columntoreset, value = inputparams
+        if columntoreset not in allparticles:
+            print("\n>> Error: " + columntoreset + " does not exist in the star file.\n")
+            sys.exit()
+        resetstar = resetcolumn(allparticles,columntoreset,value)
+        writestar(resetstar, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
     if params["parser_sort"] != "":

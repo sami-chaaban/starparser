@@ -70,6 +70,10 @@ def setupParserOptions():
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
 
+    modify_opts.add_option("--multiply",
+        action="store", dest="parser_multiply", type="string", default="", metavar='column/value',
+        help="Multiply all values of a column by a value. The argument to pass is column/value (e.g. _rlnHelicalTrackLength/0.25).")
+
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
         help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
@@ -142,11 +146,11 @@ def setupParserOptions():
     parser.add_option_group(info_opts)
 
     mt_opts = optparse.OptionGroup(
-        parser, 'Query Options')
+        parser, 'Microtubule Options')
     
     mt_opts.add_option("--MT_unify_pfs",
         action="store", dest="parser_MTunifypfs", type="string", default="", metavar='bias',
-        help="Unify the class number of every microtubule to the most common one (mode) for that microtubule. If there is more than one mode, the unification will be biased according to the argument passed here. Pass \"bias-high\" to pick the higher class number, \"bias-low\" to pick the lower one, or \"bias/#/#/#\" where \"#\" refers to the class numbers in decreasing order of priority (e.g. \"bias/3/4/2/1/5/6\"). Outputs a new file to output.star (or specified with --o).")
+        help="Unify the class number of every microtubule to the most common one (mode) for that microtubule. If there is more than one mode, the unification will be biased according to the argument passed here. Pass \"bias-high\" to pick the higher class number, \"bias-low\" to pick the lower one, or \"bias/#/#/#\" where \"#\" refers to the class numbers in decreasing order of priority (e.g. \"bias/3/4/2/1/5/6\").")
 
     parser.add_option_group(mt_opts)
     
@@ -646,6 +650,20 @@ def renumbercol(datatable, columns):
             newdatatable.append(L)
             
     return(newdatatable)
+
+def multiply(particles,column,value):
+
+    try:
+        particles[column] = pd.to_numeric(particles[column], downcast="float")
+    except:
+        print("\n>> Error: Could not interpret the values in " + column + " as numbers.\n")
+        sys.exit()
+
+    print("\n>> Multiplying all values in " + column + " by " + str(value) + ".")
+
+    particles[column] = value * particles[column]
+
+    return(particles)
     
 def checksubset(particles, params):
     
@@ -1239,6 +1257,25 @@ def mainloop(params):
         swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
         print("\n>> Swapped in " + str(columstoswap) + " from " + file2)
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_multiply"] != "":
+        arguments = params["parser_multiply"].split("/")
+        if len(arguments) != 2:
+            print("\n>> Error: the argument to pass is column/value (e.g. _rlnHelicalTrackLength/0.25).\n")
+            sys.exit()
+        column, value = arguments
+        try:    
+            value = float(value)
+        except:
+            print("\n>> Error: Could not interpret \"" + value + "\" as numeric.\n")
+            sys.exit()      
+        if column not in allparticles:
+            print("\n>> Error: Could not find the column " + column + " in the star file.\n")
+            sys.exit()  
+
+        multipliedparticles = multiply(allparticles,column,value)
+        writestar(multipliedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
     if params["parser_findshared"] != "":

@@ -70,9 +70,9 @@ def setupParserOptions():
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
 
-    modify_opts.add_option("--multiply",
-        action="store", dest="parser_multiply", type="string", default="", metavar='column/value',
-        help="Multiply all values of a column by a value. The argument to pass is column/value (e.g. _rlnHelicalTrackLength/0.25).")
+    modify_opts.add_option("--operate",
+        action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
+        help="Perform operation on all values of a column. The argument to pass is column[operator]value; operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
@@ -645,7 +645,7 @@ def renumbercol(datatable, columns):
             
     return(newdatatable)
 
-def multiply(particles,column,value):
+def operate(particles,column,operator,value):
 
     try:
         particles[column] = pd.to_numeric(particles[column], downcast="float")
@@ -653,9 +653,21 @@ def multiply(particles,column,value):
         print("\n>> Error: Could not interpret the values in " + column + " as numbers.\n")
         sys.exit()
 
-    print("\n>> Multiplying all values in " + column + " by " + str(value) + ".")
+    if operator == "multiply":
+        print("\n>> Multiplying  all values in " + column + " by " + str(value) + ".")
+        particles[column] = particles[column] * value
 
-    particles[column] = value * particles[column]
+    elif operator == "divide":
+        print("\n>> Dividing  all values in " + column + " by " + str(value) + ".")
+        particles[column] = particles[column] / value
+
+    elif operator == "add":
+        print("\n>> Adding " + str(value) + " to all values in " + column + ".")
+        particles[column] = particles[column] + value
+
+    elif operator == "subtract":
+        print("\n>> Subtracting " + str(value) + " from all values in " + column + ".")
+        particles[column] = particles[column] - value
 
     return(particles)
     
@@ -1253,10 +1265,21 @@ def mainloop(params):
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
-    if params["parser_multiply"] != "":
-        arguments = params["parser_multiply"].split("/")
-        if len(arguments) != 2:
-            print("\n>> Error: the argument to pass is column/value (e.g. _rlnHelicalTrackLength/0.25).\n")
+    if params["parser_operate"] != "":
+        if len(params["parser_operate"].split("*")) == 2:
+            arguments = params["parser_operate"].split("*")
+            operator = "multiply"
+        elif len(params["parser_operate"].split("/")) == 2:
+            arguments = params["parser_operate"].split("/")
+            operator = "divide"
+        elif len(params["parser_operate"].split("+")) == 2:
+            arguments = params["parser_operate"].split("+")
+            operator = "add"
+        elif len(params["parser_operate"].split("-")) == 2:
+            arguments = params["parser_operate"].split("-")
+            operator = "subtract"
+        else:
+            print("\n>> Error: the argument to pass is column[operator]value (e.g. _rlnHelicalTrackLength*0.25).\n")
             sys.exit()
         column, value = arguments
         try:    
@@ -1268,8 +1291,8 @@ def mainloop(params):
             print("\n>> Error: Could not find the column " + column + " in the star file.\n")
             sys.exit()  
 
-        multipliedparticles = multiply(allparticles,column,value)
-        writestar(multipliedparticles, metadata, params["parser_outname"], relegateflag)
+        operatedparticles = operate(allparticles,column,operator,value)
+        writestar(operatedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
     if params["parser_findshared"] != "":

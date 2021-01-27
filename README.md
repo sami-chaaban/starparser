@@ -90,10 +90,6 @@ starparser --i input.star [options]
 
 * **```--sort_by```** *```column-name```* : Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. "*\_rlnClassNumber/n*"); otherwise, it will sort the values as text. 
 
-### Microtubules
-
-* **```--MT_unify_pfs```** *```bias```* : Unify the class number of every microtubule to the most common one (mode) for that microtubule. If there is more than one mode, the unification will be biased according to the argument passed here: pass "bias-high" to pick the higher class number, \"bias-low\" to pick the lower one, or "bias/#/#/#" where "#" refers to the class numbers in decreasing order of priority (e.g. "bias/3/4/2/1/5/6"). Outputs a new file to output.star (or specified with ```--o```).
-
 ### Querying
 
 * **```--c```** *```column-name(s)```* : Column query term(s). E.g. "*\_rlnMicrographName*". This is used to look for a specific query specified with ```--q```. In cases where you can enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*".
@@ -105,6 +101,8 @@ starparser --i input.star [options]
 ### Other
 
 * **```--opticsless```** : Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--plot_class_proportion``` or commands that require parsing a second file.
+
+* **```--MT_unify_pfs```** *```bias```* : Unify the class number of every microtubule to the most common one (mode) for that microtubule. If there is more than one mode, the unification will be biased according to the argument passed here: pass "bias-high" to pick the higher class number, \"bias-low\" to pick the lower one, or "bias/#/#/#" where "#" refers to the class numbers in decreasing order of priority (e.g. "bias/3/4/2/1/5/6"). Outputs a new file to output.star (or specified with ```--o```).
 
 ### Output
 

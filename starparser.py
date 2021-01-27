@@ -144,15 +144,6 @@ def setupParserOptions():
         help="Sort the column in ascending order and output a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"_rlnClassNumber/n\"); otherwise, it will sort the values as text.")   
 
     parser.add_option_group(info_opts)
-
-    mt_opts = optparse.OptionGroup(
-        parser, 'Microtubule Options')
-    
-    mt_opts.add_option("--MT_unify_pfs",
-        action="store", dest="parser_MTunifypfs", type="string", default="", metavar='bias',
-        help="Unify the class number of every microtubule to the most common one (mode) for that microtubule. If there is more than one mode, the unification will be biased according to the argument passed here. Pass \"bias-high\" to pick the higher class number, \"bias-low\" to pick the lower one, or \"bias/#/#/#\" where \"#\" refers to the class numbers in decreasing order of priority (e.g. \"bias/3/4/2/1/5/6\").")
-
-    parser.add_option_group(mt_opts)
     
     query_opts = optparse.OptionGroup(
         parser, 'Query Options')
@@ -177,6 +168,10 @@ def setupParserOptions():
     other_opts.add_option("--opticsless",
         action="store_true", dest="parser_optless", default=False,
         help="Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files.")
+
+    other_opts.add_option("--MT_unify_pfs",
+        action="store", dest="parser_MTunifypfs", type="string", default="", metavar='bias',
+        help="Unify the class number of every microtubule to the most common one (mode) for that microtubule. If there is more than one mode, the unification will be biased according to the argument passed here. Pass \"bias-high\" to pick the higher class number, \"bias-low\" to pick the lower one, or \"bias/#/#/#\" where \"#\" refers to the class numbers in decreasing order of priority (e.g. \"bias/3/4/2/1/5/6\").")
 
     parser.add_option_group(other_opts)
     
@@ -227,7 +222,6 @@ def parsestar(starfile):
     if opticsstop == 0:
         
         print('\n>> Error: Could not find the end of the optics table.\n')
-        
         sys.exit()
 
     particlesstop = 0

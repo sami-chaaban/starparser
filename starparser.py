@@ -169,9 +169,9 @@ def setupParserOptions():
         action="store_true", dest="parser_optless", default=False,
         help="Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files.")
 
-    other_opts.add_option("--MT_unify_pfs",
-        action="store", dest="parser_MTunifypfs", type="string", default="", metavar='bias',
-        help="Unify the class number of every microtubule to the most common one (mode) for that microtubule. If there is more than one mode, the unification will be biased according to the argument passed here. Pass \"bias-high\" to pick the higher class number, \"bias-low\" to pick the lower one, or \"bias/#/#/#\" where \"#\" refers to the class numbers in decreasing order of priority (e.g. \"bias/3/4/2/1/5/6\").")
+    other_opts.add_option("--unify_helix_class",
+        action="store", dest="parser_unifyhelixclass", type="string", default="", metavar='bias',
+        help="Unify the class number of every particle in the same helical unit (e.g. every segment within a microtubule) to the most common class assignment (i.e .mode). If there is more than one mode, the unification will be biased according to the argument passed here. Pass \"bias-high\" to pick the higher class number, \"bias-low\" to pick the lower one, or \"bias/#/#/#\" where \"#\" refers to the class numbers in decreasing order of priority (e.g. \"bias/3/4/2/1/5/6\").")
 
     parser.add_option_group(other_opts)
     
@@ -930,7 +930,7 @@ def unifypfs(particles,bias):
 
     bias = bias.split("/")
 
-    print("\n>> Unifying the class for each microtubule.")
+    print("\n>> Unifying the class for each helix.")
 
     if len(bias) == 1:
         bias = bias[0]
@@ -1156,7 +1156,7 @@ def mainloop(params):
     queryexact = params["parser_exact"]
     if queryexact:
         print("\n>> You have asked starparser to look for exact matches between the queries and values.")
-    elif params["parser_splitoptics"] or params["parser_classdistribution"] or params["parser_splitclasses"] or params["parser_MTunifypfs"]:
+    elif params["parser_splitoptics"] or params["parser_classdistribution"] or params["parser_splitclasses"] or params["parser_unifyhelixclass"]:
         queryexact = True
     
     #####################################################################
@@ -1399,7 +1399,7 @@ def mainloop(params):
         writestar(particlesnewoptics,metadata,params["parser_outname"],False)
         sys.exit()
 
-    if params["parser_MTunifypfs"] != "":
+    if params["parser_unifyhelixclass"] != "":
 
         if "_rlnClassNumber" not in allparticles:
             print("\n>> Error: _rlnClassNumber does not exist in the star file.\n")
@@ -1407,7 +1407,7 @@ def mainloop(params):
         if "_rlnHelicalTubeID" not in allparticles:
             print("\n>> Error: _rlnHelicalTubeID does not exist in the star file.\n")
             sys.exit()
-        unifiedparticles = unifypfs(allparticles,params["parser_MTunifypfs"])
+        unifiedparticles = unifypfs(allparticles,params["parser_unifyhelixclass"])
         writestar(unifiedparticles,metadata,params["parser_outname"],relegateflag)
         sys.exit()
 

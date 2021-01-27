@@ -88,6 +88,8 @@ starparser --i input.star [options]
 
 * **```--split```** *```number-of-splits```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain exactly the same number of particles.
 
+* **```--split_classes```** : Split the input star file into independent star files for each class. The files will have the names "Class_#.star". 
+
 * **```--split_optics```** : Split the input star file into independent star files for each optics group. The files will have the names of the optics group.
 
 * **```--sort_by```** *```column-name```* : Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. "*\_rlnClassNumber/n*"); otherwise, it will sort the values as text. 

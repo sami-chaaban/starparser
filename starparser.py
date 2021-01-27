@@ -40,7 +40,7 @@ def setupParserOptions():
 
     modify_opts.add_option("--operate",
         action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
-        help="Perform operation on all values of a column. The argument to pass is column[operator]value; operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
+        help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
     
     modify_opts.add_option("--delete_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',

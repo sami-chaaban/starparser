@@ -37,6 +37,10 @@ def setupParserOptions():
     
     modify_opts = optparse.OptionGroup(
         parser, 'Modification Options')
+
+    modify_opts.add_option("--operate",
+        action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
+        help="Perform operation on all values of a column. The argument to pass is column[operator]value; operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
     
     modify_opts.add_option("--delete_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',
@@ -69,10 +73,6 @@ def setupParserOptions():
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
-
-    modify_opts.add_option("--operate",
-        action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
-        help="Perform operation on all values of a column. The argument to pass is column[operator]value; operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',

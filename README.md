@@ -20,7 +20,9 @@ starparser --i input.star [options]
 
 * Your input file needs to be a standard **Relion** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns (i.e. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc.
 
-* The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file. If the star file lacks an optics table, as with those from Relion 3.0, you can add the ```--opticsless``` option to parse it.
+* If the star file lacks an optics table, such as those from Relion 3.0, just add the ```--opticsless``` option to parse it (see limitations below).
+
+* The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
 
 ## Options
 
@@ -52,7 +54,7 @@ starparser --i input.star [options]
 
 * **```--replace_column```** *```column-name```* : Replace all entries of a column with a list of values found in the file provided by ```--f```. The file should be a single column and should have an equivalent number to the star file. This is useful when used in conjunction with ```--list_column```, which outputs column values for easy editing before reinsertion with ```--replace_column```. The result is written to a new star file (default output.star, or specified with ```--o```).
 
-* **```--copy_column```** *```source-column/target-column```* : Replace all entries of a target column with those of a source column in the same star file. If the target column exists, its values will be replaced. If the target does not exist, a new column will be made. The argument to pass is source-column/target-column (e.g. \_rlnAngleTiltPrior/\_rlnAngleTilt). The result is written to a new star file (default output.star, or specified with ```--o```)
+* **```--copy_column```** *```source-column/target-column```* : Replace all entries of a target column with those of a source column in the same star file. If the target column does not exist, a new column will be made. The argument to pass is source-column/target-column (e.g. \_rlnAngleTiltPrior/\_rlnAngleTilt). The result is written to a new star file (default output.star, or specified with ```--o```)
 
 * **```--reset_column```** *```column-name/new-value```* : Change all values of a column to the one provided here. The argument to pass is column-name/new-value (e.g. \_rlnOriginX/0). The result is written to a new star file (default output.star, or specified with ```--o```)
 

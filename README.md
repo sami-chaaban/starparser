@@ -40,6 +40,8 @@ starparser --i input.star [options]
 
 ### Modifying
 
+* **```--operate```** *```column-name[operator]value```* : Perform operation on all values of a column. The argument to pass is column[operator]value; operators include "\*", "/", "+", and "-" (e.g. \_rlnHelicalTrackLength\*0.25). The result is written to a new star file (default output.star, or specified with ```--o```).
+
 * **```--delete_column```** *```column-name(s)```* : Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. "*\_rlnMicrographName*". To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that "relion_star_handler --remove_column" also does this.
 
 * **```--delete_particles```** : Delete particles that match a query (specified with ```--q```) within a column header (specified with ```--c```; see the *Querying* options), and write to a new star file (default output.star, or specified with ```--o```).
@@ -55,8 +57,6 @@ starparser --i input.star [options]
 * **```--reset_column```** *```column-name/new-value```* : Change all values of a column to the one provided here. The argument to pass is column-name/new-value (e.g. \_rlnOriginX/0). The result is written to a new star file (default output.star, or specified with ```--o```)
 
 * **```--swap_columns```** *```column-name(s)```* : Swap columns from another star file (specified with ```--f```). For example, pass "*\_rlnMicrographName*" to swap that column. To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
-
-* **```--operate```** *```column-name[operator]value```* : Perform operation on all values of a column. The argument to pass is column[operator]value; operators include "\*", "/", "+", and "-" (e.g. \_rlnHelicalTrackLength\*0.25). The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--regroup```** *```particles-per-group```* : Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if \_rlnGroupNumber is being used in the star file rater than \_rlnGroupName. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 

@@ -1340,6 +1340,7 @@ def mainloop(params):
         if numrandom > len(allparticles.index):
             print("\n>> Error: the number of particles you want to randomly extract cannot be greater than the total number of particles (" + str(len(allparticles.index)) + ").\n")
         if params["parser_column"] == "" and params["parser_query"] == "":
+            print("\n>> Creating a random set of " + str(numrandom) + " particles.")
             writestar(allparticles.sample(n = numrandom), metadata, params["parser_outname"], relegateflag)
         elif params["parser_column"] == "" or params["parser_query"] == "":
             print("\n>> Error: check that you have passed the column and query arguments correctly.\n")

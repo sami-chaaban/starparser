@@ -40,7 +40,7 @@ def setupParserOptions():
 
     modify_opts.add_option("--operate",
         action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
-        help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
+        help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
     
     modify_opts.add_option("--delete_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',
@@ -168,10 +168,6 @@ def setupParserOptions():
     other_opts.add_option("--opticsless",
         action="store_true", dest="parser_optless", default=False,
         help="Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files.")
-
-    other_opts.add_option("--unify_helix_class",
-        action="store", dest="parser_unifyhelixclass", type="string", default="", metavar='bias',
-        help="Unify the class number of every particle in the same helical unit (e.g. every segment within a microtubule) to the most common class assignment (i.e .mode). If there is more than one mode, the unification will be biased according to the argument passed here. Pass \"bias-high\" to pick the higher class number, \"bias-low\" to pick the lower one, or \"bias/#/#/#\" where \"#\" refers to the class numbers in decreasing order of priority (e.g. \"bias/3/4/2/1/5/6\").")
 
     parser.add_option_group(other_opts)
     
@@ -926,87 +922,6 @@ def resetcolumn(particles,column,value):
     particles[column]=value
     return(particles)
 
-def unifypfs(particles,bias):
-
-    bias = bias.split("/")
-
-    print("\n>> Unifying the class for each helix.")
-
-    if len(bias) == 1:
-        bias = bias[0]
-        if bias == "bias":
-            print("\n>> Error: the arguments should be in the form \"bias-high\", \"bias-low\", or \"bias/3/4/2/1/5/6\",.")
-            sys.exit()
-        elif bias == "bias-low":
-            print("\n>> Prioritizing lower numbers when there is more than one mode.")
-        elif bias == "bias-high":
-            print("\n>> Prioritizing higher numbers when there is more than one mode.")
-    elif len(bias) > 1:
-        biaslist = bias[1:]
-        bias = bias[0]
-        for c in list(set(particles["_rlnClassNumber"])):
-            if c not in biaslist:
-                print("\n>> Error: " + str(c) + " is a class in the star file that you have not provided in your bias list.")
-        print("\n>> When there is more than one mode, the class will be chosen from this list (in decreasing priority): " + str(biaslist) + ".")
-    if bias not in ["bias-low","bias-high","bias"]:
-        print("\n>> Error: the arguments should be in the form \"bias-high\", \"bias-low\", or \"bias/3/4/2/1/5/6\".")
-        sys.exit()
-
-    micrographs = particles.groupby(["_rlnMicrographName"])
-
-    for micrograph in micrographs:
-
-        microtubules = micrograph[1].groupby(["_rlnHelicalTubeID"])
-
-        for microtubule in microtubules:
-
-            pfnumber_mixed = microtubule[1]["_rlnClassNumber"]
-            pfnumber_mixed = list(map(int, pfnumber_mixed))
-
-            pfnumber_mixed_set = set(pfnumber_mixed)
-
-            if len(pfnumber_mixed_set) > 1 and bias != "bias-low":
-
-                pfestimatecount = []
-
-                for pfestimate in pfnumber_mixed_set:
-                    pfestimatecount.append(pfnumber_mixed.count(pfestimate))
-
-                pfnumber_mixed_set = [x for _,x in sorted(zip(pfestimatecount,pfnumber_mixed_set))]
-                pfestimatecount = sorted(pfestimatecount)
-
-                if pfestimatecount[-1] == pfestimatecount[-2]:
-                    if bias == "bias":
-                        for i in biaslist:
-                            if i in [str(pfnumber_mixed_set[-1]),str(pfnumber_mixed_set[-2])]: #this only takes into account top two modes
-                                pfnumber_mode = i
-                                break
-                    elif bias == "bias-high":
-                        pfnumber_mode = max([pfnumber_mixed_set[-1],pfnumber_mixed_set[-2]])
-                else:
-                    pfnumber_mode = pfnumber_mixed_set[-1]
-
-            else:
-                pfnumber_mode = max(set(pfnumber_mixed), key=pfnumber_mixed.count)
-
-            particleindex = list(microtubule[1].index)
-
-            for p in particleindex:
-
-                particles.iloc[p,particles.columns.get_loc("_rlnClassNumber")] = str(pfnumber_mode)
-
-    classes = list(set(particles["_rlnClassNumber"]))
-    classes = sorted(list(map(int, classes)))
-    
-    for c in classes:
-        totalinclass = countqueryparticles(particles, ["_rlnClassNumber"], [str(c)], True)
-        percentinclass = totalinclass*100 / len(particles.index)
-        print("\n · Class " + str(c) + ": " + str(totalinclass) + " (" + str(round(percentinclass,1)) + "%)")
-
-    print("")
-
-    return(particles)
-
 def findnearby(coreparticles,nearparticles,threshdist):
 
     coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
@@ -1156,7 +1071,7 @@ def mainloop(params):
     queryexact = params["parser_exact"]
     if queryexact:
         print("\n>> You have asked starparser to look for exact matches between the queries and values.")
-    elif params["parser_splitoptics"] or params["parser_classdistribution"] or params["parser_splitclasses"] or params["parser_unifyhelixclass"]:
+    elif params["parser_splitoptics"] or params["parser_classdistribution"] or params["parser_splitclasses"]:
         queryexact = True
     
     #####################################################################
@@ -1397,18 +1312,6 @@ def mainloop(params):
         particlesnewoptics, newopticsnumber = setparticleoptics(allparticles,columns,query,str(opticsnumber))
         print("\n>> Created optics group called " + newgroup + " (optics group " + str(opticsnumber)+") for the " + str(newopticsnumber) + " particles that match " + str(query) + " in the column " + str(columns))
         writestar(particlesnewoptics,metadata,params["parser_outname"],False)
-        sys.exit()
-
-    if params["parser_unifyhelixclass"] != "":
-
-        if "_rlnClassNumber" not in allparticles:
-            print("\n>> Error: _rlnClassNumber does not exist in the star file.\n")
-            sys.exit()
-        if "_rlnHelicalTubeID" not in allparticles:
-            print("\n>> Error: _rlnHelicalTubeID does not exist in the star file.\n")
-            sys.exit()
-        unifiedparticles = unifypfs(allparticles,params["parser_unifyhelixclass"])
-        writestar(unifiedparticles,metadata,params["parser_outname"],relegateflag)
         sys.exit()
 
     if params["parser_limitparticles"] != "":

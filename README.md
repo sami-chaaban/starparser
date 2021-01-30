@@ -106,8 +106,6 @@ starparser --i input.star [options]
 
 * **```--opticsless```** : Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--plot_class_proportion``` or commands that require parsing a second file.
 
-* **```--unify_helix_class```** *```bias```* : Unify the class number of every particle in the same helical unit (e.g. every segment within a microtubule) to the most common class assignment (i.e .mode). If there is more than one mode, the unification will be biased according to the argument passed here: pass "bias-high" to pick the higher class number, \"bias-low\" to pick the lower one, or "bias/#/#/#" where "#" refers to the class numbers in decreasing order of priority (e.g. "bias/3/4/2/1/5/6"). Outputs a new file to output.star (or specified with ```--o```).
-
 ### Output
 
 * **```--o```** *```filename```* : Output file name. Default is output.star.

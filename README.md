@@ -70,7 +70,7 @@ starparser --i input.star [options]
 
 * **```--extract_particles```** : Find particles that match a column header (```--c```) and query (```--q```) and write them to a new star file (default output.star, or specified with ```--o```).
 
-* **```--limit_particles```** *```limit```* : Extract particles that match a specific operator ("*lt*" for less than, "*gt*" for greater than). The argument to pass is "column/operator/value" (e.g. "*\_rlnDefocusU/lt/40000*" for defocus values less than 40000). If possible, use Relion Subset Selection to do this.
+* **```--limit_particles```** *```column/comparator/value```* : Extract particles that match a specific operator ("*lt*" for less than, "*gt*" for greater than). The argument to pass is "column/comparator/value" (e.g. "*\_rlnDefocusU/lt/40000*" for defocus values less than 40000). If possible, use Relion Subset Selection to do this.
 
 * **```--count_particles```** : Count particles and print the result. This can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
 

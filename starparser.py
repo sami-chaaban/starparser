@@ -96,8 +96,8 @@ def setupParserOptions():
         help="Write a star file with particles that match a column header (--c) and query (--q).")
 
     info_opts.add_option("--limit_particles",
-        action="store", dest="parser_limitparticles", type="string", default = "", metavar='limit',
-        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/operator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
+        action="store", dest="parser_limitparticles", type="string", default = "", metavar='column/comparator/value',
+        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
     
     info_opts.add_option("--count_particles",
         action="store_true", dest="parser_countme", default=False,

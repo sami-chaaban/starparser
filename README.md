@@ -8,7 +8,7 @@ Use this script to manipulate Relion 3.1 star files, including counting, plottin
 python starparser.py --i input.star [options]
 ```
 
-Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/scripts/starparser.py'`) and run the script with:
+Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/scripts/starparser.py'`) or .bashrc (`alias starparser='python /home/scripts/starparser.py'`) and run the script with:
 
 ```
 starparser --i input.star [options]

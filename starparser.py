@@ -2,13 +2,14 @@ import sys
 import os.path
 import pandas as pd
 import optparse
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.12.")
+        version="%prog 1.13.")
 
     parser.add_option("--i",
         action="store", dest="file", default="", metavar='starfile-name',
@@ -24,6 +25,10 @@ def setupParserOptions():
     plot_opts.add_option("--histogram",
         action="store", dest="parser_plot", default="", metavar="column-name",
         help="Plot values of a column as a histogram. Use --c and --q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
+
+    plot_opts.add_option("--plot_orientations",
+        action="store_true", dest="parser_plotangledist", default=False,
+        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
@@ -513,6 +518,52 @@ def plotclassparts(filename, classes):
     ax.set_ylabel("Particle number")
     fig = ax.get_figure()
     outputfig(fig, "Class_distribution")
+
+def plotangledist(particles):
+
+    lon=list(map(float, list(particles["_rlnAngleRot"])))
+    lat=list(map(float, list(particles["_rlnAngleTilt"])))
+
+    # create some random data for histogram
+    lat = [l-90 for l in lat]
+    data = [list(a) for a in zip(lon, lat)]
+    data = np.array(data) / 180 * np.pi  # shape (n, 2)
+
+    # create bin edges
+    bin_number = 60
+    lon_edges = np.linspace(-np.pi, np.pi, bin_number + 1)
+    lat_edges = np.linspace(-np.pi/2., np.pi/2., bin_number + 1)
+
+    # calculate 2D histogram, the shape of hist is (bin_number, bin_number)
+    hist, lon_edges, lat_edges = np.histogram2d(
+        *data.T, bins=[lon_edges, lat_edges], density=True
+    )
+
+    # generate the plot
+    fig = plt.figure(figsize=(10,5))
+    ax = fig.add_subplot(111, projection='mollweide')
+
+    cmap='Blues'
+
+    ax.pcolor(
+        lon_edges, lat_edges,
+        hist.T,  # transpose from (row, column) to (x, y)
+        cmap=cmap
+    )
+
+    # hide the tick labels
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # add the colorbar
+    cbar = plt.colorbar(
+            plt.cm.ScalarMappable(
+                norm=mpl.colors.Normalize(0, 1), cmap=cmap
+            )
+        )
+    cbar.set_label("Orientation Density")
+
+    outputfig(fig, "Particle_orientations")
 
 def limitparticles(particles, column, limit, operator):
     
@@ -1500,6 +1551,14 @@ def mainloop(params):
         except:
             print("\n>> Error: could not plot the column \"" + columntoplot + "\", maybe it's not numeric.\n")
             sys.exit()
+        sys.exit()
+
+    if params["parser_plotangledist"]:
+        if "_rlnAngleRot" not in particles2use or "_rlnAngleTilt" not in particles2use:
+            print("\n>> Error: the column _rlnAngleRot or _rlnAngleTilt does not exist.\n")
+            sys.exit()
+        print("\n>> Plotting the particle orientations based on the _rlnAngleRot and _rlnAngleTilt on a Mollweide projection.")
+        plotangledist(particles2use)
         sys.exit()
         
     if params["parser_writecol"] != "": 

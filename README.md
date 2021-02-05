@@ -34,7 +34,9 @@ starparser --i input.star [options]
 
 ### Plotting
 
-* **```--histogram```** *```column-name```*: Plot values of a column as a histogram. Use ```--c``` and ```--q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
+* **```--histogram```** *```column-name```* : Plot values of a column as a histogram. Use ```--c``` and ```--q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
+
+* **```--plot_orientations```** : Plot the particle orientations based on the \_rlnAngleRot and \_rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change filetype (see the *Output* options).
 
 * **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" after the option to plot all classes, or separate the classes that you want with a slash (e.g. "*1/2/5*"). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
@@ -127,6 +129,16 @@ starparser --i run_data.star --histogram _rlnDefocusU
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **DefocusU.png**:
 ![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
+
+---
+
+* Plot the particle orientation distribution.
+```
+starparser --i run_data.star --plot_orientations
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Particle_orientations.png**:
+![Orientation plot](./Examples/Particle_orientations.png "Particle orientations")
 
 ---
 
@@ -352,7 +364,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.12** - January 2021
+* **1.13** - February 2021
 
 ## License
 

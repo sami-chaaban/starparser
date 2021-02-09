@@ -1,6 +1,6 @@
 # StarParser
 
-Use this script to manipulate Relion 3.1 star files, including counting, plotting, extracting, and removing data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below (note: some of the options are already available in "relion_star_handler").
+Use this program to manipulate Relion 3.1 star files, including counting, plotting, extracting, and removing data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below (note: some of the options are already available in "relion_star_handler").
 
 **Usage:**
 
@@ -8,7 +8,7 @@ Use this script to manipulate Relion 3.1 star files, including counting, plottin
 python starparser.py --i input.star [options]
 ```
 
-Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/scripts/starparser.py'`) or .bashrc (`alias starparser='python /home/scripts/starparser.py'`) and run the script with:
+Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/programs/starparser.py'`) or .bashrc (`alias starparser='python /home/programs/starparser.py'`) and run the program with:
 
 ```
 starparser --i input.star [options]
@@ -16,7 +16,7 @@ starparser --i input.star [options]
 
 ## Requirements
 
-* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`. (Note: it has only been tested on **pandas** version 1.1.3.) You can then run the **starparser.py** script directly or with an alias.
+* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`. (Note: it has only been tested on **pandas** version 1.1.3.) You can then run the **starparser.py** program directly or with an alias.
 
 * Your input file needs to be a standard **Relion** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns (i.e. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc.
 

@@ -9,7 +9,7 @@ import numpy as np
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.13.")
+        version="%prog 1.14.")
 
     parser.add_option("--i",
         action="store", dest="file", default="", metavar='starfile-name',
@@ -81,7 +81,7 @@ def setupParserOptions():
 
     modify_opts.add_option("--import_mic_value",
         action="store", dest="parser_importmicvalue", type="string", default="", metavar='column-name',
-        help="For every particle, find the equivalent micrograph in a second star file provided by --f and replace its column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of that micrograph name.")
+        help="For every particle, find the equivalent micrograph in a second star file provided by --f and replace its column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of each micrograph name.")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
@@ -689,32 +689,47 @@ def importmicvalue(original_particles, importfrom_particles, column):
 
     importedparticles = original_particles.copy()
 
+    dropflag = False
+
     if "/" in importedparticles['_rlnMicrographName'][0]:
+        importedparticles["_rlnMicrographNameSimple"] = importedparticles['_rlnMicrographName']
         for idx, row in importedparticles.iterrows():
             micname = importedparticles.loc[idx,"_rlnMicrographName"]
-            importedparticles.loc[idx,"_rlnMicrographName"] = micname[micname.rfind("/")+1:]
+            importedparticles.loc[idx,"_rlnMicrographNameSimple"] = micname[micname.rfind("/")+1:]
 
-    importedparticles = importedparticles.set_index('_rlnMicrographName')
+        importedparticles = importedparticles.set_index('_rlnMicrographNameSimple')
+
+        dropflag = True
+
+    else:
+
+        importedparticles = importedparticles.set_index('_rlnMicrographName')
 
     ##
 
     if "/" in importfrom_particles['_rlnMicrographName'][0]:
+        importfrom_particles["_rlnMicrographNameSimple"] = importfrom_particles['_rlnMicrographName']
         for idx, row in importfrom_particles.iterrows():
             micname = importfrom_particles.loc[idx,"_rlnMicrographName"]
-            importfrom_particles.loc[idx,"_rlnMicrographName"] = micname[micname.rfind("/")+1:]
+            importfrom_particles.loc[idx,"_rlnMicrographNameSimple"] = micname[micname.rfind("/")+1:]
 
-    importfrom_particles = importfrom_particles[["_rlnMicrographName", column]]
-    importfrom_particles = importfrom_particles.set_index('_rlnMicrographName')
+        importfrom_particles = importfrom_particles[["_rlnMicrographNameSimple", column]]
+        importfrom_particles = importfrom_particles.set_index('_rlnMicrographNameSimple')
+
+    else:
+
+        importfrom_particles = importfrom_particles[["_rlnMicrographName", column]]
+        importfrom_particles = importfrom_particles.set_index('_rlnMicrographName')
 
     ####
 
-    print(importedparticles["_rlnOpticsGroup"].head())
-
     importedparticles.update(importfrom_particles)
 
-    print(importedparticles["_rlnOpticsGroup"].head())
-
     importedparticles.reset_index(inplace=True)
+
+    if dropflag:
+
+        importedparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)
     
     return(importedparticles)
 

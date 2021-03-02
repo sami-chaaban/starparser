@@ -366,7 +366,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.13** - February 2021
+* **1.14** - March 2021
 
 ## License
 

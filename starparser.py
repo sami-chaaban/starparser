@@ -79,6 +79,10 @@ def setupParserOptions():
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
 
+    modify_opts.add_option("--import_mic_value",
+        action="store", dest="parser_importmicvalue", type="string", default="", metavar='column-name',
+        help="For every particle, find the equivalent micrograph in a second star file provided by --f and replace its column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of that micrograph name.")
+
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
         help="Regroup particles such that those with similar defocus values are in the same group. Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. Note that Subset selection in Relion can also regroup.")
@@ -665,6 +669,55 @@ def swapcolumns(original_particles, swapfrom_particles, columns):
     
     return(swappedparticles)
 
+def importmicvalue(original_particles, importfrom_particles, column):
+
+    if column not in original_particles:
+        print("\n>> Error: the column \"" + c + "\" does not exist in the original star file.\n")
+        sys.exit()
+    if column not in importfrom_particles:
+        print("\n>> Error: the column \"" + c + "\" does not exist in the second star file.\n")
+        sys.exit()
+
+    if "_rlnMicrographName" not in original_particles:
+        print("\n>> Error: _rlnMicrographName does not exist in the original star file.\n")
+        sys.exit()
+    if "_rlnMicrographName" not in importfrom_particles:
+        print("\n>> Error: _rlnMicrographName does not exist in the second star file.\n")
+        sys.exit()
+
+    ####
+
+    importedparticles = original_particles.copy()
+
+    if "/" in importedparticles['_rlnMicrographName'][0]:
+        for idx, row in importedparticles.iterrows():
+            micname = importedparticles.loc[idx,"_rlnMicrographName"]
+            importedparticles.loc[idx,"_rlnMicrographName"] = micname[micname.rfind("/")+1:]
+
+    importedparticles = importedparticles.set_index('_rlnMicrographName')
+
+    ##
+
+    if "/" in importfrom_particles['_rlnMicrographName'][0]:
+        for idx, row in importfrom_particles.iterrows():
+            micname = importfrom_particles.loc[idx,"_rlnMicrographName"]
+            importfrom_particles.loc[idx,"_rlnMicrographName"] = micname[micname.rfind("/")+1:]
+
+    importfrom_particles = importfrom_particles[["_rlnMicrographName", column]]
+    importfrom_particles = importfrom_particles.set_index('_rlnMicrographName')
+
+    ####
+
+    print(importedparticles["_rlnOpticsGroup"].head())
+
+    importedparticles.update(importfrom_particles)
+
+    print(importedparticles["_rlnOpticsGroup"].head())
+
+    importedparticles.reset_index(inplace=True)
+    
+    return(importedparticles)
+
 def renumbercol(datatable, columns):
     
     newdatatable = datatable[:3]
@@ -1225,10 +1278,25 @@ def mainloop(params):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         otherparticles, metadata2 = getparticles(file2)
-        columstoswap = params["parser_swapcolumns"].split("/")
-        swappedparticles = swapcolumns(allparticles, otherparticles, columstoswap)
-        print("\n>> Swapped in " + str(columstoswap) + " from " + file2)
+        columnstoswap = params["parser_swapcolumns"].split("/")
+        swappedparticles = swapcolumns(allparticles, otherparticles, columnstoswap)
+        print("\n>> Swapped in " + str(columnstoswap) + " from " + file2)
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_importmicvalue"] != "":
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to import values from.\n")
+            sys.exit()
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
+            sys.exit();
+        otherparticles, metadata2 = getparticles(file2)
+        columntoimport = params["parser_importmicvalue"]
+        importedparticles = importmicvalue(allparticles, otherparticles, columntoimport)
+        print("\n>> Imported " + str(columntoimport) + " from " + file2)
+        writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
     if params["parser_operate"] != "":

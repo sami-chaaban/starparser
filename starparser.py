@@ -210,11 +210,11 @@ def parsestar(starfile):
 
     starfilesplit = starfile.split()
 
-    opticsstop = 0
+    opticsstop = 0 #for finding the end of the optics values
 
-    for i in range(4,100):
+    for i in range(4,2000):
         
-        if starfilesplit[i] == '#':
+        if starfilesplit[i] == '#': #When you see a #, it must be the next table starting, so break
             
             opticsstop = i
             
@@ -225,19 +225,19 @@ def parsestar(starfile):
         print('\n>> Error: Could not find the end of the optics table.\n')
         sys.exit()
 
-    particlesstop = 0
+    particlesstop = 0 #for finding the end of the particles table headers
 
-    opticstablestop = 0
+    opticstablestop = 0 #for finding the end of the optics table headers
     
     for i in range(5,opticsstop,2):
         
-        if starfilesplit[i][0] != "_":
+        if starfilesplit[i][0] != "_": #optics table headers start with _, so when it doesn't happen, break
         
             opticstablestop = i
             
             break
-            
-    for i in range(opticsstop+5,200,2):
+
+    for i in range(opticsstop+5,2000,2):
 
         if starfilesplit[i][0] != "_":
             
@@ -530,7 +530,7 @@ def plotangledist(particles):
     data = np.array(data) / 180 * np.pi  # shape (n, 2)
 
     # create bin edges
-    bin_number = 60
+    bin_number = 100
     lon_edges = np.linspace(-np.pi, np.pi, bin_number + 1)
     lat_edges = np.linspace(-np.pi/2., np.pi/2., bin_number + 1)
 

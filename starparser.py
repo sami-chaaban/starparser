@@ -523,7 +523,7 @@ def plotclassparts(filename, classes):
     fig = ax.get_figure()
     outputfig(fig, "Class_distribution")
 
-def plotangledist(particles):
+def plotangledist_old(particles):
 
     lon=list(map(float, list(particles["_rlnAngleRot"])))
     lat=list(map(float, list(particles["_rlnAngleTilt"])))
@@ -534,7 +534,7 @@ def plotangledist(particles):
     data = np.array(data) / 180 * np.pi  # shape (n, 2)
 
     # create bin edges
-    bin_number = 100
+    bin_number = 50 #this is not always ideal
     lon_edges = np.linspace(-np.pi, np.pi, bin_number + 1)
     lat_edges = np.linspace(-np.pi/2., np.pi/2., bin_number + 1)
 
@@ -544,15 +544,16 @@ def plotangledist(particles):
     )
 
     # generate the plot
-    fig = plt.figure(figsize=(10,5))
+    fig = plt.figure(figsize=(3,2))
     ax = fig.add_subplot(111, projection='mollweide')
 
     cmap='Blues'
 
-    ax.pcolor(
-        lon_edges, lat_edges,
+    ax.pcolormesh(
+        lon_edges[:-1], lat_edges[:-1],
         hist.T,  # transpose from (row, column) to (x, y)
-        cmap=cmap
+        cmap=cmap,
+        shading='gouraud'
     )
 
     # hide the tick labels
@@ -566,6 +567,79 @@ def plotangledist(particles):
             )
         )
     cbar.set_label("Orientation Density")
+
+    outputfig(fig, "Particle_orientations")
+
+def plotangledist(particles):
+
+    import scipy
+    from scipy.stats import gaussian_kde
+
+    rot=list(map(float, list(particles["_rlnAngleRot"])))
+    tilt=list(map(float, list(particles["_rlnAngleTilt"])))
+
+    ##########################################################################################
+
+    # CODE BELOW ADAPTED FROM SIMILAR FUNCTION BY ISRAEL FERNANDEZ
+
+    ###############
+
+    tilt_m90 = [i -90 for i in tilt]
+    rot_rad = np.deg2rad(rot)
+    tilt_m90_rad = np.deg2rad(tilt_m90)
+    vertical_rad = np.vstack([tilt_m90_rad, rot_rad])
+
+    try:
+        m = gaussian_kde(vertical_rad)(vertical_rad)
+    except:
+        print("\n>> Error: check the _rlnAngleRot and _rlnAngleTilt columns.\n")
+        sys.exit()
+
+    # fig = plt.figure(figsize=(3, 3))
+    # plt.hist(rot_rad)
+    # outputfig(fig,"rot_rad")
+
+    # fig = plt.figure(figsize=(3, 3))
+    # plt.hist(tilt_m90_rad)
+    # outputfig(fig,"tilt_m90_rad")
+
+    fig = plt.figure(figsize=(3.5, 1.8))
+    ax = plt.subplot(111, projection="mollweide")
+
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        ax.scatter(rot_rad, tilt_m90_rad, cmap="Blues", c=m, s=3, alpha=0.1)
+
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+
+    #x_60_rad = [1.047 for i in range(0,7)]
+    #x_m60_rad = [-1.047 for i in range(0,7)]
+    #x_120_rad = [2.094 for i in range(0,7)]
+    #x_m120_rad = [-2.094 for i in range(0,7)]
+
+    """These two lines draw curved lines at x -120, -60, 60, 120."""
+    #ax.plot(x_60_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
+    #ax.plot(x_m60_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
+    #ax.plot(x_120_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
+    #ax.plot(x_m120_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
+    """These two lines draw vertical and horizontal straight lines as x, y cartesian axes."""
+    #ax.vlines(0,-1.6,1.6, colors='k', lw=1.5, linestyles=':')
+    #ax.hlines(0,-10,10, colors='k', lw=1.5, linestyles=':')
+
+    #########################################################################################################
+
+    # SHOW COLOR BAR
+
+    cbar = plt.colorbar(
+            plt.cm.ScalarMappable(
+                norm=mpl.colors.Normalize(0, 1), cmap="Blues"
+            ), shrink=0.6, pad = 0.1#cax = fig.add_axes([0.92, 0.33, 0.03, 0.38])
+        )
+    cbar.set_label("Orientation Density")
+
+    plt.tight_layout(pad=0.2)
 
     outputfig(fig, "Particle_orientations")
 
@@ -933,7 +1007,7 @@ def classproportion(particles, columns, query):
 
 def outputfig(fig, name):
     
-    fig.savefig(name + "." + outtype)
+    fig.savefig(name + "." + outtype, dpi=300)
     print("\n-->> Output figure to " + name + "." + outtype + ".\n")
     
 def makeopticsgroup(particles,metadata,newgroup):

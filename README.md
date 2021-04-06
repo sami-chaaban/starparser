@@ -36,11 +36,11 @@ starparser --i input.star [options]
 
 * **```--histogram```** *```column-name```* : Plot values of a column as a histogram. Use ```--c``` and ```--q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
 
-* **```--plot_orientations```** : Plot the particle orientations based on the \_rlnAngleRot and \_rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.svg. Use ```--t``` to change filetype (see the *Output* options).
+* **```--plot_orientations```** : Plot the particle orientations based on the \_rlnAngleRot and \_rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change filetype (see the *Output* options).
 
 * **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input. Type "all" after the option to plot all classes, or separate the classes that you want with a slash (e.g. "*1/2/5*"). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
 
-* **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (See the *Querying* options). It will output the proportions in percentages and plot the result in Class_proportion.svg. Use ```--t``` to change filetype (see the *Output* options).
+* **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (See the *Querying* options). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
 
 ### Modifying
 
@@ -84,7 +84,7 @@ starparser --i input.star [options]
 
 * **```--find_shared```** *```column-name```* : Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 
-* **```--extract_if_nearby```** *```distance```* : For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbor closer than the distance provided here will be output to particles_close.star, and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.svg (use ```--t``` to change filetype; see the *Output* options).
+* **```--extract_if_nearby```** *```distance```* : For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbor closer than the distance provided here will be output to particles_close.star, and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the *Output* options).
 
 * **```--fetch_from_nearby```** *```distance/column-name(s)```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. "*300/\_rlnClassNumber*" or "*100/\_rlnAnglePsi/\_rlnHelicalTubeID*"). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph).
 
@@ -114,7 +114,7 @@ starparser --i input.star [options]
 
 * **```--o```** *```filename```* : Output file name. Default is output.star.
 
-* **```--t```** *```filetype```* : File type of the plot that will be written. Choose between png, jpg, svg, and pdf. The default is svg.
+* **```--t```** *```filetype```* : File type of the plot that will be written. Choose between png, jpg, svg, and pdf. The default is png.
 
 ---
 
@@ -129,7 +129,7 @@ The following examples run the `starparser` command assuming an alias has been c
 starparser --i run_data.star --histogram _rlnDefocusU
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **DefocusU.svg**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **DefocusU.png**:
 ![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
 
 ---
@@ -139,7 +139,7 @@ starparser --i run_data.star --histogram _rlnDefocusU
 starparser --i run_data.star --plot_orientations
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Particle_orientations.svg**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Particle_orientations.png**:
 ![Orientation plot](./Examples/Particle_orientations.png "Particle orientations")
 
 ---
@@ -150,7 +150,7 @@ starparser --i run_data.star --plot_orientations
 starparser --i run_it025_data.star --plot_class_iterations all
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.svg**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.png**:
 ![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
 
 ---
@@ -161,7 +161,7 @@ starparser --i run_it025_data.star --plot_class_iterations all
 starparser --i run_it025_data.star --plot_class_iterations 1/3/6
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.svg**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.png**:
 ![Particles per class plot](./Examples/Class_distribution_subset.png "Particles per class plot")
 
 ---
@@ -174,7 +174,7 @@ starparser --i run_it025_data.star --plot_class_proportions --c _rlnMicrographNa
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  The percentage in each class will be displayed in terminal.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_proportion.svg**:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_proportion.png**:
 ![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
 
 ---

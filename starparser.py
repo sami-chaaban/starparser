@@ -188,8 +188,8 @@ def setupParserOptions():
         help="Output file name for a star file to be written. Default is output.star")
     
     output_opts.add_option("--t",
-        action="store", dest="parser_outtype", default = "svg", metavar='plot-filetype',
-        help="File type of the plot that will be written. Choose between png, jpg, svg, and pdf. Default is svg.")
+        action="store", dest="parser_outtype", default = "png", metavar='plot-filetype',
+        help="File type of the plot that will be written. Choose between png, jpg, svg, and pdf. Default is png.")
     
     parser.add_option_group(output_opts)
 

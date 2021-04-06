@@ -9,7 +9,7 @@ import numpy as np
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.14.")
+        version="%prog 1.15.")
 
     parser.add_option("--i",
         action="store", dest="file", default="", metavar='starfile-name',
@@ -188,8 +188,8 @@ def setupParserOptions():
         help="Output file name for a star file to be written. Default is output.star")
     
     output_opts.add_option("--t",
-        action="store", dest="parser_outtype", default = "png", metavar='plot-filetype',
-        help="File type of the plot that will be written. Choose between png, jpg, and pdf. Default is png.")
+        action="store", dest="parser_outtype", default = "svg", metavar='plot-filetype',
+        help="File type of the plot that will be written. Choose between png, jpg, svg, and pdf. Default is svg.")
     
     parser.add_option_group(output_opts)
 
@@ -1239,8 +1239,8 @@ def mainloop(params):
         print("\n>> Error: cannot have the relegate option and the delete OpticsGroup column at the same time (the former will do the latter already).\n")
         sys.exit()
 
-    if params["parser_outtype"] not in ["png", "pdf", "jpg"]:
-        print("\n>> Error: choose between png, pdf, and jpg for the plot filetype.\n")
+    if params["parser_outtype"] not in ["png", "pdf", "jpg", "svg"]:
+        print("\n>> Error: choose between png, pdf, svg, and jpg for the plot filetype.\n")
         sys.exit()
         
     ################################################################

@@ -55,6 +55,10 @@ def setupParserOptions():
         action="store_true", dest="parser_delparticles", default=False,
         help="Delete particles. Pick a column header (--c) and query (--q) to delete particles that match it.")
 
+    modify_opts.add_option("--delete_duplicates",
+        action="store", dest="parser_delduplicates", default="", metavar='column-name',
+        help="Delete duplicate particles based on the column provided here (e.g. _rlnImageName).")
+
     modify_opts.add_option("--delete_mics_fromlist",
         action="store_true", dest="parser_delmics", default=False,
         help="Delete particles that belong to micrographs that have a match in a second file provided by --f.")
@@ -692,6 +696,10 @@ def delparticles(particles, columns, query):
             purgedparticles.drop(purgedparticles[purgedparticles[columns[0]]==q].index , 0,inplace=True)
     
     return(purgedparticles)
+
+def delduplicates(particles, column):
+
+    return(particles.drop_duplicates(subset=[column]))
 
 def delmics(particles, micstodelete):
     purgedparticles = particles.copy()
@@ -1336,6 +1344,17 @@ def mainloop(params):
         newparticles = delparticles(allparticles, columns, query)
         purgednumber = len(allparticles.index) - len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
+        writestar(newparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_delduplicates"] != "":
+        column = params["parser_delduplicates"]
+        if column not in allparticles:
+            print("\n>> Error: the column " + str(column) + " does not exist in your star file.\n")
+            sys.exit()
+        newparticles = delduplicates(allparticles, column)
+        purgednumber = len(allparticles.index) - len(newparticles.index)
+        print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that were duplicates based on the " + column + " column.")
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 

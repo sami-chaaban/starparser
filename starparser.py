@@ -1354,7 +1354,9 @@ def mainloop(params):
             sys.exit()
         newparticles = delduplicates(allparticles, column)
         purgednumber = len(allparticles.index) - len(newparticles.index)
+        newtotal = len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that were duplicates based on the " + column + " column.")
+        print(">> The new total is " + str(newtotal) + " particles.")
         writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
@@ -1682,17 +1684,36 @@ def mainloop(params):
             print("\n>> Error: the column " + str(sortcol) + " does not exist in your star file.\n")
             sys.exit()
         if len(inputparams) == 1:
+            try:
+                pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
+                print("\n----------------------------------------------------------------------")        
+                print("\n>> Warning: it looks like this column is numeric but you haven't specified so (use \"column/n\"; see documentation). Make sure that this is the behavior you intended.\n")
+                print("----------------------------------------------------------------------")
+            except:
+                pass
             print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains text.")
             writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
         elif inputparams[1] == "s":
+            try:
+                pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
+                print("\n----------------------------------------------------------------------")        
+                print("\n>> Warning: it looks like this column is numeric but you haven't specified so (use \"column/n\"; see documentation). Make sure that this is the behavior you intended.\n")
+                print("----------------------------------------------------------------------")
+            except:
+                pass
             print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains text.")
             writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
         elif inputparams[1] == "n":
+            try:
+                pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
+            except:
+                print("\n>> Error: it looks like this column is NOT numeric but you specified that it is.\n")
+                sys.exit()
             allparticles[sortcol] = allparticles[sortcol].apply(pd.to_numeric)
             print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains numeric values.")
             writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
         else:
-            print("\n>> Error: use \"s\" or \"n\" after the slash to specify string or numeric.\n")
+            print("\n>> Error: use \"n\" after the slash to specify that it is numeric.\n")
         sys.exit()
 
     #######################################################################

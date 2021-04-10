@@ -44,7 +44,7 @@ starparser --i input.star [options]
 
 ### Modifying
 
-* **```--operate```** *```column-name[operator]value```* : Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. \_rlnHelicalTrackLength\*0.25). The result is written to a new star file (default output.star, or specified with ```--o```). If your terminal throws an error, try surrounding the argument with parentheses (e.g. **"** \_rlnHelicalTrackLength\*0.25 **"**).
+* **```--operate```** *```column-name[operator]value```* : Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. \_rlnHelicalTrackLength\*0.25). The result is written to a new star file (default output.star, or specified with ```--o```). If your terminal throws an error, try surrounding the argument with parentheses (e.g. **"**\ \_rlnHelicalTrackLength\*0.25\ **"**).
 
 * **```--delete_column```** *```column-name(s)```* : Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. "*\_rlnMicrographName*". To enter multiple columns, separate them with a slash: "*\_rlnMicrographName/\_rlnCoordinateX*". Note that "relion_star_handler --remove_column" also does this.
 

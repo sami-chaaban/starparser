@@ -123,7 +123,7 @@ def setupParserOptions():
     info_opts.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
         help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
-    
+
     info_opts.add_option("--find_shared",
         action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
         help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.")
@@ -299,7 +299,14 @@ def getparticles(filename):
     starfile = file.read()
     file.close()
 
-    version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
+    try:
+
+        version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
+
+    except:
+
+        print("\n>> Error: a problem was encountered when trying to parse " + filename + ".\n")
+        sys.exit()
     
     alloptics = makepandas(opticsheaders, optics)
     allparticles = makepandas(particlesheaders, particles)

@@ -1,6 +1,6 @@
 # StarParser
 
-Use this program to manipulate Relion 3.1 star files, including counting, plotting, extracting, and removing data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below (note: some of the options are already available in "relion_star_handler").
+Use this program to manipulate Relion 3.1 star files, including counting, plotting, extracting, and filtering data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below (note: some of the options are already available in "relion_star_handler").
 
 **Usage:**
 

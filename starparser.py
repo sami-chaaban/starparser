@@ -1649,7 +1649,7 @@ def mainloop(params):
         with open(newcolfile) as f:
             newcol = [line.split()[0] for line in f]
         if len(newcol) != len(allparticles.index):
-            print("\n>> Error: your star file has " + len(allparticles.index) + " values while your second file has " + len(newcol) + " values.\n")
+            print("\n>> Error: your star file has " + str(len(allparticles.index)) + " values while your second file has " + str(len(newcol)) + " values.\n")
             sys.exit()
         print("\n>> Replacing values in the column " + replacecol + " with those in " + newcolfile + ".")
         replacedstar = replacecolumn(allparticles,replacecol,newcol)

@@ -1623,13 +1623,13 @@ def mainloop(params):
             sys.exit()
         insertcol = params["parser_insertcol"]
         if insertcol in allparticles.columns:
-            print("\n>> Error: the column " + str(insertcol) + " already exists in your star file.\n")
+            print("\n>> Error: the column " + str(insertcol) + " already exists in your star file. Use --replace_column if you would like to replace it.\n")
             sys.exit()
         newcolfile = params["parser_file2"]
         with open(newcolfile) as f:
             newcolvalues = [line.split()[0] for line in f]
         if len(newcolvalues) != len(allparticles.index):
-            print("\n>> Error: your star file has " + len(allparticles.index) + " values while your second file has " + len(newcolvalues) + " values.\n")
+            print("\n>> Error: your star file has " + str(len(allparticles.index)) + " values while your second file has " + str(len(newcolvalues)) + " values.\n")
             sys.exit()
         print("\n>> Creating the column " + insertcol + " with the values in " + newcolfile + ".")
         allparticles[insertcol]=newcolvalues

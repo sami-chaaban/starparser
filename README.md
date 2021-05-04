@@ -90,6 +90,8 @@ starparser --i input.star [options]
 
 * **```--fetch_from_nearby```** *```distance/column-name(s)```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. *300/\_rlnClassNumber* or *100/\_rlnAnglePsi/\_rlnHelicalTubeID*). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph).
 
+* **```--extract_clusters```** *```threshold-distance/minimum-number```* : Extract particles that have a minimum number of neighbors within a given radius. For example, passing *400/4* extracts particles with at least 4 neighbors within 400 pixels.
+
 * **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Use ```--c``` and ```--q``` to extract a random set of each passed query in the specified column (see the *Querying* options); in this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```--o```).
 
 * **```--split```** *```number-of-files```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain exactly the same number of particles.
@@ -368,7 +370,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.15** - April 2021
+* **1.16** - May 2021
 
 ## License
 

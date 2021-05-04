@@ -9,7 +9,7 @@ import numpy as np
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.15.")
+        version="%prog 1.16.")
 
     parser.add_option("--i",
         action="store", dest="file", default="", metavar='starfile-name',
@@ -135,6 +135,10 @@ def setupParserOptions():
     info_opts.add_option("--fetch_from_nearby",
         action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name(s)',
         help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph).")
+
+    info_opts.add_option("--extract_clusters",
+        action="store", dest="parser_cluster", type="string", default="", metavar='threshold-distance/minimum-per-cluster',
+        help="Extract particles that have a minimum number of neighbors within a given radius. For example, passing \"400/4\" extracts particles with at least 4 neighbors within 400 pixels.")
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
@@ -1234,6 +1238,48 @@ def fetchnearby(coreparticles,nearparticles,threshdist,columnstoretrieve):
     print(">> " + str(len(stolenparticles.index)) + " out of " + str(len(coreparticles.index)) + " (" + str(round(100*(len(stolenparticles.index)/len(coreparticles.index)),1)) + "%) " + "had neighbors close enough to fetch from. " + str(len(farparts)) + " were too far and " + str(len(noparts)) + " did not have neighbors.")
 
     return(stolenparticles)
+
+
+def getcluster(particles,threshold,minimum):
+
+    uniquemics = particles.groupby(["_rlnMicrographName"])
+    xloc = particles.columns.get_loc("_rlnCoordinateX")+1
+    yloc = particles.columns.get_loc("_rlnCoordinateY")+1
+    nameloc = particles.columns.get_loc("_rlnImageName")+1
+
+    keep = []
+    for mic in uniquemics:
+        coords = []
+        names = []
+        for particle in mic[1].itertuples():
+            x = float(particle[xloc])
+            y = float(particle[yloc])
+            coords.append([x,y])
+            names.append(particle[nameloc])
+        coords = np.asarray(coords)
+        for i in range(0,len(coords)):
+            #print("coords", coords[i])
+            distances = np.sqrt(np.sum((coords - [coords[i]])**2, axis=1))
+            #print("distances", distances)
+            distances = distances[np.logical_and(distances <= threshold, distances > 0)]
+            #print("distances2", distances)
+            if len(distances) >= minimum:
+                #print("KEPT")
+                keep.append(names[i])
+
+    if len(keep) == 0:
+        print(">> Error: no particles were retained based on the criteria.\n")
+        sys.exit()
+    elif len(keep) == len(particles.index):
+        print(">> Error: all particles were retained. No star file will be output.")
+        sys.exit()
+    particles_purged = particles.copy()
+    toconcat = [particles_purged[particles_purged["_rlnImageName"] == q] for q in keep]
+    particles_purged = pd.concat(toconcat)
+
+    print(">> Removed " + str(len(particles.index)-len(particles_purged.index)) + " that did not match the criteria (" + str(len(particles_purged.index)) + " remaining out of " + str(len(particles.index)) + ").")
+
+    return(particles_purged)
         
 ################################################################################################################
 ################################################################################################################
@@ -1526,6 +1572,18 @@ def mainloop(params):
         print("\n>> Fetching " + str(columnstoretrieve) + " values from particles within " + str(threshdist) + " pixels.\n")
         stolenparticles = fetchnearby(allparticles, nearparticles, threshdist, columnstoretrieve)
         writestar(stolenparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_cluster"] != "":
+        retrieveparams = params["parser_cluster"].split("/")
+        if len(retrieveparams) != 2:
+            print("\n>> Error: provide argument in this format: threshold-distance/minimum-per-cluster (e.g. 400/4).")
+            sys.exit()
+        threshold = float(retrieveparams[0])
+        minimum = int(retrieveparams[1])
+        print("\n>> Extracting particles that have at least " + str(minimum) + " neighbors within " + str(threshold) + " pixels.\n")
+        clusterparticles = getcluster(allparticles, threshold,minimum)
+        writestar(clusterparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
     if params["parser_classproportion"]:

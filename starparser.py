@@ -4,6 +4,7 @@ import pandas as pd
 import optparse
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
 
 def setupParserOptions():
@@ -37,6 +38,10 @@ def setupParserOptions():
     plot_opts.add_option("--plot_class_proportions",
         action="store_true", dest="parser_classproportion", default=False,
         help="Plot the proportion of particles that match different queries in each class. At least two queries (--q, separated by slashes) must be provided along with the column to search in (--c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
+
+    plot_opts.add_option("--plot_coordinates",
+        action="store", dest="parser_comparecoords", type="string", default="", metavar="xlimit/ylimit",
+        help="Plot the particle coordinates for the input star file (black circles) and a second star file provided by --f (blue dots). The micrograph names should match between the two star files. The argument to pass is the x and y limits of the plot (i.e. the size of the micrographs) in pixels (e.g. 5760/4096). This option is useful to compare coordinates after filtering a dataset.")
 
     parser.add_option_group(plot_opts)
     
@@ -82,6 +87,10 @@ def setupParserOptions():
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+
+    modify_opts.add_option("--fetch_from_nearby",
+        action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name(s)',
+        help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph).")
 
     modify_opts.add_option("--import_mic_value",
         action="store", dest="parser_importmicvalue", type="string", default="", metavar='column-name',
@@ -131,10 +140,6 @@ def setupParserOptions():
     info_opts.add_option("--extract_if_nearby",
         action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
         help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbor in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
-
-    info_opts.add_option("--fetch_from_nearby",
-        action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name(s)',
-        help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph).")
 
     info_opts.add_option("--extract_clusters",
         action="store", dest="parser_cluster", type="string", default="", metavar='threshold-distance/minimum-per-cluster',
@@ -1280,6 +1285,71 @@ def getcluster(particles,threshold,minimum):
     print(">> Removed " + str(len(particles.index)-len(particles_purged.index)) + " that did not match the criteria (" + str(len(particles_purged.index)) + " remaining out of " + str(len(particles.index)) + ").")
 
     return(particles_purged)
+
+
+def comparecoords(file1parts,file2parts,limits):
+
+    file1mics = file1parts.groupby(["_rlnMicrographName"])
+    file1micloc = file1parts.columns.get_loc("_rlnMicrographName")+1
+    file1xloc = file1parts.columns.get_loc("_rlnCoordinateX")+1
+    file1yloc = file1parts.columns.get_loc("_rlnCoordinateY")+1
+    file1nameloc = file1parts.columns.get_loc("_rlnImageName")+1
+    if not file2parts.empty:
+        file2mics = file2parts.groupby(["_rlnMicrographName"])
+        file2xloc = file2parts.columns.get_loc("_rlnCoordinateX")+1
+        file2yloc = file2parts.columns.get_loc("_rlnCoordinateY")+1
+
+    skipped=0
+
+    fig = plt.figure()
+
+    try:
+        pdf = PdfPages('Coordinates.pdf')
+    except:
+        print("\n>> Error: could not save to Compare_coordinates.pdf. Is it still open?\n")
+        sys.exit()
+
+    if not file2parts.empty:
+        print("\n>> Plotting coordinates from the star file (black circles) and second file (blue dots) for each micrograph.")
+    else:
+        print("\n>> Plotting coordinates from the star file (black circles) for each micrograph.")
+
+    for file1mic in file1mics:
+
+        skipflag = False
+        try:
+            file2mic = file2mics.get_group(file1mic[0])
+        except:
+            skipflag = True
+            #continue
+            
+        mic = file1mic[0].split("/")[-1][:-4]
+        
+        fig, ax = plt.subplots(figsize=(5.63,4.09))
+        
+        for file1part in file1mic[1].itertuples():
+            x1 = float(file1part[file1xloc])
+            y1 = float(file1part[file1yloc])
+            plt.scatter(x1,y1, color='black', facecolors='none', s=150, alpha=0.8, linewidth = 1.8)
+
+        if not skipflag and not file2parts.empty:
+            for file2part in file2mic.itertuples():
+                x2 = float(file2part[file2xloc])
+                y2 = float(file2part[file2yloc])
+                plt.scatter(x2,y2, color='blue', s=20, alpha=0.8, linewidth = 1)
+
+        plt.title(mic, fontsize = 8)
+        plt.xlim(0,int(limits[0]))
+        plt.ylim(0,int(limits[1]))
+        plt.xlabel("Pixels")
+        plt.ylabel("Pixels") 
+        plt.tight_layout()
+        pdf.savefig(fig)
+        plt.close('all')
+
+    pdf.close()
+
+    print("-->> Output figure to Coordinates.pdf\n")
         
 ################################################################################################################
 ################################################################################################################
@@ -1693,6 +1763,18 @@ def mainloop(params):
         allparticles[insertcol]=newcolvalues
         metadata[3].append(insertcol)
         writestar(allparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_comparecoords"] != "":
+        if params["parser_file2"] == "":
+            file2particles = pd.DataFrame({'A' : []})
+        else:
+            file2particles, metadata = getparticles(params["parser_file2"])
+        limits = params["parser_comparecoords"].split("/")
+        if len(limits) != 2:
+            print("\n>> Error: provide argument in this format: xlimit/ylimit (e.g. 5760/4092).")
+            sys.exit()
+        comparecoords(allparticles, file2particles, limits)
         sys.exit()
 
     if params["parser_replacecol"] != "":

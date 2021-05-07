@@ -18,18 +18,18 @@ def setupParserOptions():
 
     parser.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile-name',
-        help="Name of second file to extract columns from, if necessary.")
+        help="Name of second file to get information from, if necessary.")
     
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
 
     plot_opts.add_option("--histogram",
         action="store", dest="parser_plot", default="", metavar="column-name",
-        help="Plot values of a column as a histogram. Use --c and --q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
+        help="Plot values of a column as a histogram. Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
 
     plot_opts.add_option("--plot_orientations",
         action="store_true", dest="parser_plotangledist", default=False,
-        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
+        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
@@ -41,7 +41,7 @@ def setupParserOptions():
 
     plot_opts.add_option("--plot_coordinates",
         action="store", dest="parser_comparecoords", type="string", default="", metavar="xlimit/ylimit",
-        help="Plot the particle coordinates for the input star file (black circles) and a second star file provided by --f (blue dots). The micrograph names should match between the two star files. The argument to pass is the x and y limits of the plot (i.e. the size of the micrographs) in pixels (e.g. 5760/4096). This option is useful to compare coordinates after filtering a dataset.")
+        help="Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (black circles). The argument to pass is the x and y limits of the plot (i.e. the size of the micrographs) in pixels (e.g. 5760/4096). Use --f to overlay the coordinates of a second star file (blue dots); in this case, the micrograph names should match between the two star files. This option is useful to compare coordinates after filtering a dataset. The plots are output to Coordinates.pdf. Optionally, pass a third argument to specify how many micrographs to plot (e.g. *5760/4096/100* to do the first 100 micrographs).")
 
     parser.add_option_group(plot_opts)
     
@@ -123,11 +123,11 @@ def setupParserOptions():
     
     info_opts.add_option("--count_particles",
         action="store_true", dest="parser_countme", default=False,
-        help="Count particles and print the result. Use --c and --q to count a subset of particles, otherwise counts all.")
+        help="Count particles and print the result. Optionally, use --c and --q to count a subset of particles, otherwise counts all.")
     
     info_opts.add_option("--count_mics",
         action="store_true", dest="parser_uniquemics", default=False,
-        help="Count the number of unique micrographs. Use --c and --q to count from a subset of particles, otherwise counts all.")
+        help="Count the number of unique micrographs. Optionally, use --c and --q to count from a subset of particles, otherwise counts all.")
     
     info_opts.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
@@ -147,7 +147,7 @@ def setupParserOptions():
 
     info_opts.add_option("--random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
-        help="Get a random set of particles totaling the number provided here. Use --c and --q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
+        help="Get a random set of particles totaling the number provided here. Optionally, use --c and --q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
 
     info_opts.add_option("--split",
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
@@ -1263,13 +1263,9 @@ def getcluster(particles,threshold,minimum):
             names.append(particle[nameloc])
         coords = np.asarray(coords)
         for i in range(0,len(coords)):
-            #print("coords", coords[i])
             distances = np.sqrt(np.sum((coords - [coords[i]])**2, axis=1))
-            #print("distances", distances)
             distances = distances[np.logical_and(distances <= threshold, distances > 0)]
-            #print("distances2", distances)
             if len(distances) >= minimum:
-                #print("KEPT")
                 keep.append(names[i])
 
     if len(keep) == 0:
@@ -1287,10 +1283,9 @@ def getcluster(particles,threshold,minimum):
     return(particles_purged)
 
 
-def comparecoords(file1parts,file2parts,limits):
+def comparecoords(file1parts,file2parts,limits,numtoplot):
 
     file1mics = file1parts.groupby(["_rlnMicrographName"])
-    file1micloc = file1parts.columns.get_loc("_rlnMicrographName")+1
     file1xloc = file1parts.columns.get_loc("_rlnCoordinateX")+1
     file1yloc = file1parts.columns.get_loc("_rlnCoordinateY")+1
     file1nameloc = file1parts.columns.get_loc("_rlnImageName")+1
@@ -1298,8 +1293,6 @@ def comparecoords(file1parts,file2parts,limits):
         file2mics = file2parts.groupby(["_rlnMicrographName"])
         file2xloc = file2parts.columns.get_loc("_rlnCoordinateX")+1
         file2yloc = file2parts.columns.get_loc("_rlnCoordinateY")+1
-
-    skipped=0
 
     fig = plt.figure()
 
@@ -1314,16 +1307,19 @@ def comparecoords(file1parts,file2parts,limits):
     else:
         print("\n>> Plotting coordinates from the star file (black circles) for each micrograph.")
 
+    count=0
+
     for file1mic in file1mics:
+
+        count+=1
 
         skipflag = False
         try:
             file2mic = file2mics.get_group(file1mic[0])
         except:
             skipflag = True
-            #continue
             
-        mic = file1mic[0].split("/")[-1][:-4]
+        mic = file1mic[0].split("/")[-1]
         
         fig, ax = plt.subplots(figsize=(5.63,4.09))
         
@@ -1346,6 +1342,9 @@ def comparecoords(file1parts,file2parts,limits):
         plt.tight_layout()
         pdf.savefig(fig)
         plt.close('all')
+
+        if count == numtoplot:
+            break
 
     pdf.close()
 
@@ -1770,11 +1769,17 @@ def mainloop(params):
             file2particles = pd.DataFrame({'A' : []})
         else:
             file2particles, metadata = getparticles(params["parser_file2"])
-        limits = params["parser_comparecoords"].split("/")
-        if len(limits) != 2:
+        retrieveparams = params["parser_comparecoords"].split("/")
+        if len(retrieveparams) < 2 or len(retrieveparams) > 3:
             print("\n>> Error: provide argument in this format: xlimit/ylimit (e.g. 5760/4092).")
             sys.exit()
-        comparecoords(allparticles, file2particles, limits)
+        elif len(retrieveparams) == 2:
+            limits = retrieveparams
+            numtoplot = len(allparticles.index)
+        elif len(retrieveparams) == 3:
+            limits = retrieveparams[0:2]
+            numtoplot = int(retrieveparams[2])
+        comparecoords(allparticles, file2particles, limits, numtoplot)
         sys.exit()
 
     if params["parser_replacecol"] != "":
@@ -1927,7 +1932,7 @@ def mainloop(params):
         writestar(particles2use, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
-    print("\n>> Either the options weren't passed correctly or none were passed at all. See the help page (-h).\n")
+    print("\n>> Error: either the options weren't passed correctly or none were passed at all. See the help page (-h).\n")
 
 if __name__ == "__main__":
     params = setupParserOptions()

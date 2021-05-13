@@ -13,11 +13,11 @@ def setupParserOptions():
         version="%prog 1.16.")
 
     parser.add_option("--i",
-        action="store", dest="file", default="", metavar='starfile-name',
+        action="store", dest="file", default="", metavar='starfile',
         help="Input file name.")
 
     parser.add_option("--f",
-        action="store", dest="parser_file2", default="", metavar='other-starfile-name',
+        action="store", dest="parser_file2", default="", metavar='other-starfile',
         help="Name of second file to get information from, if necessary.")
     
     plot_opts = optparse.OptionGroup(
@@ -151,7 +151,7 @@ def setupParserOptions():
 
     info_opts.add_option("--split",
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
-        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain exactly the same number of particles")
+        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will have the input file name with the suffix \"_split-#\". Note that they will not necessarily contain exactly the same number of particles")
 
     info_opts.add_option("--split_classes",
         action="store_true", dest="parser_splitclasses", default=False,
@@ -1729,9 +1729,10 @@ def mainloop(params):
             sys.exit()
         splitstars = splitparts(allparticles,numsplits)
         print("\n")
+        fill = len(str(len(splitstars)))
         for i,s in enumerate(splitstars):
             print(">> There are " + str(len(s.index)) + " particles in file " + str(i+1))
-            writestar(s, metadata, "split_"+str(i+1)+".star", relegateflag)
+            writestar(s, metadata, filename[:-5]+"_split-"+str(i+1).zfill(fill)+".star", relegateflag)
         sys.exit()
 
     if params["parser_splitoptics"]:

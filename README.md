@@ -96,7 +96,7 @@ starparser --i input.star [options]
 
 * **```--random```** *```number-of-particles```* : Get a random set of particles totaling the number provided here. Optionally, use ```--c``` and ```--q``` to extract a random set of each passed query in the specified column (see the *Querying* options); in this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be output to output.star (or specified with ```--o```).
 
-* **```--split```** *```number-of-files```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will be called split_#.star. Note that they will not necessarily contain exactly the same number of particles.
+* **```--split```** *```number-of-files```* : Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will have the input file name with the suffix "\_split-#". Note that they will not necessarily contain exactly the same number of particles.
 
 * **```--split_classes```** : Split the input star file into independent star files for each class. The files will have the names "Class_#.star". 
 

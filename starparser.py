@@ -1141,6 +1141,9 @@ def resetcolumn(particles,column,value):
 
 def findnearby(coreparticles,nearparticles,threshdist):
 
+    coreparticles["_rlnMicrographName"] = coreparticles["_rlnMicrographName"].str.split('/').str[-1]
+    nearparticles["_rlnMicrographName"] = nearparticles["_rlnMicrographName"].str.split('/').str[-1]
+
     coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
     coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
     corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1

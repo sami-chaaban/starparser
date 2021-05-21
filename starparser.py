@@ -1288,11 +1288,14 @@ def getcluster(particles,threshold,minimum):
 
 def comparecoords(file1parts,file2parts,limits,numtoplot):
 
+    file1parts["_rlnMicrographName"] = file1parts["_rlnMicrographName"].str.split('/').str[-1]
+
     file1mics = file1parts.groupby(["_rlnMicrographName"])
     file1xloc = file1parts.columns.get_loc("_rlnCoordinateX")+1
     file1yloc = file1parts.columns.get_loc("_rlnCoordinateY")+1
     file1nameloc = file1parts.columns.get_loc("_rlnImageName")+1
     if not file2parts.empty:
+        file2parts["_rlnMicrographName"] = file2parts["_rlnMicrographName"].str.split('/').str[-1]
         file2mics = file2parts.groupby(["_rlnMicrographName"])
         file2xloc = file2parts.columns.get_loc("_rlnCoordinateX")+1
         file2yloc = file2parts.columns.get_loc("_rlnCoordinateY")+1

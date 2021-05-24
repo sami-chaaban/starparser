@@ -90,11 +90,11 @@ def setupParserOptions():
 
     modify_opts.add_option("--fetch_from_nearby",
         action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name(s)',
-        help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph).")
+        help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from _rlnMicrographName do not necessarily need to match, just the filenames need to.")
 
     modify_opts.add_option("--import_mic_value",
         action="store", dest="parser_importmicvalue", type="string", default="", metavar='column-name',
-        help="For every particle, find the equivalent micrograph in a second star file provided by --f and replace its column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of each micrograph name.")
+        help="For every particle, find the equivalent micrograph in a second star file provided by --f and replace its column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of each micrograph name. To import multiple columns, separate them with a slash.")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
@@ -767,16 +767,16 @@ def swapcolumns(original_particles, swapfrom_particles, columns):
     
     return(swappedparticles)
 
-def importmicvalue(original_particles, importfrom_particles, column):
+def importmicvalue(importedparticles, importfrom_particles, column):
 
-    if column not in original_particles:
-        print("\n>> Error: the column \"" + c + "\" does not exist in the original star file.\n")
+    if column not in importedparticles:
+        print("\n>> Error: the column \"" + column + "\" does not exist in the original star file.\n")
         sys.exit()
     if column not in importfrom_particles:
-        print("\n>> Error: the column \"" + c + "\" does not exist in the second star file.\n")
+        print("\n>> Error: the column \"" + column + "\" does not exist in the second star file.\n")
         sys.exit()
 
-    if "_rlnMicrographName" not in original_particles:
+    if "_rlnMicrographName" not in importedparticles:
         print("\n>> Error: _rlnMicrographName does not exist in the original star file.\n")
         sys.exit()
     if "_rlnMicrographName" not in importfrom_particles:
@@ -784,8 +784,6 @@ def importmicvalue(original_particles, importfrom_particles, column):
         sys.exit()
 
     ####
-
-    importedparticles = original_particles.copy()
 
     dropflag = False
 
@@ -1141,10 +1139,10 @@ def resetcolumn(particles,column,value):
 
 def findnearby(coreparticles,nearparticles,threshdist):
 
-    coreparticles["_rlnMicrographName"] = coreparticles["_rlnMicrographName"].str.split('/').str[-1]
+    coreparticles["_rlnMicrographNameSimple"] = coreparticles['_rlnMicrographName'].str.split('/').str[-1]
     nearparticles["_rlnMicrographName"] = nearparticles["_rlnMicrographName"].str.split('/').str[-1]
 
-    coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
+    coremicrographs = coreparticles.groupby(["_rlnMicrographNameSimple"])
     coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
     corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
     coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
@@ -1193,6 +1191,9 @@ def findnearby(coreparticles,nearparticles,threshdist):
         closeparticles = closeparticles[~closeparticles['_rlnImageName'].isin(noparts)]
 
     print("\n>> Created subsets with particles that are closer or further than " + str(threshdist) + " pixels from the closest particle in the second star file. Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
+
+    closeparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)
+    farparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)
 
     return(farparticles, closeparticles, alldistances)
 
@@ -1325,7 +1326,7 @@ def comparecoords(file1parts,file2parts,limits,numtoplot):
         except:
             skipflag = True
             
-        mic = file1mic[0].split("/")[-1]
+        mic = file1mic[0] #.split("/")[-1]
         
         fig, ax = plt.subplots(figsize=(5.63,4.09))
         
@@ -1531,9 +1532,11 @@ def mainloop(params):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         otherparticles, metadata2 = getparticles(file2)
-        columntoimport = params["parser_importmicvalue"]
-        importedparticles = importmicvalue(allparticles, otherparticles, columntoimport)
-        print("\n>> Imported " + str(columntoimport) + " from " + file2)
+        columnstoimport = params["parser_importmicvalue"].split("/")
+        importedparticles = allparticles.copy()
+        for column in columnstoimport:
+            importedparticles = importmicvalue(importedparticles, otherparticles, column)
+        print("\n>> Imported " + str(columnstoimport) + " from " + file2)
         writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 

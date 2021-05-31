@@ -1528,10 +1528,10 @@ def mainloop(params):
                 print("\n>> Error: the column \"" + column + "\" does not exist in the second star file.\n")
                 sys.exit()
 
-        if "_rlnMicrographName" not in importedparticles:
+        if "_rlnMicrographName" not in allparticles:
             print("\n>> Error: _rlnMicrographName does not exist in the original star file.\n")
             sys.exit()
-        if "_rlnMicrographName" not in importfrom_particles:
+        if "_rlnMicrographName" not in otherparticles:
             print("\n>> Error: _rlnMicrographName does not exist in the second star file.\n")
             sys.exit()
 

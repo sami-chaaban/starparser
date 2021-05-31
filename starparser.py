@@ -92,8 +92,8 @@ def setupParserOptions():
         action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name(s)',
         help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from _rlnMicrographName do not necessarily need to match, just the filenames need to.")
 
-    modify_opts.add_option("--import_mic_value",
-        action="store", dest="parser_importmicvalue", type="string", default="", metavar='column-name',
+    modify_opts.add_option("--import_mic_values",
+        action="store", dest="parser_importmicvalues", type="string", default="", metavar='column-name',
         help="For every particle, find the equivalent micrograph in a second star file provided by --f and replace its column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of each micrograph name. To import multiple columns, separate them with a slash.")
 
     modify_opts.add_option("--regroup",
@@ -767,21 +767,7 @@ def swapcolumns(original_particles, swapfrom_particles, columns):
     
     return(swappedparticles)
 
-def importmicvalue(importedparticles, importfrom_particles, column):
-
-    if column not in importedparticles:
-        print("\n>> Error: the column \"" + column + "\" does not exist in the original star file.\n")
-        sys.exit()
-    if column not in importfrom_particles:
-        print("\n>> Error: the column \"" + column + "\" does not exist in the second star file.\n")
-        sys.exit()
-
-    if "_rlnMicrographName" not in importedparticles:
-        print("\n>> Error: _rlnMicrographName does not exist in the original star file.\n")
-        sys.exit()
-    if "_rlnMicrographName" not in importfrom_particles:
-        print("\n>> Error: _rlnMicrographName does not exist in the second star file.\n")
-        sys.exit()
+def importmicvalues(importedparticles, importfrom_particles, column):
 
     ####
 
@@ -1523,7 +1509,7 @@ def mainloop(params):
         writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
-    if params["parser_importmicvalue"] != "":
+    if params["parser_importmicvalues"] != "":
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f to import values from.\n")
             sys.exit()
@@ -1532,10 +1518,28 @@ def mainloop(params):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         otherparticles, metadata2 = getparticles(file2)
-        columnstoimport = params["parser_importmicvalue"].split("/")
+        columnstoimport = params["parser_importmicvalues"].split("/")
+
+        for column in columnstoimport:
+            if column not in allparticles:
+                print("\n>> Error: the column \"" + column + "\" does not exist in the original star file.\n")
+                sys.exit()
+            if column not in otherparticles:
+                print("\n>> Error: the column \"" + column + "\" does not exist in the second star file.\n")
+                sys.exit()
+
+        if "_rlnMicrographName" not in importedparticles:
+            print("\n>> Error: _rlnMicrographName does not exist in the original star file.\n")
+            sys.exit()
+        if "_rlnMicrographName" not in importfrom_particles:
+            print("\n>> Error: _rlnMicrographName does not exist in the second star file.\n")
+            sys.exit()
+
+        #this is very inefficient
         importedparticles = allparticles.copy()
         for column in columnstoimport:
-            importedparticles = importmicvalue(importedparticles, otherparticles, column)
+            importedparticles = importmicvalues(importedparticles, otherparticles, column)
+
         print("\n>> Imported " + str(columnstoimport) + " from " + file2)
         writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()

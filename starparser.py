@@ -33,7 +33,7 @@ def setupParserOptions():
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
-        help="Plot the number of particles per class for all iterations up to the one provided in the input. Type \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
+        help="Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Type \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
     
     plot_opts.add_option("--plot_class_proportions",
         action="store_true", dest="parser_classproportion", default=False,
@@ -441,7 +441,7 @@ def getiterationlist(filename):
         iterationfilename = iterationfilename[::-1]
 
 
-    return(iterationfilename)
+    return(iterationfilename[2:]) #skip iteration 0 and 1
 
 def delcolumn(particles, columns, metadata):
     
@@ -516,7 +516,7 @@ def plotclassparts(filename, classes):
     numclasses = max(list(map(int, allparticles["_rlnClassNumber"].tolist())))
     iterationfilename = getiterationlist(filename)
     
-    print("\n>> Looping through iteration 0 to " + str(iteration) + " on " + str(numclasses) + " classes.")
+    print("\n>> Looping through iteration 2 to " + str(iteration) + " on " + str(numclasses) + " classes.")
     if -1 not in classes:
         print("\n>> Only plotting classes " + str(classes) + ".")
 
@@ -528,7 +528,7 @@ def plotclassparts(filename, classes):
         numperclass = []
         for c in range(1,numclasses+1):
             numperclass.append(countqueryparticles(allparticles, ["_rlnClassNumber"], [str(c)], True))
-        numperclassdf[str(i)] = numperclass
+        numperclassdf[str(i+2)] = numperclass #set column names to proper iteration number since skipping 0 and 1
 
     numperclassdf.index +=1
 
@@ -538,6 +538,7 @@ def plotclassparts(filename, classes):
             ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
         elif test in classes:
             ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
+
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Particle number")
     fig = ax.get_figure()

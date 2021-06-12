@@ -145,7 +145,11 @@ def setupParserOptions():
         action="store", dest="parser_cluster", type="string", default="", metavar='threshold-distance/minimum-per-cluster',
         help="Extract particles that have a minimum number of neighbors within a given radius. For example, passing \"400/4\" extracts particles with at least 4 neighbors within 400 pixels.")
 
-    info_opts.add_option("--random",
+    info_opts.add_option("--extract_indices",
+        action="store_true", dest="parser_getindex", default=False,
+        help="Extract particles with indices that match a list in a second file (specified by --f). The second file must be a single column list of numbers with values between 1 and the last particle index of the star file.")  
+
+    info_opts.add_option("--extract_random",
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
         help="Get a random set of particles totaling the number provided here. Optionally, use --c and --q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
 
@@ -516,7 +520,7 @@ def plotclassparts(filename, classes):
     numclasses = max(list(map(int, allparticles["_rlnClassNumber"].tolist())))
     iterationfilename = getiterationlist(filename)
     
-    print("\n>> Looping through iteration 2 to " + str(iteration) + " on " + str(numclasses) + " classes.")
+    print("\n>> Reading iteration 2 to " + str(iteration) + " on " + str(numclasses) + " classes.")
     if -1 not in classes:
         print("\n>> Only plotting classes " + str(classes) + ".")
 
@@ -1758,6 +1762,20 @@ def mainloop(params):
             print("\n>> Error: _rlnClassNumber does not exist in the star file.")
         splitbyclass(allparticles,metadata,relegateflag)
         sys.exit()
+
+    if params["parser_getindex"]:
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f that has the list of values.\n")
+            sys.exit()
+        with open(params["parser_file2"]) as f:
+            indicestoget = [line.split()[0] for line in f]
+        indicestoget = [(int(i)-1) for i in indicestoget]
+        if max(indicestoget)+1 > len(allparticles.index):
+            print("\n>> Error: the index " + str(max(indicestoget)+1) + " is out of bounds (the last index in your star file is " + str(len(allparticles.index)) + ").\n")
+            sys.exit()
+        print("\n>> Extracting " + str(len(indicestoget)) + " particles (" + str(round(100*len(indicestoget)/len(allparticles.index),1)) + "%) that match the indices.")
+        writestar(allparticles.iloc[indicestoget], metadata, params["parser_outname"], relegateflag)
+        sys.exit()   
 
     if params["parser_insertcol"] != "":
         if params["parser_file2"] == "":

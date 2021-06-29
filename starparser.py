@@ -51,7 +51,11 @@ def setupParserOptions():
     modify_opts.add_option("--operate",
         action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
         help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
-    
+
+    modify_opts.add_option("--operate_columns",
+        action="store", dest="parser_operatecolumns", type="string", default="", metavar='column[operator]value',
+        help="Perform operation between two columns and output to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted).")
+
     modify_opts.add_option("--delete_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',
         help="Delete column and renumber headers. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
@@ -520,7 +524,7 @@ def plotclassparts(filename, classes):
     numclasses = max(list(map(int, allparticles["_rlnClassNumber"].tolist())))
     iterationfilename = getiterationlist(filename)
     
-    print("\n>> Reading iteration 2 to " + str(iteration) + " on " + str(numclasses) + " classes.")
+    print("\n>> Analyzing iteration 2 to " + str(iteration) + " for " + str(numclasses) + " classes.")
     if -1 not in classes:
         print("\n>> Only plotting classes " + str(classes) + ".")
 
@@ -872,6 +876,39 @@ def operate(particles,column,operator,value):
         particles[column] = particles[column] - value
 
     return(particles)
+
+def operatecolumns(particles,column1,column2,newcolumn,operator,metadata):
+
+    try:
+        particles[column1] = pd.to_numeric(particles[column1], downcast="float")
+    except:
+        print("\n>> Error: Could not interpret the values in " + column1 + " as numbers.\n")
+        sys.exit()
+    try:
+        particles[column2] = pd.to_numeric(particles[column2], downcast="float")
+    except:
+        print("\n>> Error: Could not interpret the values in " + column2 + " as numbers.\n")
+        sys.exit()
+
+    if operator == "multiply":
+        print("\n>> Multiplying " + column1 + " by " + column2 + " and storing the result in " + newcolumn + ".")
+        particles[newcolumn] = particles[column1] * particles[column2]
+
+    elif operator == "divide":
+        print("\n>> Dividing  all values in " + column1 + " by " + column2 + " and storing the result in " + newcolumn + ".")
+        particles[newcolumn] = particles[column1] / particles[column2]
+
+    elif operator == "add":
+        print("\n>> Adding " + column2 + " to all values in " + column1 + " and storing the result in " + newcolumn + ".")
+        particles[newcolumn] = particles[column1] + particles[column2]
+
+    elif operator == "subtract":
+        print("\n>> Subtracting " + column2 + " from all values in " + column1 + " and storing the result in " + newcolumn + ".")
+        particles[newcolumn] = particles[column1] - particles[column2]
+
+    metadata[3].append(newcolumn)
+
+    return(particles,metadata)
     
 def checksubset(particles, params):
     
@@ -1577,6 +1614,38 @@ def mainloop(params):
 
         operatedparticles = operate(allparticles,column,operator,value)
         writestar(operatedparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_operatecolumns"] != "":
+        if len(params["parser_operatecolumns"].split("*")) == 2:
+            arguments = params["parser_operatecolumns"].split("*")
+            operator = "multiply"
+        elif len(params["parser_operatecolumns"].split("/")) == 2:
+            arguments = params["parser_operatecolumns"].split("/")
+            operator = "divide"
+        elif len(params["parser_operatecolumns"].split("+")) == 2:
+            arguments = params["parser_operatecolumns"].split("+")
+            operator = "add"
+        elif len(params["parser_operatecolumns"].split("-")) == 2:
+            arguments = params["parser_operatecolumns"].split("-")
+            operator = "subtract"
+        else:
+            print("\n>> Error: the argument to pass is column1[operator]column2=newcolumn (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted).\n")
+            sys.exit()
+        column1, secondhalf = arguments
+        column2 = secondhalf.split("=")[0]
+        newcolumn = secondhalf.split("=")[1] 
+        if column1 not in allparticles:
+            print("\n>> Error: Could not find the column " + column1 + " in the star file.\n")
+            sys.exit()
+        elif column2 not in allparticles:
+            print("\n>> Error: Could not find the column " + column2 + " in the star file.\n")
+            sys.exit()
+        elif newcolumn in allparticles:
+            print("\n>> Error: The column " + newcolumn + " already exists in the star file.\n")
+            sys.exit()
+        operatedparticles, newmetadata = operatecolumns(allparticles,column1,column2,newcolumn,operator,metadata)
+        writestar(operatedparticles, newmetadata, params["parser_outname"], relegateflag)
         sys.exit()
         
     if params["parser_findshared"] != "":

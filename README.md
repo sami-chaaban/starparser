@@ -48,6 +48,8 @@ starparser --i input.star [options]
 
 * **```--operate```** *```column-name[operator]value```* : Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. *\_rlnHelicalTrackLength\*0.25*). The result is written to a new star file (default output.star, or specified with ```--o```). If your terminal throws an error, try surrounding the argument with quotations (e.g. *"\_rlnHelicalTrackLength\*0.25"*).
 
+* **```--operate_columns```** *```column1[operator]column2=newcolumn```* : Perform operation between two columns and output to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. *\_rlnCoordinateX+\_rlnOriginX=\_rlnShiftedX*). If your terminal throws an error, try surrounding the argument with quotations (e.g. *"\_rlnCoordinateX+\_rlnOriginX=\_rlnShiftedX"*).
+
 * **```--delete_column```** *```column-name(s)```* : Delete column, renumber headers, and output to a new star file (default output.star, or specified with ```--o```). E.g. *\_rlnMicrographName*. To enter multiple columns, separate them with a slash: *\_rlnMicrographName/\_rlnCoordinateX*. Note that "relion_star_handler --remove_column" also does this.
 
 * **```--delete_particles```** : Delete particles that match a query (specified with ```--q```) within a column header (specified with ```--c```; see the *Querying* options), and write to a new star file (default output.star, or specified with ```--o```).

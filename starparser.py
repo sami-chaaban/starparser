@@ -1391,6 +1391,7 @@ def comparecoords(file1parts,file2parts,numtoplot):
             header = np.fromfile(themic, dtype=header_dtype, count=1)
             # Read in the initial header values
             head1 = header['head1'][0]
+            extra = header['extra'][0][1]
             dataSize = head1[0:3]
             dataSize = dataSize[::-1]
             # Set the data type and convert to numpy type
@@ -1406,10 +1407,10 @@ def comparecoords(file1parts,file2parts,numtoplot):
             num0 = int(np.prod(dataSize, dtype=np.uint64))
 
             with open(themic) as f:
-                data1 = np.fromfile(f, dtype=dataType, count=num0, offset = 1024)
+                data1 = np.fromfile(f, dtype=dataType, count=num0, offset = 1024+extra)
             data1 = data1.reshape(dataSize)
             data1 = data1[0,:,:]
-            plt.imshow(data1, 'gray', origin='lower', vmin=np.percentile(np.ndarray.flatten(data1), 15), vmax=np.percentile(np.ndarray.flatten(data1), 85))
+            plt.imshow(data1, 'gray', origin='lower', vmin=np.percentile(np.ndarray.flatten(data1), 10), vmax=np.percentile(np.ndarray.flatten(data1), 90))
 
         plt.title(file1part[file1originalmics], fontsize = 20)
         plt.xlabel("Pixels", fontsize = 24)

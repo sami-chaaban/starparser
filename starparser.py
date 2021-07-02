@@ -10,7 +10,7 @@ import numpy as np
 def setupParserOptions():
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
-        version="%prog 1.16.")
+        version="%prog 1.17.")
 
     parser.add_option("--i",
         action="store", dest="file", default="", metavar='starfile',
@@ -33,15 +33,15 @@ def setupParserOptions():
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
-        help="Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Type \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
+        help="Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
     
     plot_opts.add_option("--plot_class_proportions",
         action="store_true", dest="parser_classproportion", default=False,
         help="Plot the proportion of particles that match different queries in each class. At least two queries (--q, separated by slashes) must be provided along with the column to search in (--c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
 
     plot_opts.add_option("--plot_coordinates",
-        action="store", dest="parser_comparecoords", type="string", default="", metavar="xlimit/ylimit",
-        help="Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (black circles). The argument to pass is the x and y limits of the plot (i.e. the size of the micrographs) in pixels (e.g. 5760/4096). Use --f to overlay the coordinates of a second star file (blue dots); in this case, the micrograph names should match between the two star files. This option is useful to compare coordinates after filtering a dataset. The plots are output to Coordinates.pdf. Optionally, pass a third argument to specify how many micrographs to plot (e.g. *5760/4096/100* to do the first 100 micrographs).")
+        action="store", dest="parser_comparecoords", type="string", default="", metavar="number-of-micrographs",
+        help="Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Use --f to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are output to Coordinates.pdf.")
 
     parser.add_option_group(plot_opts)
     
@@ -1315,11 +1315,13 @@ def getcluster(particles,threshold,minimum):
     return(particles_purged)
 
 
-def comparecoords(file1parts,file2parts,limits,numtoplot):
+def comparecoords(file1parts,file2parts,numtoplot):
 
+    file1parts["_rlnMicrographNameOriginal"] = file1parts["_rlnMicrographName"]
     file1parts["_rlnMicrographName"] = file1parts["_rlnMicrographName"].str.split('/').str[-1]
 
     file1mics = file1parts.groupby(["_rlnMicrographName"])
+    file1originalmics = file1parts.columns.get_loc("_rlnMicrographNameOriginal")+1
     file1xloc = file1parts.columns.get_loc("_rlnCoordinateX")+1
     file1yloc = file1parts.columns.get_loc("_rlnCoordinateY")+1
     file1nameloc = file1parts.columns.get_loc("_rlnImageName")+1
@@ -1331,22 +1333,23 @@ def comparecoords(file1parts,file2parts,limits,numtoplot):
 
     fig = plt.figure()
 
-    try:
-        pdf = PdfPages('Coordinates.pdf')
-    except:
-        print("\n>> Error: could not save to Compare_coordinates.pdf. Is it still open?\n")
-        sys.exit()
-
     if not file2parts.empty:
-        print("\n>> Plotting coordinates from the star file (black circles) and second file (blue dots) for each micrograph.")
+        if numtoplot != -1:
+            print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(numtoplot) + " micrographs.")
+        else:
+            print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(len(file1mics)) + " micrographs.")
     else:
-        print("\n>> Plotting coordinates from the star file (black circles) for each micrograph.")
+        if numtoplot != -1:
+            print("\n>> Plotting coordinates from the star file (red circles) for " + str(numtoplot) + " micrographs.")
+        else:
+            print("\n>> Plotting coordinates from the star file (red circles) for " + str(len(file1mics)) + " micrographs.")
 
     count=0
 
     for file1mic in file1mics:
 
-        count+=1
+        if numtoplot != -1:
+            count+=1
 
         skipflag = False
         try:
@@ -1356,24 +1359,63 @@ def comparecoords(file1parts,file2parts,limits,numtoplot):
             
         mic = file1mic[0] #.split("/")[-1]
         
-        fig, ax = plt.subplots(figsize=(5.63,4.09))
+        fig, ax = plt.subplots(figsize=(22.52,16.36))
         
         for file1part in file1mic[1].itertuples():
             x1 = float(file1part[file1xloc])
             y1 = float(file1part[file1yloc])
-            plt.scatter(x1,y1, color='black', facecolors='none', s=150, alpha=0.8, linewidth = 1.8)
+            plt.scatter(x1,y1, color='red', facecolors='none', s=8000, alpha=0.7, linewidth = 4)
 
         if not skipflag and not file2parts.empty:
             for file2part in file2mic.itertuples():
                 x2 = float(file2part[file2xloc])
                 y2 = float(file2part[file2yloc])
-                plt.scatter(x2,y2, color='blue', s=20, alpha=0.8, linewidth = 1)
+                plt.scatter(x2,y2, color='blue', facecolors='none', s=10000, alpha=0.7, linewidth = 4)
 
-        plt.title(mic, fontsize = 8)
-        plt.xlim(0,int(limits[0]))
-        plt.ylim(0,int(limits[1]))
-        plt.xlabel("Pixels")
-        plt.ylabel("Pixels") 
+        themic = file1part[file1originalmics]
+        if not os.path.isfile(themic):
+            print("\n>> Error: the micrograph " + themic + " does not exist. Are you running starparser from the right directory?\n")
+            sys.exit()
+        else:
+            if count == 1:
+                try:
+                    pdf = PdfPages('Coordinates.pdf')
+                except:
+                    print("\n>> Error: could not save to Coordinates.pdf. Is it still open?\n")
+                    sys.exit()
+
+            #Plot mrc:
+            header_dtype = np.dtype(
+                [('head1', '10int32'), ('head2', '6float32'), ('axisOrientations', '3int32'), ('minMaxMean', '3int32'),
+                 ('extra', '32int32')])
+            header = np.fromfile(themic, dtype=header_dtype, count=1)
+            # Read in the initial header values
+            head1 = header['head1'][0]
+            dataSize = head1[0:3]
+            dataSize = dataSize[::-1]
+            # Set the data type and convert to numpy type
+            mrcType = head1[3]
+            if mrcType == 0:
+                dataType = np.int8
+            elif mrcType == 1:
+                dataType = np.int16
+            elif mrcType == 2:
+                dataType = np.float32
+            elif mrcType == 6:
+                dataType = np.uint16
+            num0 = int(np.prod(dataSize, dtype=np.uint64))
+
+            with open(themic) as f:
+                data1 = np.fromfile(f, dtype=dataType, count=num0, offset = 1024)
+            data1 = data1.reshape(dataSize)
+            data1 = data1[0,:,:]
+            plt.imshow(data1, 'gray', origin='lower', vmin=np.percentile(np.ndarray.flatten(data1), 15), vmax=np.percentile(np.ndarray.flatten(data1), 85))
+
+        plt.title(file1part[file1originalmics], fontsize = 20)
+        plt.xlabel("Pixels", fontsize = 24)
+        plt.ylabel("Pixels", fontsize = 24)
+        plt.xticks(fontsize = 24)
+        plt.yticks(fontsize = 24)
         plt.tight_layout()
         pdf.savefig(fig)
         plt.close('all')
@@ -1437,7 +1479,7 @@ def mainloop(params):
     #Set up jobs that don't require initialization
     
     if params["parser_classdistribution"] != "":
-        if params["parser_classdistribution"] == "all":
+        if params["parser_classdistribution"] in ["all", "All", "ALL"]:
             plotclassparts(filename, [-1])
         else:
             plotclassparts(filename,params["parser_classdistribution"].split("/"))
@@ -1871,17 +1913,16 @@ def mainloop(params):
             file2particles = pd.DataFrame({'A' : []})
         else:
             file2particles, metadata = getparticles(params["parser_file2"])
-        retrieveparams = params["parser_comparecoords"].split("/")
-        if len(retrieveparams) < 2 or len(retrieveparams) > 3:
-            print("\n>> Error: provide argument in this format: xlimit/ylimit (e.g. 5760/4092).")
-            sys.exit()
-        elif len(retrieveparams) == 2:
-            limits = retrieveparams
-            numtoplot = len(allparticles.index)
-        elif len(retrieveparams) == 3:
-            limits = retrieveparams[0:2]
-            numtoplot = int(retrieveparams[2])
-        comparecoords(allparticles, file2particles, limits, numtoplot)
+        numtoplot = params["parser_comparecoords"]
+        if numtoplot in ["all", "All", "ALL"]:
+            numtoplot = -1
+        else:
+            try:
+                numtoplot = int(numtoplot)
+            except:
+                print("\n>> Error: provide a number of micrographs to plot or pass \"all\" to plot all micrographs.\n")
+                sys.exit()
+        comparecoords(allparticles, file2particles, numtoplot)
         sys.exit()
 
     if params["parser_replacecol"] != "":

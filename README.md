@@ -42,7 +42,7 @@ starparser --i input.star [options]
 
 * **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (See the *Querying* options). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
 
-* **```--plot_coordinates```** *```xlimit/ylimit```* :  Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (black circles). The argument to pass is the x and y limits of the plot (i.e. the size of the micrographs) in pixels (e.g. *5760/4096*). Use ```--f``` to overlay the coordinates of a second star file (blue dots); in this case, the micrograph names should match between the two star files. This option is useful to compare coordinates after filtering a dataset. The plots are output to Coordinates.pdf. Optionally, pass a third argument to specify how many micrographs to plot (e.g. *5760/4096/100* to do the first 100 micrographs).
+* **```--plot_coordinates```** *```number-of-micrographs```* :  Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Make sure you are running it in the relion directory so that the micrograph mrcs can be properly sourced (or change the \_rlnMicrographName column to absolute paths). Use --f to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are output to Coordinates.pdf.
 
 ### Modifying
 
@@ -376,7 +376,7 @@ starparser --i particles.star --split 3
 
 ## Version
 
-* **1.16** - May 2021
+* **1.17** - July 2021
 
 ## License
 

@@ -1,22 +1,20 @@
 # StarParser
 
-Use this program to manipulate Relion 3.1 star files, including counting, plotting, extracting, and filtering data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below (note: some of the options are already available in "relion_star_handler").
+Use this program to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below (note: some of the options are already available in Relion with "relion_star_handler").
 
 **Usage:**
 
 ```
-python starparser.py --i input.star [options]
-```
-
-Alternatively, add an alias to your .cshrc (`alias starparser 'python /home/programs/starparser.py'`) or .bashrc (`alias starparser='python /home/programs/starparser.py'`) and run the program with:
-
-```
 starparser --i input.star [options]
-```	
+```
 
-## Requirements
+## Installation
 
-* You need to have **Python 3** installed and have the **pandas** and **matplotlib** packages. This is probably best done in a new conda environment: `conda create -n star python=3.6 pandas matplotlib`, which is activated with `conda activate star`. (Note: it has only been tested on **pandas** version 1.1.3.) You can then run the **starparser.py** program directly or with an alias.
+* Set up a fresh conda environment with Python 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
+
+* Install starparser: `pip install starparser`
+
+## Important notes
 
 * Your input file needs to be a standard **Relion** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns (i.e. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc.
 
@@ -70,7 +68,7 @@ starparser --i input.star [options]
 
 * **```--fetch_from_nearby```** *```distance/column-name(s)```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. *300/\_rlnClassNumber* or *100/\_rlnAnglePsi/\_rlnHelicalTubeID*). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from \_rlnMicrographName do not necessarily need to match, just the filenames need to.
 
-* **```--import_mic_values```** *```column-name```* : For every particle, find the equivalent micrograph in a second star file provided by ```--f``` and replace its column value with that of the second star file (e.g. *\_rlnOpticsGroup*). This requires that the second star file only has one instance of each micrograph name. To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
+* **```--import_mic_values```** *```column-name```* : For every particle, find the micrograph that it belongs to in a second star file (provided by ```--f```) and replace the original column value with that of the second star file (e.g. *\_rlnOpticsGroup*). This requires that the second star file only has one instance of each micrograph name (e.g. a micrographs_ctf.star file). To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 * **```--regroup```** *```particles-per-group```* : Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if *\_rlnGroupNumber* is being used in the star file rater than *\_rlnGroupName*. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
@@ -140,7 +138,7 @@ starparser --i run_data.star --histogram _rlnDefocusU
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **DefocusU.png**:
-![Defocus plot](./Examples/Defocus_histogram.png "Defocus plot")
+![Defocus plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Defocus_histogram.png?raw=true "Defocus plot")
 
 ---
 
@@ -150,7 +148,7 @@ starparser --i run_data.star --plot_orientations
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Particle_orientations.png**:
-![Orientation plot](./Examples/Particle_orientations.png "Particle orientations")
+![Orientation plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Particle_orientations.png?raw=true "Particle orientations")
 
 ---
 
@@ -161,7 +159,7 @@ starparser --i run_it025_data.star --plot_class_iterations all
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.png**:
-![Particles per class plot](./Examples/Class_distribution.png "Particles per class plot")
+![Particles per class plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Class_distribution.png?raw=true "Particles per class plot")
 
 ---
 
@@ -172,7 +170,7 @@ starparser --i run_it025_data.star --plot_class_iterations 1/3/6
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_distribution.png**:
-![Particles per class plot](./Examples/Class_distribution_subset.png "Particles per class plot")
+![Particles per class plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Class_distribution_subset.png?raw=true "Particles per class plot")
 
 ---
 
@@ -185,7 +183,7 @@ starparser --i run_it025_data.star --plot_class_proportions --c _rlnMicrographNa
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  The percentage in each class will be displayed in terminal.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_proportion.png**:
-![Class proportion plot](./Examples/Class_proportion.png "Class proportion plot")
+![Class proportion plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Class_proportion.png?raw=true "Class proportion plot")
 
 ---
 
@@ -374,10 +372,6 @@ starparser --i particles.star --split 3
 
 ---
 
-## Version
-
-* **1.17** - July 2021
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE.txt](https://github.com/sami-chaaban/StarParser/blob/main/LICENSE.txt) file for details.

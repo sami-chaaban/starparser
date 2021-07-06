@@ -2,13 +2,20 @@
 
 Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with examples for some (note: some of the options are already available in Relion with "relion_star_handler"). Alternatively, use the starparser modules in your own python scripts (examples below as well)
 
-## Installation
+1. [Installation](#introduction)
+2. [Important notes](#notes)
+3. [Command-line options](#cmdop)
+4. [Command-line examples](#cmdex)
+5. [Scripting](#scripts)
+6. [License](#license)
+
+## Installation<a name="installation"></a>
 
 * Set up a fresh conda environment with Python 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
 
 * Install starparser: `pip install starparser`
 
-## Important notes
+## Important notes<a name="notes"></a>
 
 * Your input file needs to be a standard **Relion** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns (i.e. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc.
 
@@ -16,7 +23,7 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 * The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
 
-## Command-line options
+## Command-line options<a name="cmdop"></a>
 
 **Usage:**
 
@@ -126,7 +133,7 @@ starparser --i input.star [options]
 
 ---
 
-## Usage in scripts
+## Scripting<a name="scripts"></a>
 
 * To parse a star file for downstream use in a python script:
 
@@ -135,9 +142,15 @@ from starparser import fileparser
 particles, metadata = fileparser.getparticles("file.star")
 ```
 
+* After manipulating the particles, you can write the star file:
+
+```python
+fileparser.writestar(newparticles, metadata, "output.star")
+```
+
 ---
 
-## Command-line examples
+## Command-line examples<a name="cmdex"></a>
 
 The following examples run the `starparser` command assuming an alias has been created as described above. Otherwise, run it with `python starparser.py --i input.star [options]`.
 
@@ -383,6 +396,6 @@ starparser --i particles.star --split 3
 
 ---
 
-## License
+## License<a name="license"></a>
 
 This project is licensed under the MIT License - see the [LICENSE.txt](https://github.com/sami-chaaban/StarParser/blob/main/LICENSE.txt) file for details.

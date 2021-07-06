@@ -2,7 +2,7 @@
 
 Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with examples for some (note: some of the options are already available in Relion with "relion_star_handler"). Alternatively, use the starparser modules in your own python scripts (examples below as well)
 
-1. [Installation](#introduction)
+1. [Installation](#installation)
 2. [Important notes](#notes)
 3. [Command-line options](#cmdop)
 4. [Command-line examples](#cmdex)
@@ -151,8 +151,6 @@ fileparser.writestar(newparticles, metadata, "output.star")
 ---
 
 ## Command-line examples<a name="cmdex"></a>
-
-The following examples run the `starparser` command assuming an alias has been created as described above. Otherwise, run it with `python starparser.py --i input.star [options]`.
 
 ### Plotting
 

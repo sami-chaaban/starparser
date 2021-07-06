@@ -1,12 +1,6 @@
-# StarParser
+# starparser
 
-Use this program to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. See options and examples below (note: some of the options are already available in Relion with "relion_star_handler").
-
-**Usage:**
-
-```
-starparser --i input.star [options]
-```
+Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with examples for some (note: some of the options are already available in Relion with "relion_star_handler"). Alternatively, use the starparser modules in your own python scripts (examples below as well)
 
 ## Installation
 
@@ -22,25 +16,19 @@ starparser --i input.star [options]
 
 * The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
 
-## Options
+## Command-line options
+
+**Usage:**
+
+```
+starparser --i input.star [options]
+```
 
 ### Input
 
 * **```--i```** *```filename```* : Input star file.
 
 * **```--f```** *```filename```* : The name of another file to get information from, if necessary.
-
-### Plotting
-
-* **```--histogram```** *```column-name```* : Plot values of a column as a histogram. Optionally, use ```--c``` and ```--q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
-
-* **```--plot_orientations```** : Plot the particle orientations based on the *\_rlnAngleRot* and *\_rlnAngleTilt* columns on a Mollweide projection (longitude and lattitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change filetype (see the *Output* options).
-
-* **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Type "all" after the option to plot all classes, or separate the classes that you want with a slash (e.g. *1/2/5*). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
-
-* **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (See the *Querying* options). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
-
-* **```--plot_coordinates```** *```number-of-micrographs```* :  Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Make sure you are running it in the relion directory so that the micrograph mrc files can be properly sourced (or change the \_rlnMicrographName column to absolute paths). Use ```--f``` to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are output to Coordinates.pdf.
 
 ### Modifying
 
@@ -106,6 +94,18 @@ starparser --i input.star [options]
 
 * **```--sort_by```** *```column-name```* : Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. *\_rlnClassNumber/n*); otherwise, it will sort the values as text. 
 
+### Plotting
+
+* **```--histogram```** *```column-name```* : Plot values of a column as a histogram. Optionally, use ```--c``` and ```--q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
+
+* **```--plot_orientations```** : Plot the particle orientations based on the *\_rlnAngleRot* and *\_rlnAngleTilt* columns on a Mollweide projection (longitude and lattitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change filetype (see the *Output* options).
+
+* **```--plot_class_iterations```** *```classes```* : Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Type "all" after the option to plot all classes, or separate the classes that you want with a slash (e.g. *1/2/5*). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
+
+* **```--plot_class_proportions```** : Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (See the *Querying* options). It will output the proportions in percentages and plot the result in Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
+
+* **```--plot_coordinates```** *```number-of-micrographs```* :  Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Make sure you are running it in the relion directory so that the micrograph mrc files can be properly sourced (or change the *\_rlnMicrographName* column to absolute paths). Use ```--f``` to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are output to Coordinates.pdf.
+
 ### Querying
 
 * **```--c```** *```column-name(s)```* : Column query term(s). E.g. *\_rlnMicrographName*. This is used to look for a specific query specified with ```--q```. In cases where you can enter multiple columns, separate them with a slash: *\_rlnMicrographName/\_rlnCoordinateX*.
@@ -116,7 +116,7 @@ starparser --i input.star [options]
 
 ### Other
 
-* **```--opticsless```** : Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--plot_class_proportion``` or commands that require parsing a second file.
+* **```--opticsless```** : Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--plot_class_proportions``` or commands that require parsing a second file.
 
 ### Output
 
@@ -126,7 +126,18 @@ starparser --i input.star [options]
 
 ---
 
-## Examples
+## Usage in scripts
+
+* To parse a star file for downstream use in a python script:
+
+```python
+from starparser import fileparser
+particles, metadata = fileparser.getparticles("file.star")
+```
+
+---
+
+## Command-line examples
 
 The following examples run the `starparser` command assuming an alias has been created as described above. Otherwise, run it with `python starparser.py --i input.star [options]`.
 

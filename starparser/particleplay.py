@@ -1,4 +1,6 @@
+import sys
 import pandas as pd
+from starparser import argparser
 
 def limitparticles(particles, column, limit, operator):
     
@@ -66,6 +68,7 @@ def extractparticles(particles, columns, query, queryexact):
         print("\n>> Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
 
+    params = argparser.argparse()
     if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_splitoptics"] and not params["parser_classproportion"]:
         print("\n----------------------------------------------------------------------")        
         print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (--e). Make sure that this is the behavior you intended.\n")
@@ -181,3 +184,20 @@ def setparticleoptics(particles,column,query,queryexact,opticsnumber):
             particlesnewoptics.loc[particles[column[0]]==q, "_rlnOpticsGroup"] = opticsnumber
         
     return(particlesnewoptics, numchanged)
+
+def importpartvalues(original_particles, importfrom_particles, columnstoswap):
+
+    importedparticles = original_particles.copy()
+
+    for index, particle in original_particles.iterrows():
+        imagename = particle["_rlnImageName"]
+        importloc = importfrom_particles.index[importfrom_particles["_rlnImageName"] == imagename].tolist()
+        if len(importloc) > 1:
+            print("\n>> Error: " + imagename + " exists more than once in the star file.\n")
+            sys.exit()
+        importloc = importloc[0]
+        for c in columnstoswap:
+            importedparticles[c].iloc[index] = importfrom_particles[c].iloc[importloc]
+
+    return(importedparticles)
+

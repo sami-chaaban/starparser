@@ -15,31 +15,6 @@ def argparse():
         action="store", dest="parser_file2", default="", metavar='other-starfile',
         help="Name of second file to get information from, if necessary.")
     
-    plot_opts = optparse.OptionGroup(
-        parser, 'Plotting Options')
-
-    plot_opts.add_option("--histogram",
-        action="store", dest="parser_plot", default="", metavar="column-name",
-        help="Plot values of a column as a histogram. Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
-
-    plot_opts.add_option("--plot_orientations",
-        action="store_true", dest="parser_plotangledist", default=False,
-        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
-    
-    plot_opts.add_option("--plot_class_iterations",
-        action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
-        help="Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
-    
-    plot_opts.add_option("--plot_class_proportions",
-        action="store_true", dest="parser_classproportion", default=False,
-        help="Plot the proportion of particles that match different queries in each class. At least two queries (--q, separated by slashes) must be provided along with the column to search in (--c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
-
-    plot_opts.add_option("--plot_coordinates",
-        action="store", dest="parser_comparecoords", type="string", default="", metavar="number-of-micrographs",
-        help="Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Use --f to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are output to Coordinates.pdf.")
-
-    parser.add_option_group(plot_opts)
-    
     modify_opts = optparse.OptionGroup(
         parser, 'Modification Options')
 
@@ -92,8 +67,12 @@ def argparse():
         help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from _rlnMicrographName do not necessarily need to match, just the filenames need to.")
 
     modify_opts.add_option("--import_mic_values",
-        action="store", dest="parser_importmicvalues", type="string", default="", metavar='column-name',
+        action="store", dest="parser_importmicvalues", type="string", default="", metavar='column-name(s)',
         help="For every particle, find the micrograph that it belongs to in a second star file (provided by --f) and replace the original column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of each micrograph name (e.g. a micrographfs_ctf.star file). To import multiple columns, separate them with a slash.")
+
+    modify_opts.add_option("--import_particle_values",
+        action="store", dest="parser_importpartvalues", type="string", default="", metavar='column-name(s)',
+        help="For every particle in the input star file, find the equivalent particle in a second star file (provided by --f) (i.e. those with equivalent _rlnImageName values) and replace the original column value with the one from the second star file. To import multiple columns, separate them with a slash.")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
@@ -170,6 +149,31 @@ def argparse():
 
     parser.add_option_group(info_opts)
     
+    plot_opts = optparse.OptionGroup(
+        parser, 'Plotting Options')
+
+    plot_opts.add_option("--histogram",
+        action="store", dest="parser_plot", default="", metavar="column-name",
+        help="Plot values of a column as a histogram. Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. The filename will be that of the column name. Use --t to change the filetype.")
+
+    plot_opts.add_option("--plot_orientations",
+        action="store_true", dest="parser_plotangledist", default=False,
+        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
+    
+    plot_opts.add_option("--plot_class_iterations",
+        action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
+        help="Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
+    
+    plot_opts.add_option("--plot_class_proportions",
+        action="store_true", dest="parser_classproportion", default=False,
+        help="Plot the proportion of particles that match different queries in each class. At least two queries (--q, separated by slashes) must be provided along with the column to search in (--c). It will output the proportions and plot the result in Class_proportion.png. Use --t to change filetype.")
+
+    plot_opts.add_option("--plot_coordinates",
+        action="store", dest="parser_comparecoords", type="string", default="", metavar="number-of-micrographs",
+        help="Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Use --f to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are output to Coordinates.pdf.")
+
+    parser.add_option_group(plot_opts)
+
     query_opts = optparse.OptionGroup(
         parser, 'Query Options')
     

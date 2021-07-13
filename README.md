@@ -1,6 +1,6 @@
 # starparser
 
-Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with examples for some (note: some of the options are already available in Relion with "relion_star_handler"). Alternatively, use the starparser modules in your own python scripts (examples below as well)
+Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with examples for some (note: some of the options are already available in Relion with "relion_star_handler"). Alternatively, use the starparser modules in your own python scripts.
 
 1. [Installation](#installation)
 2. [Important notes](#notes)
@@ -63,7 +63,9 @@ starparser --i input.star [options]
 
 * **```--fetch_from_nearby```** *```distance/column-name(s)```* : Find the nearest particle in a second star file (specified by ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. *300/\_rlnClassNumber* or *100/\_rlnAnglePsi/\_rlnHelicalTubeID*). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from \_rlnMicrographName do not necessarily need to match, just the filenames need to.
 
-* **```--import_mic_values```** *```column-name```* : For every particle, find the micrograph that it belongs to in a second star file (provided by ```--f```) and replace the original column value with that of the second star file (e.g. *\_rlnOpticsGroup*). This requires that the second star file only has one instance of each micrograph name (e.g. a micrographs_ctf.star file). To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
+* **```--import_mic_values```** *```column-name(s)```* : For every particle, find the micrograph that it belongs to in a second star file (provided by ```--f```) and replace the original column value with that of the second star file (e.g. *\_rlnOpticsGroup*). This requires that the second star file only has one instance of each micrograph name (e.g. a micrographs_ctf.star file). To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
+
+* **```import_particle_values```** *```column-name(s)```* : For every particle in the input star file, find the equivalent particle in a second star file (provided by ```--f```) (i.e. those with equivalent *\_rlnImageName* values) and replace the original column value with the one from the second star file. To import multiple columns, separate them with a slash.
 
 * **```--regroup```** *```particles-per-group```* : Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if *\_rlnGroupNumber* is being used in the star file rater than *\_rlnGroupName*. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 

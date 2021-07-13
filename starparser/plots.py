@@ -366,13 +366,13 @@ def comparecoords(file1parts,file2parts,numtoplot):
         for file1part in file1mic[1].itertuples():
             x1 = float(file1part[file1xloc])
             y1 = float(file1part[file1yloc])
-            plt.scatter(x1,y1, color='red', facecolors='none', s=8000, alpha=0.7, linewidth = 4)
+            plt.scatter(x1,y1, color='red', facecolors='none', s=80, alpha=0.7, linewidth = 4)
 
         if not skipflag and not file2parts.empty:
             for file2part in file2mic.itertuples():
                 x2 = float(file2part[file2xloc])
                 y2 = float(file2part[file2yloc])
-                plt.scatter(x2,y2, color='blue', facecolors='none', s=10000, alpha=0.7, linewidth = 4)
+                plt.scatter(x2,y2, color='blue', facecolors='none', s=250, alpha=0.7, linewidth = 3.5)
 
         themic = file1part[file1originalmics]
         if not os.path.isfile(themic):

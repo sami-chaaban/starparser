@@ -196,12 +196,46 @@ def decide():
             print("\n>> Error: _rlnMicrographName does not exist in the second star file.\n")
             sys.exit()
 
+        print("\n>> Importing " + str(columnstoimport) + " from " + file2)
+
         #this is very inefficient
         importedparticles = allparticles.copy()
         for column in columnstoimport:
             importedparticles = columnplay.importmicvalues(importedparticles, otherparticles, column)
 
-        print("\n>> Imported " + str(columnstoimport) + " from " + file2)
+        fileparser.writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_importpartvalues"] != "":
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to import values from.\n")
+            sys.exit()
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
+            sys.exit();
+        otherparticles, metadata2 = fileparser.getparticles(file2)
+        columnstoimport = params["parser_importpartvalues"].split("/")
+
+        for column in columnstoimport:
+            if column not in allparticles:
+                print("\n>> Error: the column \"" + column + "\" does not exist in the original star file.\n")
+                sys.exit()
+            if column not in otherparticles:
+                print("\n>> Error: the column \"" + column + "\" does not exist in the second star file.\n")
+                sys.exit()
+
+        if "_rlnImageName" not in allparticles:
+            print("\n>> Error: _rlnImageName does not exist in the original star file.\n")
+            sys.exit()
+        if "_rlnImageName" not in otherparticles:
+            print("\n>> Error: _rlnImageName does not exist in the second star file.\n")
+            sys.exit()
+
+        print("\n>> Importing " + str(columnstoimport) + " from " + file2)
+
+        importedparticles = particleplay.importpartvalues(allparticles, otherparticles, columnstoimport)
+
         fileparser.writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
@@ -279,7 +313,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
-        otherparticles, metadata = fileparser.getparticles(file2)
+        otherparticles, f2metadata = fileparser.getparticles(file2)
         unsharedparticles = allparticles[~allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         sharedparticles = allparticles[allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         if params["parser_findshared"] != "":

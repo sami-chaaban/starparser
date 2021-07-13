@@ -1,5 +1,6 @@
 from starparser import particleplay
 from starparser import fileparser
+import sys
 
 def splitparts(particles,numsplits):
 

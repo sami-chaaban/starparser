@@ -127,7 +127,7 @@ def getparticles_dummyoptics(filename):
 
     return(allparticles, metadata)
 
-def writestar(particles, metadata, outputname, relegate):
+def writestar(particles, metadata, outputname, relegate=False):
 
     if len(particles.index) == 0:
         print("\n>> Error: no particles to output.\n")

@@ -7,7 +7,7 @@ def argparse():
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
         version=starparser.__version__)
 
-    parser.add_option("--i",
+    parser.add_option("--i", "--in_parts", "--in_mics", "--in_movies",
         action="store", dest="file", default="", metavar='starfile',
         help="Input file name.")
 
@@ -198,6 +198,9 @@ def argparse():
         action="store_true", dest="parser_optless", default=False,
         help="Pass this if the file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files.")
 
+    
+    other_opts.add_option("--j", help="Ignore this option, multi-threading is not supported yet. The option is included so that Relion can submit starparser jobs.")
+
     parser.add_option_group(other_opts)
     
     output_opts = optparse.OptionGroup(
@@ -210,7 +213,7 @@ def argparse():
     output_opts.add_option("--t",
         action="store", dest="parser_outtype", default = "png", metavar='plot-filetype',
         help="File type of the plot that will be written. Choose between png, jpg, svg, and pdf. Default is png.")
-    
+
     parser.add_option_group(output_opts)
 
     ########

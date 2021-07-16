@@ -4,14 +4,15 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 1. [Installation](#installation)
 2. [Important notes](#notes)
-3. [Command-line options](#cmdop)
-4. [Command-line examples](#cmdex)
+3. [Command-line options](#cmdops)
+4. [Relion GUI usage](#reliongui)
 5. [Scripting](#scripts)
-6. [License](#license)
+6. [Examples](#examples)
+7. [License](#license)
 
 ## Installation<a name="installation"></a>
 
-* Set up a fresh conda environment with Python 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
+* Set up a fresh conda environment with Python $\geq$ 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
 
 * Install starparser: `pip install starparser`
 
@@ -23,7 +24,7 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 * The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
 
-## Command-line options<a name="cmdop"></a>
+## Command-line options<a name="cmdops"></a>
 
 **Usage:**
 
@@ -135,6 +136,18 @@ starparser --i input.star [options]
 
 ---
 
+## Relion GUI Usage<a name="reliongui"></a>
+
+* Use the External commands tab to run starparser within Relion. You don't need the double dash ```--``` in this case.
+
+![Relion-GUI-1](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Relion-1.png?raw=true "Relion-GUI-1")
+
+![Relion-GUI-2](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Relion-2.png?raw=true "Relion-GUI-2")
+
+![Relion-GUI-3](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Relion-1.png?raw=true "Relion-GUI-3")
+
+---
+
 ## Scripting<a name="scripts"></a>
 
 * To parse a star file for downstream use in a python script:
@@ -152,7 +165,7 @@ fileparser.writestar(newparticles, metadata, "output.star")
 
 ---
 
-## Command-line examples<a name="cmdex"></a>
+## Examples<a name="examples"></a>
 
 ### Plotting
 

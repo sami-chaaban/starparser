@@ -144,7 +144,7 @@ starparser --i input.star [options]
 
 ![Relion-GUI-2](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Relion-2.png?raw=true "Relion-GUI-2")
 
-![Relion-GUI-3](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Relion-1.png?raw=true "Relion-GUI-3")
+![Relion-GUI-3](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Relion-3.png?raw=true "Relion-GUI-3")
 
 ---
 

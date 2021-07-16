@@ -12,7 +12,7 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 ## Installation<a name="installation"></a>
 
-* Set up a fresh conda environment with Python $\geq$ 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
+* Set up a fresh conda environment with Python >= 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
 
 * Install starparser: `pip install starparser`
 

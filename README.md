@@ -268,6 +268,7 @@ starparser --i particles.star --f select_particles.star --plot_coordinates 1
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Plotting coordinates from the star file (red circles) and second file (blue circles) for 1 micrograph.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Coordinates.pdf**:
+
 ![Coordinates plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Coordinates.png?raw=true "Coordinates plot")
 
 ---

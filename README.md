@@ -163,6 +163,41 @@ particles, metadata = fileparser.getparticles("file.star")
 fileparser.writestar(newparticles, metadata, "output.star")
 ```
 
+* A simple example showing how to iterate through micrographs and keep only one of three particles of a helix.
+
+```python
+from starparser import fileparser
+
+#import data to a pandas dataframe
+particles, metadata = fileparser.getparticles("particles.star")
+
+#group by micrographs
+micrographs = particles.groupby(["_rlnMicrographName"])
+
+keeplist = []
+
+#iterate through the micrographs
+for idm, micrograph in micrographs:
+    
+    #get the helices for the current micrograph
+    helices = micrograph.groupby(["_rlnHelicalTubeID"])
+
+    #iterate through the helices for this micrograph
+    for idh, helix in helices:
+        
+        #get the indices for the particles
+        indices = helix.index.tolist()
+        
+        #get the indices for one of every three particles in the helix
+        keeplist.append(indices[::3])
+    
+#flatten the list; this is now the list of particles to keep
+keeplist = [item for sublist in keeplist for item in sublist]
+    
+#write out a star file only containing those particles to keep
+fileparser.writestar(particles[particles.index.isin(keeplist)], metadata, "particles_purged.star")
+```
+
 ---
 
 ## Examples<a name="examples"></a>
@@ -221,6 +256,19 @@ starparser --i run_it025_data.star --plot_class_proportions --c _rlnMicrographNa
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Class_proportion.png**:
 ![Class proportion plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Class_proportion.png?raw=true "Class proportion plot")
+
+---
+
+* Overlay the coordinates of two star files.
+
+```
+starparser --i particles.star --f select_particles.star --plot_coordinates 1
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Plotting coordinates from the star file (red circles) and second file (blue circles) for 1 micrograph.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Coordinates.pdf**:
+![Coordinates plot](https://github.com/sami-chaaban/StarParser/blob/main/Examples/Coordinates.png?raw=true "Coordinates plot")
 
 ---
 

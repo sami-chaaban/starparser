@@ -350,8 +350,7 @@ def comparecoords(file1parts,file2parts,numtoplot):
 
     for file1mic in file1mics:
 
-        if numtoplot != -1:
-            count+=1
+        count+=1
 
         skipflag = False
         try:

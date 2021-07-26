@@ -317,7 +317,7 @@ def classproportion(particles, columns, query, queryexact, outtype):
     
     outputfig(fig, "Class_proportion", outtype)
 
-def comparecoords(file1parts,file2parts,numtoplot):
+def comparecoords(file1parts,file2parts,numtoplot, circlesize):
 
     file1parts["_rlnMicrographNameOriginal"] = file1parts["_rlnMicrographName"]
     file1parts["_rlnMicrographName"] = file1parts["_rlnMicrographName"].str.split('/').str[-1]
@@ -326,7 +326,6 @@ def comparecoords(file1parts,file2parts,numtoplot):
     file1originalmics = file1parts.columns.get_loc("_rlnMicrographNameOriginal")+1
     file1xloc = file1parts.columns.get_loc("_rlnCoordinateX")+1
     file1yloc = file1parts.columns.get_loc("_rlnCoordinateY")+1
-    file1nameloc = file1parts.columns.get_loc("_rlnImageName")+1
     if not file2parts.empty:
         file2parts["_rlnMicrographName"] = file2parts["_rlnMicrographName"].str.split('/').str[-1]
         file2mics = file2parts.groupby(["_rlnMicrographName"])
@@ -334,17 +333,6 @@ def comparecoords(file1parts,file2parts,numtoplot):
         file2yloc = file2parts.columns.get_loc("_rlnCoordinateY")+1
 
     fig = plt.figure()
-
-    if not file2parts.empty:
-        if numtoplot != -1:
-            print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(numtoplot) + " micrographs.")
-        else:
-            print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(len(file1mics)) + " micrographs.")
-    else:
-        if numtoplot != -1:
-            print("\n>> Plotting coordinates from the star file (red circles) for " + str(numtoplot) + " micrographs.")
-        else:
-            print("\n>> Plotting coordinates from the star file (red circles) for " + str(len(file1mics)) + " micrographs.")
 
     count=0
 
@@ -365,13 +353,13 @@ def comparecoords(file1parts,file2parts,numtoplot):
         for file1part in file1mic[1].itertuples():
             x1 = float(file1part[file1xloc])
             y1 = float(file1part[file1yloc])
-            plt.scatter(x1,y1, color='red', facecolors='none', s=80, alpha=0.7, linewidth = 4)
+            plt.scatter(x1,y1, color='red', facecolors='none', s=circlesize, alpha=0.7, linewidth = 4)
 
         if not skipflag and not file2parts.empty:
             for file2part in file2mic.itertuples():
                 x2 = float(file2part[file2xloc])
                 y2 = float(file2part[file2yloc])
-                plt.scatter(x2,y2, color='blue', facecolors='none', s=250, alpha=0.7, linewidth = 3.5)
+                plt.scatter(x2,y2, color='blue', facecolors='none', s=circlesize*3, alpha=0.7, linewidth = 3.5)
 
         themic = file1part[file1originalmics]
         if not os.path.isfile(themic):

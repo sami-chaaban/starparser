@@ -108,6 +108,10 @@ def getparticles(filename):
     alloptics = makepandas(opticsheaders, optics)
     allparticles = makepandas(particlesheaders, particles)
     
+    if len(particlesheaders) != len(allparticles.columns):
+        print("\n>> Error: something went wrong when parsing " + filename + ".\n")
+        sys.exit()
+    
     metadata = [version,opticsheaders,alloptics,particlesheaders,tablename]
 
     return(allparticles, metadata)

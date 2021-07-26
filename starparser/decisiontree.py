@@ -67,6 +67,8 @@ def decide():
     
     #Initialize variables
 
+    print("\n>> Reading " + filename)
+
     if params["parser_optless"]: #add dummy optics table
         allparticles, metadata = fileparser.getparticles_dummyoptics(filename)
         #print("\n>> Created a dummy optics table to read this star file.")
@@ -524,7 +526,8 @@ def decide():
             file2particles = pd.DataFrame({'A' : []})
         else:
             file2particles, metadata = fileparser.getparticles(params["parser_file2"])
-        numtoplot = params["parser_comparecoords"]
+        currentparams = params["parser_comparecoords"].split("/")
+        numtoplot = currentparams[0]
         if numtoplot in ["all", "All", "ALL"]:
             numtoplot = -1
         else:
@@ -536,7 +539,23 @@ def decide():
         if numtoplot == 0:
             print("\n>> Error: provide a number of micrographs to plot or pass \"all\" to plot all micrographs.\n")
             sys.exit()
-        plots.comparecoords(allparticles, file2particles, numtoplot)
+        if len(currentparams) > 1:
+            circlesize = float(currentparams[1])
+        else:
+            circlesize = 80
+
+        if not file2parts.empty:
+            if numtoplot != -1:
+                print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(numtoplot) + " micrographs.")
+            else:
+                print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(len(file1mics)) + " micrographs.")
+        else:
+            if numtoplot != -1:
+                print("\n>> Plotting coordinates from the star file (red circles) for " + str(numtoplot) + " micrographs.")
+            else:
+                print("\n>> Plotting coordinates from the star file (red circles) for " + str(len(file1mics)) + " micrographs.")
+
+        plots.comparecoords(allparticles, file2particles, numtoplot, circlesize)
         sys.exit()
 
     if params["parser_replacecol"] != "":
@@ -562,7 +581,7 @@ def decide():
 
         inputparams = params["parser_copycol"].split("/")
         if len(inputparams) != 2:
-            print("\n>> Error: you should provide columns in the form of source-column/target-column.\n")
+            print("\n>> Error: the input should be source-column/target-column.\n")
             sys.exit()
         sourcecol, targetcol = inputparams
         if sourcecol not in allparticles:
@@ -576,7 +595,7 @@ def decide():
 
         inputparams = params["parser_resetcol"].split("/")
         if len(inputparams) != 2:
-            print("\n>> Error: you should provide columns in the form of column-name/value.\n")
+            print("\n>> Error: the input should be column-name/value.\n")
             sys.exit()
         columntoreset, value = inputparams
         if columntoreset not in allparticles:
@@ -634,11 +653,11 @@ def decide():
                 newparticles, metadata = columnplay.delcolumn(allparticles, ["_rlnOpticsGroup"], metadata)
                 metadata[0] = ["#","version","30000"]
                 print("\n>> Removed the _rlnOpticsGroup column and Optics table.")
-                particles2use = particleplay.checksubset(newparticles, params, queryexact)
+                particles2use = particleplay.checksubset(newparticles, queryexact)
         else:
-            particles2use = particleplay.checksubset(allparticles, params, queryexact)
+            particles2use = particleplay.checksubset(allparticles, queryexact)
     else:      
-        particles2use = particleplay.checksubset(allparticles, params, queryexact)
+        particles2use = particleplay.checksubset(allparticles, queryexact)
     
     if params["parser_uniquemics"]:
         if not "_rlnMicrographName" in allparticles.columns:

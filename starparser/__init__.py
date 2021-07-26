@@ -1,4 +1,4 @@
 import os
 
-__version__ = '1.22'
+__version__ = '1.23'
 _ROOT = os.path.abspath(os.path.dirname(__file__))

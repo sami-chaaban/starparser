@@ -20,11 +20,11 @@ def argparse():
 
     modify_opts.add_option("--operate",
         action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
-        help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25).")
+        help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25). If the terminal throws an error, try surrounding the argument with quotes.")
 
     modify_opts.add_option("--operate_columns",
         action="store", dest="parser_operatecolumns", type="string", default="", metavar='column[operator]value',
-        help="Perform operation between two columns and output to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted).")
+        help="Perform operation between two columns and output to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted). If the terminal throws an error, try surrounding the argument with quotes.")
 
     modify_opts.add_option("--delete_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',

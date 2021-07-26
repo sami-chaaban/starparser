@@ -86,8 +86,9 @@ def extractparticles(particles, columns, query, queryexact):
     
     return(extractedparticles, extractednumber)
 
-def checksubset(particles, params, queryexact):
+def checksubset(particles, queryexact):
     
+    params = argparser.argparse()
     if params["parser_column"] != "" and params["parser_query"] != "":
         query = params["parser_query"].split("/")
         columns = params["parser_column"].split("/")

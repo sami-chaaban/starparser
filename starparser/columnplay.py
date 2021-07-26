@@ -114,7 +114,7 @@ def operate(particles,column,operator,value):
 
     try:
         particles[column] = pd.to_numeric(particles[column], downcast="float")
-    except:
+    except ValueError:
         print("\n>> Error: Could not interpret the values in " + column + " as numbers.\n")
         sys.exit()
 
@@ -140,12 +140,12 @@ def operatecolumns(particles,column1,column2,newcolumn,operator,metadata):
 
     try:
         particles[column1] = pd.to_numeric(particles[column1], downcast="float")
-    except:
+    except ValueError:
         print("\n>> Error: Could not interpret the values in " + column1 + " as numbers.\n")
         sys.exit()
     try:
         particles[column2] = pd.to_numeric(particles[column2], downcast="float")
-    except:
+    except ValueError:
         print("\n>> Error: Could not interpret the values in " + column2 + " as numbers.\n")
         sys.exit()
 
@@ -189,7 +189,6 @@ def writecol(particles, columns):
         output.close()
     
     return(outputs)
-
 
 def replacecolumn(particles,replacecol,newcol):
     columnindex = particles.columns.get_loc(replacecol)

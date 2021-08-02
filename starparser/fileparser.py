@@ -85,6 +85,8 @@ def makepandas(headers,items):
     return(itemspd)
 
 def getparticles(filename):
+
+    print("\n>> Reading " + filename)
     
     file = open(filename,mode='r')
     starfile = file.read()

@@ -55,7 +55,7 @@ def findnearby(coreparticles,nearparticles,threshdist):
         farparticles = farparticles[~farparticles['_rlnImageName'].isin(noparts)]
         closeparticles = closeparticles[~closeparticles['_rlnImageName'].isin(noparts)]
 
-    print("\n>> Created subsets with particles that are closer or further than " + str(threshdist) + " pixels from the closest particle in the second star file. Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
+    print("\n>> Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
 
     closeparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)
     farparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)

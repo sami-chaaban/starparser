@@ -1,6 +1,7 @@
 import sys
 import os.path
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from starparser import argparser
 from starparser import columnplay
@@ -66,8 +67,6 @@ def decide():
     #########################################################################
     
     #Initialize variables
-
-    print("\n>> Reading " + filename)
 
     if params["parser_optless"]: #add dummy optics table
         allparticles, metadata = fileparser.getparticles_dummyoptics(filename)
@@ -338,6 +337,9 @@ def decide():
             sys.exit();
 
         nearparticles, nearmetadata = fileparser.getparticles(params["parser_file2"])
+
+        print("\n>> Creating subsets with particles that are closer/further than " + str(threshdist) + " pixels from the closest particle in the second star file.")
+
         farparticles, closeparticles, distances = specialparticles.findnearby(allparticles, nearparticles, threshdist)
 
         fig = plt.figure()

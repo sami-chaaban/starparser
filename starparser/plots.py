@@ -412,7 +412,7 @@ def comparecoords(file1parts,file2parts,numtoplot, circlesize):
 
     pdf.close()
 
-    print("-->> Output figure to Coordinates.pdf\n")
+    print("\n-->> Output figure to Coordinates.pdf\n")
 
 def outputfig(fig, name, outtype):
     

@@ -319,6 +319,8 @@ def classproportion(particles, columns, query, queryexact, outtype):
 
 def comparecoords(file1parts,file2parts,numtoplot, circlesize):
 
+    circlesize = (3.14*circlesize/11)**2
+
     file1parts["_rlnMicrographNameOriginal"] = file1parts["_rlnMicrographName"]
     file1parts["_rlnMicrographName"] = file1parts["_rlnMicrographName"].str.split('/').str[-1]
 

@@ -26,7 +26,7 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 ## Command-line options<a name="cmdops"></a>
 
-**Usage:**
+### Usage
 
 ```
 starparser --i input.star [options]

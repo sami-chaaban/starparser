@@ -546,16 +546,16 @@ def decide():
         else:
             circlesize = 80
 
-        if not file2parts.empty:
+        if not file2particles.empty:
             if numtoplot != -1:
-                print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(numtoplot) + " micrographs.")
+                print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(numtoplot) + " micrograph(s).")
             else:
-                print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(len(file1mics)) + " micrographs.")
+                print("\n>> Plotting coordinates from the star file (red circles) and second file (blue circles) for " + str(len(file1mics)) + " micrograph(s).")
         else:
             if numtoplot != -1:
-                print("\n>> Plotting coordinates from the star file (red circles) for " + str(numtoplot) + " micrographs.")
+                print("\n>> Plotting coordinates from the star file (red circles) for " + str(numtoplot) + " micrograph(s).")
             else:
-                print("\n>> Plotting coordinates from the star file (red circles) for " + str(len(file1mics)) + " micrographs.")
+                print("\n>> Plotting coordinates from the star file (red circles) for " + str(len(file1mics)) + " micrograph(s).")
 
         plots.comparecoords(allparticles, file2particles, numtoplot, circlesize)
         sys.exit()

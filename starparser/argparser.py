@@ -9,12 +9,73 @@ def argparse():
 
     parser.add_option("--i", "--in_parts", "--in_mics", "--in_movies",
         action="store", dest="file", default="", metavar='starfile',
-        help="Input file name.")
+        help="Name of the input star file.")
 
     parser.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile',
-        help="Name of second file to get information from, if necessary.")
+        help="Name of a second star file, if necessary.")
+
+    info_opts = optparse.OptionGroup(
+        parser, 'Data Mining Options')
+
+    info_opts.add_option("--extract",
+        action="store_true", dest="parser_extractparticles", default=False,
+        help="Find particles that match a column header (--c) and query (--q) and write them to a new star file.")
+
+    info_opts.add_option("--limit_particles",
+        action="store", dest="parser_limitparticles", type="string", default = "", metavar='column/comparator/value',
+        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
     
+    info_opts.add_option("--count_particles",
+        action="store_true", dest="parser_countme", default=False,
+        help="Count particles and display the result. Optionally, use --c and --q to count a subset of particles, otherwise counts all.")
+    
+    info_opts.add_option("--count_mics",
+        action="store_true", dest="parser_uniquemics", default=False,
+        help="Count the number of unique micrographs. Optionally, use --c and --q to count from a subset of particles, otherwise counts all.")
+    
+    info_opts.add_option("--list_column",
+        action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
+        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
+
+    info_opts.add_option("--find_shared",
+        action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
+        help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.")
+
+    info_opts.add_option("--extract_if_nearby",
+        action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
+        help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbor in the second star file closer than the distance provided here will be written to particles_close.star and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
+
+    info_opts.add_option("--extract_clusters",
+        action="store", dest="parser_cluster", type="string", default="", metavar='threshold-distance/minimum-per-cluster',
+        help="Extract particles that have a minimum number of neighbors within a given radius. For example, passing \"400/4\" extracts particles with at least 4 neighbors within 400 pixels.")
+
+    info_opts.add_option("--extract_indices",
+        action="store_true", dest="parser_getindex", default=False,
+        help="Extract particles with indices that match a list in a second file (specified by --f). The second file must be a single column list of numbers with values between 1 and the last particle index of the star file.")  
+
+    info_opts.add_option("--extract_random",
+        action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
+        help="Get a random set of particles totaling the number provided here. Optionally, use --c and --q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
+
+    info_opts.add_option("--split",
+        action="store", dest="parser_split", type="int", default=-1, metavar='number',
+        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will have the input file name with the suffix \"_split-#\". Note that they will not necessarily contain exactly the same number of particles")
+
+    info_opts.add_option("--split_classes",
+        action="store_true", dest="parser_splitclasses", default=False,
+        help="Split the input star file into independent star files for each class. The files will have the names \"Class_#.star\".") 
+
+    info_opts.add_option("--split_optics",
+        action="store_true", dest="parser_splitoptics", default=False,
+        help="Split the input star file into independent star files for each optics group. The files will have the names of the optics group.")
+
+    info_opts.add_option("--sort_by",
+        action="store", dest="parser_sort", type="string", default="", metavar='column-name',
+        help="Sort the column in ascending order and output a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"_rlnClassNumber/n\"); otherwise, it will sort the values as text.")   
+
+    parser.add_option_group(info_opts)
+
     modify_opts = optparse.OptionGroup(
         parser, 'Modification Options')
 
@@ -24,23 +85,23 @@ def argparse():
 
     modify_opts.add_option("--operate_columns",
         action="store", dest="parser_operatecolumns", type="string", default="", metavar='column[operator]value',
-        help="Perform operation between two columns and output to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted). If the terminal throws an error, try surrounding the argument with quotes.")
+        help="Perform operation between two columns and write to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted). If the terminal throws an error, try surrounding the argument with quotes.")
 
-    modify_opts.add_option("--delete_column",
+    modify_opts.add_option("--remove_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',
-        help="Delete column and renumber headers. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+        help="Remove column, renumber headers, and write to a new star file. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
     
-    modify_opts.add_option("--delete_particles",
+    modify_opts.add_option("--remove_particles",
         action="store_true", dest="parser_delparticles", default=False,
-        help="Delete particles. Pick a column header (--c) and query (--q) to delete particles that match it.")
+        help="Remove particles that match a query (specified with --q) within a column header (specified with --c), and write to a new star file.")
 
-    modify_opts.add_option("--delete_duplicates",
+    modify_opts.add_option("--remove_duplicates",
         action="store", dest="parser_delduplicates", default="", metavar='column-name',
-        help="Delete duplicate particles based on the column provided here (e.g. _rlnImageName).")
+        help="Remove duplicate particles based on the column provided here (e.g. _rlnImageName).")
 
-    modify_opts.add_option("--delete_mics_fromlist",
+    modify_opts.add_option("--remove_mics_fromlist",
         action="store_true", dest="parser_delmics", default=False,
-        help="Delete particles that belong to micrographs that have a match in a second file provided by --f.")
+        help="Remove particles that belong to micrographs that have a match in a second file provided by --f.")
 
     modify_opts.add_option("--insert_column",
         action="store", dest="parser_insertcol", type="string", default="", metavar='column-name',
@@ -88,67 +149,6 @@ def argparse():
 
     parser.add_option_group(modify_opts)
     
-    info_opts = optparse.OptionGroup(
-        parser, 'Data Mining Options')
-
-    info_opts.add_option("--extract_particles",
-        action="store_true", dest="parser_extractparticles", default=False,
-        help="Write a star file with particles that match a column header (--c) and query (--q).")
-
-    info_opts.add_option("--limit_particles",
-        action="store", dest="parser_limitparticles", type="string", default = "", metavar='column/comparator/value',
-        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
-    
-    info_opts.add_option("--count_particles",
-        action="store_true", dest="parser_countme", default=False,
-        help="Count particles and print the result. Optionally, use --c and --q to count a subset of particles, otherwise counts all.")
-    
-    info_opts.add_option("--count_mics",
-        action="store_true", dest="parser_uniquemics", default=False,
-        help="Count the number of unique micrographs. Optionally, use --c and --q to count from a subset of particles, otherwise counts all.")
-    
-    info_opts.add_option("--list_column",
-        action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
-        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
-
-    info_opts.add_option("--find_shared",
-        action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
-        help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.")
-
-    info_opts.add_option("--extract_if_nearby",
-        action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
-        help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbor in the second star file closer than the distance provided here will be output to particles_close.star and those that don't will be output to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
-
-    info_opts.add_option("--extract_clusters",
-        action="store", dest="parser_cluster", type="string", default="", metavar='threshold-distance/minimum-per-cluster',
-        help="Extract particles that have a minimum number of neighbors within a given radius. For example, passing \"400/4\" extracts particles with at least 4 neighbors within 400 pixels.")
-
-    info_opts.add_option("--extract_indices",
-        action="store_true", dest="parser_getindex", default=False,
-        help="Extract particles with indices that match a list in a second file (specified by --f). The second file must be a single column list of numbers with values between 1 and the last particle index of the star file.")  
-
-    info_opts.add_option("--extract_random",
-        action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
-        help="Get a random set of particles totaling the number provided here. Optionally, use --c and --q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
-
-    info_opts.add_option("--split",
-        action="store", dest="parser_split", type="int", default=-1, metavar='number',
-        help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will have the input file name with the suffix \"_split-#\". Note that they will not necessarily contain exactly the same number of particles")
-
-    info_opts.add_option("--split_classes",
-        action="store_true", dest="parser_splitclasses", default=False,
-        help="Split the input star file into independent star files for each class. The files will have the names \"Class_#.star\".") 
-
-    info_opts.add_option("--split_optics",
-        action="store_true", dest="parser_splitoptics", default=False,
-        help="Split the input star file into independent star files for each optics group. The files will have the names of the optics group.")
-
-    info_opts.add_option("--sort_by",
-        action="store", dest="parser_sort", type="string", default="", metavar='column-name',
-        help="Sort the column in ascending order and output a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"_rlnClassNumber/n\"); otherwise, it will sort the values as text.")   
-
-    parser.add_option_group(info_opts)
-    
     plot_opts = optparse.OptionGroup(
         parser, 'Plotting Options')
 
@@ -158,7 +158,7 @@ def argparse():
 
     plot_opts.add_option("--plot_orientations",
         action="store_true", dest="parser_plotangledist", default=False,
-        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and lattitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
+        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
@@ -170,7 +170,7 @@ def argparse():
 
     plot_opts.add_option("--plot_coordinates",
         action="store", dest="parser_comparecoords", type="string", default="", metavar="number-of-micrographs",
-        help="Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Use --f to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are output to Coordinates.pdf.")
+        help="Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Use --f to overlay the coordinates of a second star file (blue circles); in this case, the micrograph names should match between the two star files. The plots are written to Coordinates.pdf.")
 
     parser.add_option_group(plot_opts)
 

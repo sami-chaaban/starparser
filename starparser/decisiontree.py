@@ -13,92 +13,153 @@ from starparser import splits
 
 def decide():
 
-    ##############################################################
+    ##################################
+    """
+    This function is used to determine what the user is asking for from the command-line options and fulfilling it,
+    """
+    ##################################
 
+    #Get the passed parameters
     params = argparser.argparse()
-    
-    #Sanity check
-    
+
+    """
+    First, some basic checks
+    """
+
+    #The --i option must be passed, otherwise there is nothing to parse.    
     if 'file' not in params:
         print("\n>> Error: no filename entered. See the help page (-h).\n")
         sys.exit()
         
+    #This is a rare ocurance, but it's possible that the user asks to delete the _rlnOpticsGroup column as well as pass the --relegate option, which is redundant.
     if "_rlnOpticsGroup" in params["parser_column"] and params["parser_relegate"]:
         print("\n>> Error: cannot have the relegate option and the delete OpticsGroup column at the same time (the former will do the latter already).\n")
         sys.exit()
 
+    #The output file types (--t) for plots are listed below, so any other file type will not work.
     if params["parser_outtype"] not in ["png", "pdf", "jpg", "svg"]:
         print("\n>> Error: choose between png, pdf, svg, and jpg for the plot filetype.\n")
         sys.exit()
         
-    ################################################################
-    
-    #Essential variables
-    
+    ##################################
+    """
+    The variables below are essential for all functions
+    """
+    ##################################
+
+    #The name of the star file
     filename = params['file']
 
+    #Check if a star file has been passed. This check is probably redundant with the check above. Consider removing.
     if params['file'] == "":
         print("\n>> Error: enter a star file with --i.\n")
         sys.exit();
 
+    #Check if the file exists
     if not os.path.isfile(filename):
         print("\n>> Error: \"" + filename + "\" does not exist.\n")
         sys.exit();
 
+    #Assign the plot file type to outtype. This is probably not necessary. Consider removing.
     outtype = params["parser_outtype"]
 
+    #The queryexact option checks if the query should match exactly (as opposed to finding any instance of the query).
     queryexact = params["parser_exact"]
+
+    #Assure the user that they have asked for exact values.
     if queryexact:
-        print("\n>> You have asked starparser to look for exact matches between the queries and values.")
-    elif params["parser_splitoptics"] or params["parser_classdistribution"] or params["parser_splitclasses"]:
+        print("\n>> You have asked for exact matches between the queries and values (--e).")
+
+    #In the cases below, a subset of particles are generated from a qurey that must be exact, so the queryexact variable is forced to be True.
+    elif params["parser_splitoptics"] or params["parser_classiterations"] or params["parser_splitclasses"]:
         queryexact = True
+
+    ##################################
+    """
+    From here on out, the passed parameters
+    are checked and the proper functions are called.
+    """
+    ##################################
     
-    #####################################################################
+    """
+    --plot_class_iterations is checked first since the plotclassparts() function can be called
+    without having to have read in the star file or check for queries.
+    """
     
-    #Set up jobs that don't require initialization
-    
-    if params["parser_classdistribution"] != "":
-        if params["parser_classdistribution"] in ["all", "All", "ALL"]:
+    if params["parser_classiterations"] != "":
+        if params["parser_classiterations"] in ["all", "All", "ALL"]:
             plots.plotclassparts(filename, [-1], queryexact, outtype)
         else:
-            plots.plotclassparts(filename,params["parser_classdistribution"].split("/"), queryexact, outtype)
+            plots.plotclassparts(filename,params["parser_classiterations"].split("/"), queryexact, outtype)
         sys.exit()
     
-    #########################################################################
-    
-    #Initialize variables
 
-    if params["parser_optless"]: #add dummy optics table
+    """
+    For most functions, the star file is parsed and basic variables are set before
+    deciding which function to call.
+    """
+
+    #The --opticsless option requires the getparticles_dummyoptics function to insert
+    #a fake optics table before moving on
+    if params["parser_optless"]:
+
         allparticles, metadata = fileparser.getparticles_dummyoptics(filename)
-        #print("\n>> Created a dummy optics table to read this star file.")
+
+    ####
+    #Most of the time, particles will be parsed normally below
+    #The allparticles dataframe will be used in all main functions below
     else:
         allparticles, metadata = fileparser.getparticles(filename)
+    ####
 
+
+    #Check how many particles there are. This variable isn't useful yet but will be used for
+    #various things later.
     totalparticles = len(allparticles.index)
     
+    #If a query was passed, then turn it into a list. Since queries are split by a slash, .split("/") creates the list for us
     if params["parser_query"] != "":
         query = params["parser_query"].split("/")
+
+        #If no column was passed, the query can't be checked.
+        if params["parser_column"] == "":
+            print("\n>> Error: pass a column with --c for the query to be checked.\n")
+            sys.exit()
     
+    #Same thing if a column was passed
     if params["parser_column"] != "":
         columns = params["parser_column"].split("/")
         
+        #For every column passed, check that it exists as a header in the allparticles dataframe
         for c in columns:
             if c not in allparticles.columns:
                 print("\n>> Error: the column [" + str(c) + "] does not exist in your star file.\n")
                 sys.exit()
-                
-    else:
-        
+    
+    #If not columns were passed, set the variable columns to an empty string,
+    #otherwise some functions may throw an error.
+    else:    
         columns = ""
 
+    #If the input star file lacks an optics table and the --opticsless option was passed, then
+    #it makes sense to output a star file without an optics table too, hence setting relegateflag=True
     if params["parser_optless"]:
         relegateflag = True
+
+    #Otherwise, see what the user requested (i.e. relegateflag will be True if --relegate was passed)    
     else:
         relegateflag = params["parser_relegate"]
     
-    #####################################################################
-        
-    #Set up jobs that don't require a subset (faster this way)
+
+    ##################################
+    """
+    Below is a flurry of functions in no particular order
+    """
+    ##################################
+
+    """
+    --count
+    """
 
     if params["parser_countme"] and params["parser_column"] != "" and params["parser_query"] != "":
         particleplay.countqueryparticles(allparticles, columns, query, queryexact, False)
@@ -106,14 +167,22 @@ def decide():
     elif params["parser_countme"]:
         print('\n>> There are ' + str(totalparticles) + ' particles in total.\n') 
         sys.exit()
-        
+    
+    """
+    --remove_column
+    """
+
     if params["parser_delcolumn"] != "":
         columns = params["parser_delcolumn"].split("/")
         newparticles, metadata = columnplay.delcolumn(allparticles, columns, metadata)
         print("\n>> Removed the columns " + str(columns))
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
-        
+
+    """
+    --remove_particles
+    """
+
     if params["parser_delparticles"]:
         if params["parser_query"] == "" or params["parser_column"] == "":
             print("\n>> Error: provide a column (--c) and query (--q) to find specific particles to remove.\n")
@@ -123,6 +192,10 @@ def decide():
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --remove_duplicates
+    """
 
     if params["parser_delduplicates"] != "":
         column = params["parser_delduplicates"]
@@ -137,9 +210,13 @@ def decide():
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    """
+    --remove_mics_fromlist
+    """
+
     if params["parser_delmics"]:
         if params["parser_query"] != "" or params["parser_column"] != "":
-            print("\n>> Error: you cannot provide a query to the delete_mics_fromlist option.\n")
+            print("\n>> Error: you cannot provide a query to the --remove_mics_fromlist option.\n")
             sys.exit()
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f to match micrographs.\n")
@@ -156,6 +233,10 @@ def decide():
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         
+    """
+    --swap_columns
+    """
+
     if params["parser_swapcolumns"] != "":
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f to swap columns from.\n")
@@ -170,6 +251,10 @@ def decide():
         print("\n>> Swapped in " + str(columnstoswap) + " from " + file2)
         fileparser.writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --import_mic_values
+    """
 
     if params["parser_importmicvalues"] != "":
         if params["parser_file2"] == "":
@@ -199,13 +284,20 @@ def decide():
 
         print("\n>> Importing " + str(columnstoimport) + " from " + file2)
 
-        #this is very inefficient
+        """
+        It is inefficient to update the dataframe one column at a time
+        instead of doing them all at the same time. Consider revising.
+        """
         importedparticles = allparticles.copy()
         for column in columnstoimport:
             importedparticles = columnplay.importmicvalues(importedparticles, otherparticles, column)
 
         fileparser.writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --import_particle_values
+    """
 
     if params["parser_importpartvalues"] != "":
         if params["parser_file2"] == "":
@@ -240,7 +332,13 @@ def decide():
         fileparser.writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    """
+    --operate
+    """
+
     if params["parser_operate"] != "":
+
+        #Check which operation is required by splitting, if the result is 2, then that was the operation
         if len(params["parser_operate"].split("*")) == 2:
             arguments = params["parser_operate"].split("*")
             operator = "multiply"
@@ -269,6 +367,10 @@ def decide():
         operatedparticles = columnplay.operate(allparticles,column,operator,value)
         fileparser.writestar(operatedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --operate_columns
+    """
 
     if params["parser_operatecolumns"] != "":
         if len(params["parser_operatecolumns"].split("*")) == 2:
@@ -301,6 +403,10 @@ def decide():
         operatedparticles, newmetadata = columnplay.operatecolumns(allparticles,column1,column2,newcolumn,operator,metadata)
         fileparser.writestar(operatedparticles, newmetadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --find_shared
+    """
         
     if params["parser_findshared"] != "":
         columntocheckunique = params["parser_findshared"]
@@ -323,6 +429,10 @@ def decide():
             print("Unique: \n-------\n·" + filename + ": " + str(len(unsharedparticles.index)) + " particles (these will be written to unique.star)\n·" + file2 + ": " + str(len(otherparticles.index) - len(sharedparticles.index)) + " particles\n")
             fileparser.writestar(unsharedparticles, metadata, "unique.star", relegateflag)
         sys.exit()
+
+    """
+    --find_nearby
+    """
 
     if params["parser_findnearby"] != -1:
         threshdist = float(params["parser_findnearby"])
@@ -353,6 +463,10 @@ def decide():
         fileparser.writestar(farparticles, metadata, "particles_far.star", relegateflag)
 
         sys.exit()
+
+    """
+    --fetch_from_nearby
+    """
 
     if params["parser_fetchnearby"] != "":
         retrieveparams = params["parser_fetchnearby"].split("/")
@@ -387,6 +501,10 @@ def decide():
         fileparser.writestar(stolenparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    """
+    --extract_cluster
+    """
+
     if params["parser_cluster"] != "":
         retrieveparams = params["parser_cluster"].split("/")
         if len(retrieveparams) != 2:
@@ -398,6 +516,10 @@ def decide():
         clusterparticles = specialparticles.getcluster(allparticles, threshold,minimum)
         fileparser.writestar(clusterparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --plot_class_proportions
+    """
         
     if params["parser_classproportion"]:
         if params["parser_query"] == "":
@@ -421,6 +543,10 @@ def decide():
         fileparser.writestar(particlesnewoptics,metadata,params["parser_outname"],False)
         sys.exit()
 
+    """
+    --limit
+    """
+
     if params["parser_limitparticles"] != "":
         parsedinput = params["parser_limitparticles"].split("/")
         if len(parsedinput) > 3:
@@ -439,6 +565,10 @@ def decide():
             print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values greater than " + str(limit))
         fileparser.writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --extract_random
+    """
 
     if params["parser_randomset"] != -1:
         numrandom = params["parser_randomset"]
@@ -463,6 +593,10 @@ def decide():
                 fileparser.writestar(randomsettowrite.sample(n = numrandom), metadata, q+"_"+str(numrandom)+".star", relegateflag)
         sys.exit()
 
+    """
+    --split
+    """
+
     if params["parser_split"] != -1:
         numsplits = params["parser_split"]
         if numsplits == 1:
@@ -479,15 +613,27 @@ def decide():
             fileparser.writestar(s, metadata, filename[:-5]+"_split-"+str(i+1).zfill(fill)+".star", relegateflag)
         sys.exit()
 
+    """
+    --split_optics
+    """
+
     if params["parser_splitoptics"]:
         splits.splitbyoptics(allparticles,metadata,queryexact)
         sys.exit()
+
+    """
+    --split_classes
+    """
 
     if params["parser_splitclasses"]:
         if "_rlnClassNumber" not in allparticles:
             print("\n>> Error: _rlnClassNumber does not exist in the star file.")
         splits.splitbyclass(allparticles,metadata,queryexact,relegateflag)
         sys.exit()
+
+    """
+    --extract_indices
+    """
 
     if params["parser_getindex"]:
         if params["parser_file2"] == "":
@@ -502,6 +648,10 @@ def decide():
         print("\n>> Extracting " + str(len(indicestoget)) + " particles (" + str(round(100*len(indicestoget)/len(allparticles.index),1)) + "%) that match the indices.")
         fileparser.writestar(allparticles.iloc[indicestoget], metadata, params["parser_outname"], relegateflag)
         sys.exit()   
+
+    """
+    --insert_column
+    """
 
     if params["parser_insertcol"] != "":
         if params["parser_file2"] == "":
@@ -522,6 +672,10 @@ def decide():
         metadata[3].append(insertcol)
         fileparser.writestar(allparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --plot_coordinates
+    """
 
     if params["parser_comparecoords"] != "":
         if params["parser_file2"] == "":
@@ -560,6 +714,10 @@ def decide():
         plots.comparecoords(allparticles, file2particles, numtoplot, circlesize)
         sys.exit()
 
+    """
+    --replace_column
+    """
+
     if params["parser_replacecol"] != "":
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f that has the list of values.\n")
@@ -579,6 +737,10 @@ def decide():
         fileparser.writestar(replacedstar, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    """
+    --copy_column
+    """
+
     if params["parser_copycol"] != "":
 
         inputparams = params["parser_copycol"].split("/")
@@ -593,6 +755,10 @@ def decide():
         fileparser.writestar(copiedstar, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    """
+    --reset_column
+    """
+
     if params["parser_resetcol"] != "":
 
         inputparams = params["parser_resetcol"].split("/")
@@ -606,6 +772,10 @@ def decide():
         resetstar = columnplay.resetcolumn(allparticles,columntoreset,value)
         fileparser.writestar(resetstar, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+    """
+    --sort
+    """
 
     if params["parser_sort"] != "":
         inputparams = params["parser_sort"].split("/")
@@ -646,10 +816,24 @@ def decide():
             print("\n>> Error: use \"n\" after the slash to specify that it is numeric.\n")
         sys.exit()
 
-    #######################################################################
-    
-    #setup SUBSET for remaining functions if necessary
-    
+    ############
+    """
+    The remaining functions may all be passed with a query (--c/--q)
+    to either extract/plot specific particles, or write out a column.
+    """
+    ############
+
+    """
+    Create the subset of particles particles2use from allparticles
+    At the moment, checksubset() only takes in the particles and the queryexact variable,
+    while the column and queries are re-processed within checksubset(). This is inefficient
+    and should be revised.
+    checksubset() returns the original particles if no query exists, so sometimes particles2use
+    will be equivalent to allparticles
+    """
+
+    #Check if the --relegate option was passed and remove the _rlnOpticsGroup column first before
+    #generating a subset
     if relegateflag and not params["parser_optless"]:
         if "_rlnOpticsGroup" in allparticles.columns:
                 newparticles, metadata = columnplay.delcolumn(allparticles, ["_rlnOpticsGroup"], metadata)
@@ -661,6 +845,21 @@ def decide():
     else:      
         particles2use = particleplay.checksubset(allparticles, queryexact)
     
+    """
+    --extract_particles
+    """
+
+    if params["parser_extractparticles"]:
+        if params["parser_column"] == "" or params["parser_query"] == "":
+            print("\n>> Error: enter a column (--c) and query (--q) to extract.\n")
+            sys.exit()
+        fileparser.writestar(particles2use, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    """
+    --count_mics
+    """
+
     if params["parser_uniquemics"]:
         if not "_rlnMicrographName" in allparticles.columns:
             print("\n>> Error: _rlnMicroraphName does not exist in the star file.\n")
@@ -669,13 +868,10 @@ def decide():
         print("\n>> There are " + str(totalmics) + " unique micrographs in this dataset.\n")
         sys.exit()
 
-    if params["parser_extractparticles"]:
-        if params["parser_column"] == "" or params["parser_query"] == "":
-            print("\n>> Error: enter a column (--c) and query (--q) to extract.\n")
-            sys.exit()
-        fileparser.writestar(particles2use, metadata, params["parser_outname"], relegateflag)
-        sys.exit()
-        
+    """
+    --histogram
+    """
+
     if params["parser_plot"] != "":
         columntoplot = params["parser_plot"]
         if columntoplot not in particles2use:
@@ -688,6 +884,10 @@ def decide():
             sys.exit()
         sys.exit()
 
+    """
+    --plot_orientations
+    """
+
     if params["parser_plotangledist"]:
         if "_rlnAngleRot" not in particles2use or "_rlnAngleTilt" not in particles2use:
             print("\n>> Error: the column _rlnAngleRot or _rlnAngleTilt does not exist.\n")
@@ -695,6 +895,10 @@ def decide():
         print("\n>> Plotting the particle orientations based on the _rlnAngleRot and _rlnAngleTilt on a Mollweide projection.")
         plots.plotangledist(particles2use, outtype)
         sys.exit()
+
+    """
+    --list_column
+    """
         
     if params["parser_writecol"] != "": 
         colstowrite = params["parser_writecol"].split("/")
@@ -706,6 +910,10 @@ def decide():
         print("\n>> Wrote entries from " + str(colstowrite) + "\n-->> Output files: " + str(outputs) + " \n")
         sys.exit()
         
+    """
+    --regroup
+    """
+
     if params["parser_regroup"] != 0:
         numpergroup = params["parser_regroup"]
         regroupedparticles, numgroups = particleplay.regroup(particles2use, numpergroup)
@@ -713,9 +921,15 @@ def decide():
         fileparser.writestar(regroupedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    """
+    If --relegate is the only option that is passed, then the star file is written without the optics table
+    and without _rlnOpticsGroup (which was removed above already).
+    """
+
     #This has to be at the end so it only runs if it is the only passed argument.
     if relegateflag and not params["parser_optless"]:
         fileparser.writestar(particles2use, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    #The end.
     print("\n>> Error: either the options weren't passed correctly or none were passed at all. See the help page (-h).\n")

@@ -88,6 +88,12 @@ def extractparticles(particles, columns, query, queryexact):
 
 def checksubset(particles, queryexact):
     
+    """
+    Re-processing the columns/queries is inefficient since it was
+    already processed in decision tree. This also makes it so that
+    you can't use checksubset in scripts. Consider revising.
+    """
+
     params = argparser.argparse()
     if params["parser_column"] != "" and params["parser_query"] != "":
         query = params["parser_query"].split("/")

@@ -3,10 +3,15 @@ import sys
 import starparser
 
 def argparse():
+
+    """
+    optparse is used to initialize all command-line options.
+    """
     
     parser = optparse.OptionParser(usage="Usage: %prog --i starfile [options]",
         version=starparser.__version__)
 
+    #--in_parts, --in_mics, and --in_movies is included for Relion GUI implementation.
     parser.add_option("--i", "--in_parts", "--in_mics", "--in_movies",
         action="store", dest="file", default="", metavar='starfile',
         help="Name of the input star file.")
@@ -22,11 +27,11 @@ def argparse():
         action="store_true", dest="parser_extractparticles", default=False,
         help="Find particles that match a column header (--c) and query (--q) and write them to a new star file.")
 
-    info_opts.add_option("--limit_particles",
+    info_opts.add_option("--limit",
         action="store", dest="parser_limitparticles", type="string", default = "", metavar='column/comparator/value',
         help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
     
-    info_opts.add_option("--count_particles",
+    info_opts.add_option("--count",
         action="store_true", dest="parser_countme", default=False,
         help="Count particles and display the result. Optionally, use --c and --q to count a subset of particles, otherwise counts all.")
     
@@ -36,15 +41,15 @@ def argparse():
     
     info_opts.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
-        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
+        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To write multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
 
     info_opts.add_option("--find_shared",
         action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
-        help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.")
+        help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be written, one with the shared particles and one with the unique particles.")
 
     info_opts.add_option("--extract_if_nearby",
         action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
-        help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbor in the second star file closer than the distance provided here will be written to particles_close.star and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png.")
+        help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbor in the second star file closer than the distance provided here will be written to particles_close.star and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also write a histogram of nearest distances to Particles_distances.png.")
 
     info_opts.add_option("--extract_clusters",
         action="store", dest="parser_cluster", type="string", default="", metavar='threshold-distance/minimum-per-cluster',
@@ -72,7 +77,7 @@ def argparse():
 
     info_opts.add_option("--sort_by",
         action="store", dest="parser_sort", type="string", default="", metavar='column-name',
-        help="Sort the column in ascending order and output a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"_rlnClassNumber/n\"); otherwise, it will sort the values as text.")   
+        help="Sort the column in ascending order and write a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"_rlnClassNumber/n\"); otherwise, it will sort the values as text.")   
 
     parser.add_option_group(info_opts)
 
@@ -161,7 +166,7 @@ def argparse():
         help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
     
     plot_opts.add_option("--plot_class_iterations",
-        action="store", dest="parser_classdistribution", type="string", default="", metavar="classes",
+        action="store", dest="parser_classiterations", type="string", default="", metavar="classes",
         help="Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass \"all\" to plot all classes or separate the classes you want with a dash (e.g. 1/2/5). Use --t to change filetype.")
     
     plot_opts.add_option("--plot_class_proportions",
@@ -216,17 +221,25 @@ def argparse():
 
     parser.add_option_group(output_opts)
 
-    ########
+    """
+    The rest of the function parses the input and generates a dictionary for use in decisiontree.py
+    """
 
+    #Get the passed arguments from command-line
     options,args = parser.parse_args()
 
+    #If there are less than 4 arguments passed, there were no options passed.
     if len(sys.argv) < 4:
-            parser.print_help()
+            #parser.print_help()
+            print("\n>> You did not pass the arguments properly. For help, run \"starparser -h\".\n\n>> Usage: starparser --i file.star [options]\n")
             sys.exit()
 
+    #Initialize an empty dictionary to place all the parameters in
     params={}
 
+    #Place the passed parameters (or default values if none were passed) into the params dictionary
     for i in options.__dict__.items():
         params[i[0]] = i[1]
         
+    #The dictionary is the main input to decisiontree.py
     return(params)

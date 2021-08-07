@@ -29,7 +29,7 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 ## Command-line options<a name="cmdops"></a>
 
-**Usage:**
+### Usage
 
 ```
 starparser --i input.star [options]
@@ -267,9 +267,15 @@ particles, metadata = fileparser.getparticles("file.star")
 * The particles DataFrame can be manipulated with pandas functions (see the example below). However, here are some examples of starparser options that are also available to use:
 
 ```python
+from starparser import columnplay
 
 #Remove columns with delcolumn(particles,columns,metadata)
 new_particles, new_metadata = columnplay.delcolumn(particles, ["_rlnMicrographName", "_rlnOpticsGroup"], metadata)
+
+#Operate on a column with operate(particles, column, operator, value) where operator is one of "multiply", "divide", "add", or "subtracts"
+new_particles = columnplay.operate(particles, "_rlnHelicalTrackLength", "multiply", 0.25)
+
+from starparser import particleplay
 
 #Remove particles with delparticles(particles, columns, queries, queryexact)
 new_particles = particleplay.delparticles(particles, ["_rlnMicrographName"], ["0207"], False)
@@ -277,13 +283,8 @@ new_particles = particleplay.delparticles(particles, ["_rlnMicrographName"], ["0
 #Remove duplicates with delduplicates(particles, column)
 new_particles = particleplay.delduplicates(particles, "_rlnMicrographName")
 
-#Operate on a column with operate(particles, column, operator, value) where operator is one of "multiply", "divide", "add", or "subtracts"
-new_particles = columnplay.operate(particles, "_rlnHelicalTrackLength", "multiply", 0.25)
-
 #Limit values with limit(particles, column, limit, operator) where operator is one of "lt" (less than) or "gt" (greater than)
 new_particles = particleplay.limitparticles(particles, "_rlnDefocusU", 3000, "lt")
-
-
 ``` 
 
 * After manipulating the particles, you can write the star file:
@@ -292,7 +293,31 @@ new_particles = particleplay.limitparticles(particles, "_rlnDefocusU", 3000, "lt
 fileparser.writestar(new_particles, metadata, "output.star")
 ```
 
-* A simple example showing how to iterate through micrographs and keep only one of three particles of a helix.
+* An example showing how to iterate through particles in each micrograph
+
+```python
+from starparser import fileparser
+
+#import data to a pandas dataframe
+particles, metadata = fileparser.getparticles("particles.star")
+
+#group by micrographs
+micrographs = particles.groupby(["_rlnMicrographName"])
+
+keeplist = []
+
+#iterate through the micrographs
+for idm, micrograph in micrographs:
+
+    #iterate through the particles
+    for idp, particle in micrograph.iterrows():
+
+        #access specific values with particle["_rlnColumnName"]
+
+        ...
+```
+
+* An example showing how to keep only one of three particles of a helix
 
 ```python
 from starparser import fileparser

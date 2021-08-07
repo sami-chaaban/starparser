@@ -15,11 +15,11 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 * Set up a fresh conda environment with Python >= 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
 
-* Install starparser: `pip install starparser`
+* Install starparser: **`pip install starparser`**
 
 ## Important notes<a name="notes"></a>
 
-* Your input file needs to be a standard **Relion** *.star* file with an optics table, followed by another data table (e.g. particle table), followed by a list with tab-delimited columns (i.e. it does not work on *\*\_model.star* files). Typical files include *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc.
+* Your input file needs to be a standard **Relion** *.star* file. Typical files include *particles.star*, *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. For example, it does not work on *\*\_model.star* files.
 
 * If the star file lacks an optics table, such as those from Relion 3.0, just add the ```--opticsless``` option to parse it.
 
@@ -49,7 +49,7 @@ Name of a second star file, if necessary.
 
 **```--extract```**
 
-Find particles that match a column header (```--c```) and query (```--q```) and write them to a new star file (default output.star, or specified with ```--o```).
+Find particles that match a column header (```--c```) and query (```--q```) (see the [*Querying*](#query) options) and write them to a new star file (default output.star, or specified with ```--o```).
 
 **```--limit```** *```column/comparator/value```*
 
@@ -57,15 +57,15 @@ Extract particles that match a specific operator (*lt* for less than, *gt* for g
 
 **```--count```**
 
-Count particles and display the result. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
+Count particles and display the result. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the [*Querying*](#query) options), otherwise counts all.
 
 **```--count_mics```**
 
-Count the number of unique micrographs. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the *Querying* options), otherwise counts all.
+Count the number of unique micrographs. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the [*Querying*](#query) options), otherwise counts all.
 
 **```--list_column```** *```column-name(s)```*
 
-Write all values of a column to a file. For example, passing *\_rlnMicrographName* will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *\_rlnMicrographName/\_rlnCoordinateX* outputs MicrographName.txt and CoordinateX.txt). Optionally, this can be used with ```--c``` and ```--q``` to only consider values that match the query (see the *Querying* options), otherwise it lists all values.
+Write all values of a column to a file. For example, passing *\_rlnMicrographName* will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *\_rlnMicrographName/\_rlnCoordinateX* outputs MicrographName.txt and CoordinateX.txt). Optionally, this can be used with ```--c``` and ```--q``` to only consider values that match the query (see the [*Querying*](#query) options), otherwise it lists all values.
 
 **```--find_shared```** *```column-name```*
 
@@ -73,7 +73,7 @@ Find particles that are shared between the input star file and the one provided 
 
 **```--extract_if_nearby```** *```distance```*
 
-For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbor closer than the distance (in pixels) provided here will be written to particles_close.star, and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the *Output* options).
+For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbor closer than the distance (in pixels) provided here will be written to particles_close.star, and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the [*Output*](#output) options).
 
 **```--extract_clusters```** *```threshold-distance/minimum-number```*
 
@@ -85,7 +85,7 @@ Extract particles with indices that match a list in a second file (specified by 
 
 **```--extract_random```** *```number-of-particles```*
 
-Get a random set of particles totaling the number provided here. Optionally, use ```--c``` and ```--q``` to extract a random set of each passed query in the specified column (see the *Querying* options); in this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be written to output.star (or specified with ```--o```).
+Get a random set of particles totaling the number provided here. Optionally, use ```--c``` and ```--q``` to extract a random set of each passed query in the specified column (see the [*Querying*](#query) options); in this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be written to output.star (or specified with ```--o```).
 
 **```--split```** *```number-of-files```*
 
@@ -119,7 +119,7 @@ Remove column, renumber headers, and write to a new star file (default output.st
 
 **```--remove_particles```**
 
-Remove particles that match a query (specified with ```--q```) within a column header (specified with ```--c```; see the *Querying* options), and write to a new star file (default output.star, or specified with ```--o```).
+Remove particles that match a query (specified with ```--q```) within a column header (specified with ```--c```; see the [*Querying*](#query) options), and write to a new star file (default output.star, or specified with ```--o```).
 
 **```--remove_duplicates```** *```column-name```*
 
@@ -167,7 +167,7 @@ Regroup particles such that those with similar defocus values are in the same gr
 
 **```--new_optics```** *```optics-group-name```*
 
-Provide a new optics group name. Use ```--c``` and ```--q``` to specify which particles belong to this optics group (see the *Querying* options). The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
+Provide a new optics group name. Use ```--c``` and ```--q``` to specify which particles belong to this optics group (see the [*Querying*](#query) options). The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 **```--relegate```**
 
@@ -177,25 +177,25 @@ Remove optics table and optics column and write to a new star file (default outp
 
 **```--histogram```** *```column-name```*
 
-Plot values of a column as a histogram. Optionally, use ```--c``` and ```--q``` to only plot a subset of particles (see the *Querying* options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the *Output* options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
+Plot values of a column as a histogram. Optionally, use ```--c``` and ```--q``` to only plot a subset of particles (see the [*Querying*](#query) options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the [*Output*](#output) options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
 
 **```--plot_orientations```**
 
-Plot the particle orientations based on the *\_rlnAngleRot* and *\_rlnAngleTilt* columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change filetype (see the *Output* options).
+Plot the particle orientations based on the *\_rlnAngleRot* and *\_rlnAngleTilt* columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change filetype (see the [*Output*](#output) options).
 
 **```--plot_class_iterations```** *```classes```*
 
-Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass "all" to plot all classes, or separate the classes that you want with a slash (e.g. *1/2/5*). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the *Output* options).
+Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass "all" to plot all classes, or separate the classes that you want with a slash (e.g. *1/2/5*). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the [*Output*](#output) options).
 
 **```--plot_class_proportions```**
 
-Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (See the *Querying* options). It will display the proportions in percentages and plot the result to Class_proportion.png. Use ```--t``` to change filetype (see the *Output* options).
+Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (see the [*Querying*](#query) options). It will display the proportions in percentages and plot the result to Class_proportion.png. Use ```--t``` to change filetype (see the [*Output*](#output) options).
 
 **```--plot_coordinates```** *```number-of-micrographs```*
 
  Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Make sure you are running it in the Relion directory so that the micrograph .mrc files can be properly sourced (or change the *\_rlnMicrographName* column to absolute paths). Use ```--f``` to overlay the coordinates of a second star file (larger blue circles); in this case, the micrograph names should match between the two star files. Optionally, pass the desired size of the circle after a slash (e.g. *1/250* for 1 micrograph and a circle size of 250 pixels). The plots are written to Coordinates.pdf.
 
-### Querying
+### Querying<a name="query"></a>
 
 **```--c```** *```column-name(s)```*
 
@@ -215,7 +215,7 @@ Pass this if you want an exact match of the values to the query(ies) provided by
 
 Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--plot_class_proportions``` or commands that require parsing a second file.
 
-### Output
+### Output<a name="output"></a>
 
 **```--o```** *```filename```*
 
@@ -289,7 +289,7 @@ new_particles = particleplay.limitparticles(particles, "_rlnDefocusU", 3000, "lt
 * After manipulating the particles, you can write the star file:
 
 ```python
-fileparser.writestar(newparticles, metadata, "output.star")
+fileparser.writestar(new_particles, metadata, "output.star")
 ```
 
 * A simple example showing how to iterate through micrographs and keep only one of three particles of a helix.

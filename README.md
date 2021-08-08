@@ -32,20 +32,22 @@ Use this package to manipulate Relion star files, including counting, modifying,
 ### Usage
 
 ```
-starparser --i input.star [options]
+starparser [input] [options]
 ```
+
+Typically, you just need to pass the star file ```starparser --i input.star``` followed by the desired option and its arguments (e.g. ```--count```). For some options, a second star file can also be passed as input ```--f secondfile.star```. The available options are organized by [Data Mining](#mining), [Modification](#modify), and [Plotting](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below.
 
 ### Input
 
 **```--i```** *```filename```*
 
-Name of the input star file.
+Path to the star file. This is a required input.
 
 **```--f```** *```filename```*
 
-Name of a second star file, if necessary.
+Path to a second file, if necessary.
 
-### Data mining
+### Data mining options<a name="mining"></a>
 
 **```--extract```** *`--c column --q query (--e)`*
 
@@ -103,7 +105,7 @@ Split the input star file into independent star files for each optics group. The
 
 Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. *\_rlnClassNumber/n*); otherwise, it will sort the values as text. 
 
-### Modifying
+### Modification options<a name="modify"></a>
 
 **```--operate```** *```column-name[operator]value```*
 
@@ -173,7 +175,7 @@ Provide a new optics group name. Use ```--c``` and ```--q``` to specify which pa
 
 Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--remove_column``` to remove other bad columns (e.g. helix-specific columns). Note that to use starparser on Relion 3.0 star files, you need to pass the ```--opticsless``` option.
 
-### Plotting
+### Plotting options<a name="plot"></a>
 
 **```--histogram```** *```column-name```* *`(--c column --q query (--e))`*
 

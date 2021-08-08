@@ -2,14 +2,17 @@ import sys
 import pandas as pd
 from starparser import argparser
 
+"""
+--limit
+"""
 def limitparticles(particles, column, limit, operator):
     
     tempcolumnname = column + "_float"
     particles[tempcolumnname] = particles[column]
     try:
         particles[tempcolumnname] = pd.to_numeric(particles[tempcolumnname], downcast="float")
-    except:
-        print("\n>> Error: could not convert the values in this column to numbers.\n")
+    except ValueError:
+        print("\n>> Error: this column doesn't seem to contain numbers.\n")
         sys.exit()
     limitedparticles = particles.copy()
 
@@ -17,19 +20,23 @@ def limitparticles(particles, column, limit, operator):
         limitedparticles = limitedparticles[limitedparticles[tempcolumnname]<limit]
     elif operator == "gt":
         limitedparticles = limitedparticles[limitedparticles[tempcolumnname]>limit]
-    
+    elif operator == "ge":
+        limitedparticles = limitedparticles[limitedparticles[tempcolumnname]>=limit]
+    elif operator == "le":
+        limitedparticles = limitedparticles[limitedparticles[tempcolumnname]<=limit]
+
     particles.drop(tempcolumnname,1, inplace=True)
     limitedparticles.drop(tempcolumnname,1, inplace=True)
 
     if len(limitedparticles.index) == 0:
-        if operator == "lt":
-                print("\n>> Error: there are no particles that match this criterion: " + column + " less than " + str(limit) + ".\n")
-        if operator == "gt":
-                print("\n>> Error: there are no particles that match this criterion: " + column + " greater than " + str(limit) + ".\n")
+        print("\n>> Error: there are no particles that match the criterion.\n")
         sys.exit()
     
     return(limitedparticles)
 
+"""
+--remove_particles
+"""
 def delparticles(particles, columns, query, queryexact):
     
     purgedparticles = particles.copy()
@@ -38,9 +45,15 @@ def delparticles(particles, columns, query, queryexact):
         print("\n>> Error: you have specified two columns. You can't if you're querying to delete.\n")
         sys.exit()
 
-    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact:
+    itisnumeric = True
+    try:
+        pd.to_numeric(particles[columns[0]], downcast="float")
+    except ValueError:
+        itisnumeric = False
+
+    if not queryexact and itisnumeric:
         print("\n----------------------------------------------------------------------")        
-        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (--e). Make sure that this is the behavior you intended.\n")
+        print("\n>> Warning: it looks like this column has numbers but you haven't specified the exact option (--e).\n   Make sure that this is the behavior you intended.\n")
         print("----------------------------------------------------------------------")
 
     if not queryexact:
@@ -52,26 +65,42 @@ def delparticles(particles, columns, query, queryexact):
     
     return(purgedparticles)
 
+"""
+--remove_duplicates
+"""
 def delduplicates(particles, column):
 
     return(particles.drop_duplicates(subset=[column]))
 
+"""
+--remove_mics_fromlist
+"""
 def delmics(particles, micstodelete):
     purgedparticles = particles.copy()
     m = "|".join(micstodelete)
     purgedparticles.drop(purgedparticles[purgedparticles["_rlnMicrographName"].str.contains(m)].index , 0,inplace=True)    
     return(purgedparticles)
 
+"""
+--extract
+"""
 def extractparticles(particles, columns, query, queryexact):
     
     if len(columns)>1:
         print("\n>> Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
 
+    itisnumeric = True
+    try:
+        pd.to_numeric(particles[columns[0]], downcast="float")
+    except ValueError:
+        itisnumeric = False
+
     params = argparser.argparse()
-    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup"] and not queryexact and not params["parser_splitoptics"] and not params["parser_classproportion"]:
+
+    if not queryexact and itisnumeric and not params["parser_splitoptics"] and not params["parser_classproportion"]:
         print("\n----------------------------------------------------------------------")        
-        print("\n>> Warning: it looks like this column has integers but you haven't specified the exact option (--e). Make sure that this is the behavior you intended.\n")
+        print("\n>> Warning: it looks like this column has numbers but you haven't specified the exact option (--e).\n   Make sure that this is the behavior you intended.\n")
         print("----------------------------------------------------------------------")
 
     if not queryexact:
@@ -117,9 +146,15 @@ def countqueryparticles(particles,columns,query,queryexact,quiet):
         print("\n>> Error: you have specified two different columns.\n")
         sys.exit()
 
-    if columns[0] in ["_rlnClassNumber", "_rlnGroupNumber", "_rlnNrOfSignificantSamples", "_rlnOpticsGroup", "_rlnHelicalTubeID"] and not queryexact:
+    itisnumeric = True
+    try:
+        pd.to_numeric(particles[columns[0]], downcast="float")
+    except ValueError:
+        itisnumeric = False
+
+    if not queryexact and itisnumeric:
         print("\n----------------------------------------------------------------------")        
-        print("\n>> Warning: it looks like this column has integers but you haven't specified the \"exact\" option (--e, see documentation). Make sure that this is the behavior you intended.\n")
+        print("\n>> Warning: it looks like this column has numbers but you haven't specified the \"exact\" option (--e, see documentation).\n   Make sure that this is the behavior you intended.\n")
         print("----------------------------------------------------------------------")
 
     if not queryexact:
@@ -135,7 +170,10 @@ def countqueryparticles(particles,columns,query,queryexact,quiet):
         print('\n>> There are ' + str(totalquery) + ' particles that match ' + str(query) + ' in the specified columns (out of ' + str(totalparticles) + ', or ' + str(percentparticles) + '%).\n')
 
     return(totalquery)
-  
+
+"""
+--regroup
+"""
 def regroup(particles, numpergroup):
     
     newgroups = []
@@ -162,7 +200,10 @@ def regroup(particles, numpergroup):
     regroupedparticles = regroupedparticles[particles.columns]
 
     return(regroupedparticles, roundtotal)
-    
+
+"""
+--new_optics (also see setparticeoptics())
+"""
 def makeopticsgroup(particles,metadata,newgroup):
     
     optics = metadata[2]
@@ -176,7 +217,10 @@ def makeopticsgroup(particles,metadata,newgroup):
     newoptics.loc[len(newoptics.index)-1]["_rlnOpticsGroup"] = opticsnumber
     
     return(newoptics, opticsnumber)
-    
+
+"""
+--new_optics (also see makeopticsgroup())
+"""
 def setparticleoptics(particles,column,query,queryexact,opticsnumber):
     
     particlesnewoptics = particles.copy()
@@ -192,6 +236,9 @@ def setparticleoptics(particles,column,query,queryexact,opticsnumber):
         
     return(particlesnewoptics, numchanged)
 
+"""
+--import_particle_values
+"""
 def importpartvalues(original_particles, importfrom_particles, columnstoswap):
 
     importedparticles = original_particles.copy()

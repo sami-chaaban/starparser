@@ -15,7 +15,8 @@ def decide():
 
     ##################################
     """
-    This function is used to determine what the user is asking for from the command-line options and fulfilling it,
+    This is the master function that is used to determine what the user is asking for from the command-line arguments,
+    and set up the variables required to call those functions
     """
     ##################################
 
@@ -76,7 +77,7 @@ def decide():
 
     ##################################
     """
-    From here on out, the passed parameters
+    From here on out, the passed arguments
     are checked and the proper functions are called.
     """
     ##################################
@@ -153,7 +154,7 @@ def decide():
 
     ##################################
     """
-    Below is a flurry of functions in no particular order
+    Below is a flurry of functions, in no particular order
     """
     ##################################
 
@@ -188,7 +189,7 @@ def decide():
             print("\n>> Error: provide a column (--c) and query (--q) to find specific particles to remove.\n")
             sys.exit()
         newparticles = particleplay.delparticles(allparticles, columns, query, queryexact)
-        purgednumber = len(allparticles.index) - len(newparticles.index)
+        purgednumber = totalparticles - len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched " + str(query) + " in the column " + params["parser_column"] + ".")
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
@@ -203,7 +204,7 @@ def decide():
             print("\n>> Error: the column " + str(column) + " does not exist in your star file.\n")
             sys.exit()
         newparticles = particleplay.delduplicates(allparticles, column)
-        purgednumber = len(allparticles.index) - len(newparticles.index)
+        purgednumber = totalparticles - len(newparticles.index)
         newtotal = len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that were duplicates based on the " + column + " column.")
         print(">> The new total is " + str(newtotal) + " particles.")
@@ -228,7 +229,7 @@ def decide():
         with open(file2) as f:
             micstodelete = [line.split()[0] for line in f]
         newparticles = particleplay.delmics(allparticles,micstodelete)
-        purgednumber = len(allparticles.index) - len(newparticles.index)
+        purgednumber = totalparticles - len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched the micrographs in " + file2 + ".")
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
@@ -330,6 +331,7 @@ def decide():
         importedparticles = particleplay.importpartvalues(allparticles, otherparticles, columnstoimport)
 
         fileparser.writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
+
         sys.exit()
 
     """
@@ -359,13 +361,15 @@ def decide():
             value = float(value)
         except ValueError:
             print("\n>> Error: Could not interpret \"" + value + "\" as numeric.\n")
-            sys.exit()      
+            sys.exit()
         if column not in allparticles:
             print("\n>> Error: Could not find the column " + column + " in the star file.\n")
-            sys.exit()  
+            sys.exit()
 
         operatedparticles = columnplay.operate(allparticles,column,operator,value)
+
         fileparser.writestar(operatedparticles, metadata, params["parser_outname"], relegateflag)
+
         sys.exit()
 
     """
@@ -373,6 +377,7 @@ def decide():
     """
 
     if params["parser_operatecolumns"] != "":
+
         if len(params["parser_operatecolumns"].split("*")) == 2:
             arguments = params["parser_operatecolumns"].split("*")
             operator = "multiply"
@@ -388,9 +393,11 @@ def decide():
         else:
             print("\n>> Error: the argument to pass is column1[operator]column2=newcolumn (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted).\n")
             sys.exit()
+
         column1, secondhalf = arguments
         column2 = secondhalf.split("=")[0]
-        newcolumn = secondhalf.split("=")[1] 
+        newcolumn = secondhalf.split("=")[1]
+
         if column1 not in allparticles:
             print("\n>> Error: Could not find the column " + column1 + " in the star file.\n")
             sys.exit()
@@ -400,8 +407,11 @@ def decide():
         elif newcolumn in allparticles:
             print("\n>> Error: The column " + newcolumn + " already exists in the star file.\n")
             sys.exit()
+
         operatedparticles, newmetadata = columnplay.operatecolumns(allparticles,column1,column2,newcolumn,operator,metadata)
+
         fileparser.writestar(operatedparticles, newmetadata, params["parser_outname"], relegateflag)
+
         sys.exit()
 
     """
@@ -531,6 +541,9 @@ def decide():
         plots.classproportion(allparticles, columns, query, queryexact, outtype)
         sys.exit()
         
+    """
+    --new_optics
+    """
     if params["parser_newoptics"] !="":
         newgroup = params["parser_newoptics"]
         newoptics, opticsnumber = particleplay.makeopticsgroup(allparticles,metadata,newgroup)
@@ -549,20 +562,24 @@ def decide():
 
     if params["parser_limitparticles"] != "":
         parsedinput = params["parser_limitparticles"].split("/")
-        if len(parsedinput) > 3:
-            print("\n>> Error: provide argument in this format: column/operator/value (e.g. _rlnDefocusU/lt/40000).")
+        if len(parsedinput) != 3:
+            print("\n>> Error: provide argument in this format: column/operator/value (e.g. _rlnDefocusU/lt/40000).\n")
             sys.exit()
         columntocheck = parsedinput[0]
         operator = parsedinput[1]
         limit = float(parsedinput[2])
-        if operator not in ["lt", "gt"]:
-            print("\n>> Error: use \"lt\" or \"gt\" as the operator for less than and greater than, respectively.")
+        if operator not in ["lt", "gt", "le", "ge"]:
+            print("\n>> Error: use \"lt\" (less than), \"gt\" (greater than), \"le\" (less than or equal to), or \"ge\" (greater than or equal to) as the operator.\n")
             sys.exit()
         limitedparticles = particleplay.limitparticles(allparticles, columntocheck, limit, operator)
         if operator == "lt":
             print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values less than " + str(limit))
         elif operator == "gt":
             print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values greater than " + str(limit))
+        elif operator == "le":
+            print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values less than or equal to " + str(limit))
+        elif operator == "ge":
+            print("\n>> Extracted " + str(len(limitedparticles.index)) + " particles (out of " + str(totalparticles) + ", " + str(round(len(limitedparticles.index)*100/totalparticles,1)) + "%) that have " + str(columntocheck) + " values greater than or equal to " + str(limit))
         fileparser.writestar(limitedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
@@ -574,8 +591,8 @@ def decide():
         numrandom = params["parser_randomset"]
         if numrandom == 0:
             print("\n>> Error: you cannot pass 0 particles.\n")
-        if numrandom > len(allparticles.index):
-            print("\n>> Error: the number of particles you want to randomly extract cannot be greater than the total number of particles (" + str(len(allparticles.index)) + ").\n")
+        if numrandom > totalparticles:
+            print("\n>> Error: the number of particles you want to randomly extract cannot be greater than the total number of particles (" + str(totalparticles) + ").\n")
         if params["parser_column"] == "" and params["parser_query"] == "":
             print("\n>> Creating a random set of " + str(numrandom) + " particles.")
             fileparser.writestar(allparticles.sample(n = numrandom), metadata, params["parser_outname"], relegateflag)
@@ -602,7 +619,7 @@ def decide():
         if numsplits == 1:
             print("\n>> Error: you cannot split into 1 part.\n")
             sys.exit()
-        if numsplits > len(allparticles.index):
+        if numsplits > totalparticles:
             print("\n>> Error: you cannot split into more parts than there are particles.\n")
             sys.exit()
         splitstars = splits.splitparts(allparticles,numsplits)
@@ -642,10 +659,10 @@ def decide():
         with open(params["parser_file2"]) as f:
             indicestoget = [line.split()[0] for line in f]
         indicestoget = [(int(i)-1) for i in indicestoget]
-        if max(indicestoget)+1 > len(allparticles.index):
-            print("\n>> Error: the index " + str(max(indicestoget)+1) + " is out of bounds (the last index in your star file is " + str(len(allparticles.index)) + ").\n")
+        if max(indicestoget)+1 > totalparticles:
+            print("\n>> Error: the index " + str(max(indicestoget)+1) + " is out of bounds (the last index in your star file is " + str(totalparticles) + ").\n")
             sys.exit()
-        print("\n>> Extracting " + str(len(indicestoget)) + " particles (" + str(round(100*len(indicestoget)/len(allparticles.index),1)) + "%) that match the indices.")
+        print("\n>> Extracting " + str(len(indicestoget)) + " particles (" + str(round(100*len(indicestoget)/totalparticles,1)) + "%) that match the indices.")
         fileparser.writestar(allparticles.iloc[indicestoget], metadata, params["parser_outname"], relegateflag)
         sys.exit()   
 
@@ -664,8 +681,8 @@ def decide():
         newcolfile = params["parser_file2"]
         with open(newcolfile) as f:
             newcolvalues = [line.split()[0] for line in f]
-        if len(newcolvalues) != len(allparticles.index):
-            print("\n>> Error: your star file has " + str(len(allparticles.index)) + " values while your second file has " + str(len(newcolvalues)) + " values.\n")
+        if len(newcolvalues) != totalparticles:
+            print("\n>> Error: your star file has " + str(totalparticles) + " values while your second file has " + str(len(newcolvalues)) + " values.\n")
             sys.exit()
         print("\n>> Creating the column " + insertcol + " with the values in " + newcolfile + ".")
         allparticles[insertcol]=newcolvalues
@@ -695,9 +712,11 @@ def decide():
         if numtoplot == 0:
             print("\n>> Error: provide a number of micrographs to plot or pass \"all\" to plot all micrographs.\n")
             sys.exit()
+
         if len(currentparams) > 1:
             circlesize = float(currentparams[1])
         else:
+            #This is arbitrary
             circlesize = 80
 
         if not file2particles.empty:
@@ -729,8 +748,8 @@ def decide():
         newcolfile = params["parser_file2"]
         with open(newcolfile) as f:
             newcol = [line.split()[0] for line in f]
-        if len(newcol) != len(allparticles.index):
-            print("\n>> Error: your star file has " + str(len(allparticles.index)) + " values while your second file has " + str(len(newcol)) + " values.\n")
+        if len(newcol) != totalparticles:
+            print("\n>> Error: your star file has " + str(totalparticles) + " values while your second file has " + str(len(newcol)) + " values.\n")
             sys.exit()
         print("\n>> Replacing values in the column " + replacecol + " with those in " + newcolfile + ".")
         replacedstar = columnplay.replacecolumn(allparticles,replacecol,newcol)
@@ -783,26 +802,29 @@ def decide():
         if sortcol not in allparticles.columns:
             print("\n>> Error: the column " + str(sortcol) + " does not exist in your star file.\n")
             sys.exit()
+
         if len(inputparams) == 1:
             try:
                 pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
                 print("\n----------------------------------------------------------------------")        
-                print("\n>> Warning: it looks like this column is numeric but you haven't specified so. Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
+                print("\n>> Warning: it looks like this column is numeric but you haven't specified so.\n   Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
                 print("----------------------------------------------------------------------")
             except ValueError:
                 pass
             print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains text.")
             fileparser.writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
+
         elif inputparams[1] == "s":
             try:
                 pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
                 print("\n----------------------------------------------------------------------")        
-                print("\n>> Warning: it looks like this column is numeric but you haven't specified so. Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
+                print("\n>> Warning: it looks like this column is numeric but you haven't specified so.\n   Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
                 print("----------------------------------------------------------------------")
             except ValueError:
                 pass
             print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains text.")
             fileparser.writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
+
         elif inputparams[1] == "n":
             try:
                 pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
@@ -812,8 +834,10 @@ def decide():
             allparticles[sortcol] = allparticles[sortcol].apply(pd.to_numeric)
             print("\n>> Sorted particles by the column " + sortcol + " assuming the column contains numeric values.")
             fileparser.writestar(allparticles.sort_values(by=sortcol), metadata, params["parser_outname"], relegateflag)
+
         else:
-            print("\n>> Error: use \"n\" after the slash to specify that it is numeric.\n")
+            print("\n>> Error: type \"n\" after the slash to specify that it is numeric.\n")
+
         sys.exit()
 
     ############

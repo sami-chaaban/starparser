@@ -29,7 +29,7 @@ def argparse():
 
     info_opts.add_option("--limit",
         action="store", dest="parser_limitparticles", type="string", default = "", metavar='column/comparator/value',
-        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
+        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than, \"le\" for less than or equal to, \"ge\" for greater than or equal to). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
     
     info_opts.add_option("--count",
         action="store_true", dest="parser_countme", default=False,
@@ -231,7 +231,8 @@ def argparse():
     #If there are less than 4 arguments passed, there were no options passed.
     if len(sys.argv) < 4:
             #parser.print_help()
-            print("\n>> You did not pass the arguments properly. For help, run \"starparser -h\".\n\n>> Usage: starparser --i file.star [options]\n")
+            #print("\n>> You did not pass the arguments properly. For help, run \"starparser -h\".")
+            print("\n>> Usage: starparser --i file.star [options]\n\n>> Help: starparser -h\n")
             sys.exit()
 
     #Initialize an empty dictionary to place all the parameters in

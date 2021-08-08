@@ -53,7 +53,7 @@ Find particles that match a column header (```--c```) and query (```--q```) (see
 
 **```--limit```** *```column/comparator/value```*
 
-Extract particles that match a specific operator (*lt* for less than, *gt* for greater than). The argument to pass is "column/comparator/value" (e.g. *\_rlnDefocusU/lt/40000* for defocus values less than 40000).
+Extract particles that match a specific operator (*lt* for less than, *gt* for greater than, *le* for less than or equal to, *ge* for greater than or equal to). The argument to pass is "column/comparator/value" (e.g. *\_rlnDefocusU/lt/40000* for defocus values less than 40000).
 
 **```--count```**
 
@@ -272,7 +272,7 @@ from starparser import columnplay
 #Remove columns with delcolumn(particles,columns,metadata)
 new_particles, new_metadata = columnplay.delcolumn(particles, ["_rlnMicrographName", "_rlnOpticsGroup"], metadata)
 
-#Operate on a column with operate(particles, column, operator, value) where operator is one of "multiply", "divide", "add", or "subtracts"
+#Operate on a column with operate(particles, column, operator, value) where operator is one of "multiply", "divide", "add", or "subtract"
 new_particles = columnplay.operate(particles, "_rlnHelicalTrackLength", "multiply", 0.25)
 
 from starparser import particleplay
@@ -283,7 +283,7 @@ new_particles = particleplay.delparticles(particles, ["_rlnMicrographName"], ["0
 #Remove duplicates with delduplicates(particles, column)
 new_particles = particleplay.delduplicates(particles, "_rlnMicrographName")
 
-#Limit values with limit(particles, column, limit, operator) where operator is one of "lt" (less than) or "gt" (greater than)
+#Limit values with limit(particles, column, limit, operator)
 new_particles = particleplay.limitparticles(particles, "_rlnDefocusU", 3000, "lt")
 ``` 
 
@@ -309,7 +309,7 @@ keeplist = []
 #iterate through the micrographs
 for idm, micrograph in micrographs:
 
-    #iterate through the particles
+    #iterate through the particles in the current micrograph
     for idp, particle in micrograph.iterrows():
 
         #access specific values with particle["_rlnColumnName"]
@@ -339,13 +339,13 @@ for idm, micrograph in micrographs:
     #iterate through the helices for this micrograph
     for idh, helix in helices:
         
-        #get the indices for the particles
+        #get the indices for the particles of the current helix and turn it into a list
         indices = helix.index.tolist()
         
-        #get the indices for one of every three particles in the helix
+        #get the indices for one of every three particles of that helix and store it in keeplist
         keeplist.append(indices[::3])
     
-#flatten the list; this is now the list of particles to keep
+#flatten the aggregate list; this is now the list of particle indices to keep
 keeplist = [item for sublist in keeplist for item in sublist]
     
 #write out a star file only containing those particles to keep

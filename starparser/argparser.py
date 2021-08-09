@@ -14,11 +14,11 @@ def argparse():
     #--in_parts, --in_mics, and --in_movies is included for Relion GUI implementation.
     parser.add_option("--i", "--in_parts", "--in_mics", "--in_movies",
         action="store", dest="file", default="", metavar='starfile',
-        help="Name of the input star file.")
+        help="Path to the star file. This is a required input.")
 
     parser.add_option("--f",
         action="store", dest="parser_file2", default="", metavar='other-starfile',
-        help="Name of a second star file, if necessary.")
+        help="Path to a second file, if necessary.")
 
     info_opts = optparse.OptionGroup(
         parser, 'Data Mining Options')
@@ -29,7 +29,7 @@ def argparse():
 
     info_opts.add_option("--limit",
         action="store", dest="parser_limitparticles", type="string", default = "", metavar='column/comparator/value',
-        help="Extract particles that match a specific operator (\"lt\" for less than, \"gt\" for greater than, \"le\" for less than or equal to, \"ge\" for greater than or equal to). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
+        help="Extract particles that match a specific comparison (\"lt\" for less than, \"gt\" for greater than, \"le\" for less than or equal to, \"ge\" for greater than or equal to). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
     
     info_opts.add_option("--count",
         action="store_true", dest="parser_countme", default=False,

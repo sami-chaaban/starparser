@@ -61,11 +61,11 @@ Extract particles that match a specific comparison (*lt* for less than, *gt* for
 
 **```--count```** *`(--c column --q query (--e))`*
 
-Count particles and display the result. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the [*Querying*](#query) options), otherwise counts all.
+Count the number of particles and display the result. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the [*Querying*](#query) options), otherwise counts all.
 
 **```--count_mics```** *`(--c column --q query (--e))`*
 
-Count the number of unique micrographs. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the [*Querying*](#query) options), otherwise counts all.
+Count the number of unique micrographs and display the result. Optionally, this can be used with ```--c``` and ```--q``` to only count a subset of particles that match the query (see the [*Querying*](#query) options), otherwise counts all.
 
 **```--list_column```** *```column-name(s)```* *`(--c column --q query (--e))`*
 
@@ -207,7 +207,7 @@ Column query term(s). E.g. *\_rlnMicrographName*. This is used to look for a spe
 
 **```--q```** *```query(ies)```*
 
-Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use ```--e``` if the query(ies) should exactly match the values in the column.
+Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash (e.g. 20200101/20200203 to request matching either of the two queries). Use ```--e``` if the query(ies) should exactly match the values in the column.
 
 **```--e```**
 
@@ -292,12 +292,12 @@ limit_particles = particleplay.limitparticles(particles, "_rlnDefocusU", 30000, 
 
 from starparser import specialparticles
 
-#Find particles that near those in another star file with findnearby(particles, otherparticles, threshold)
+#Keep particles that have a nearest neighbor in another star file within a threshold with findnearby(particles, otherparticles, threshold)
 otherparticles, metadata2 = fileparser.getparticles("dataset2/particles.star")
 far_particles, close_particles, distances = specialparticles.findnearby(particles, otherparticles, 600)
 
 #Extract particles that have a minimum number of neighbors within a radius with getcluster(particles, threshold, minimum)
-clusterparticles = specialparticles.findnearby(particles, 250, 4)
+clusterparticles = specialparticles.getcluster(particles, 250, 4)
 ``` 
 
 * After manipulating the particles, you can write the star file:
@@ -591,6 +591,20 @@ starparser --i run_data1.star --find_shared _rlnMicrographName --f run_data2.sta
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2.star (unique.star) and only the particles that are shared between them (shared.star) based on the \_rlnMicrographName column.
+
+---
+
+**Extract particles that have a nearest neighbor in a second star file closer than a threshold distance**
+
+```
+starparser --i particles1.star --f particles2.star --extract_if_nearby 650
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named particles_close.star and particles_far.star that will have particles that have a nearest neighbor closer than 650 pixels or not, respectively.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Particle_distances.png**:
+
+![Particle distances](https://github.com/sami-chaaban/StarParser/blob/main/Images/Particle_distances.png?raw=true "Particle distances")
 
 ---
 

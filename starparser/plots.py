@@ -130,6 +130,7 @@ def plotclassparts(filename, classes, queryexact, outtype):
     #Plot the classes. If classes contained -1, then the user wanted all classes plotted,
     #otherise, just plot the ones that were requested
     for c in range(numclasses):
+        #range starts at 0, so the class number is c+1
         classinquestion = c+1
         if -1 in classes:
             ax = numperclassdf.iloc[c].plot(kind='line', legend = True, linewidth = 2, alpha = 0.7)
@@ -150,6 +151,7 @@ def plotclassparts(filename, classes, queryexact, outtype):
 This is a helper function for plotclassparts() to generate a list of file names
 for all iterations up to the one that was passed. This is an overly complicated
 way to do this but works well. Consider simplifying.
+e.g. it returns ['run_it002_data.star', 'run_it003_data.star', etc.]
 """
 def getiterationlist(filename):
     
@@ -248,15 +250,23 @@ def plotangledist(particles, outtype):
     ax = plt.subplot(111, projection="mollweide")
 
     """
+    For star files with more than 200,000 particles, the size if the plotted scatter point
+    should be 0.1, but that gets to be too small for fewer particles. This equation increases
+    the size so that particles in the tens of thousands can still look decent in the plot
+    """
+    spotsize = -0.000006*len(particles.index)+1.4
+    if spotsize < 0.1:
+        spotsize = 0.1
+
+    """
     In some cases, an invalid value error is thrown while calculating arcsin for the projection in scatter().
     warnings.catch_warnings allows us to ignore it to keep the terminal output clean.
     """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        #The plot was already defined as a mollweide projection above.
-        #Consider making the size dependent on the number of particles.
-        ax.scatter(rot_rad, tilt_m90_rad, cmap="Blues", c=m, s=3, alpha=0.1)
+        #Plot!
+        ax.scatter(rot_rad, tilt_m90_rad, cmap="Blues", c=m, s=spotsize, alpha=0.1)
 
     #Remove the tick labels to make the plot cleaner
     ax.set_xticklabels([])

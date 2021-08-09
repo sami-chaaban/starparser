@@ -441,7 +441,7 @@ def decide():
         sys.exit()
 
     """
-    --find_nearby
+    --extract_if_nearby
     """
 
     if params["parser_findnearby"] != -1:
@@ -524,6 +524,7 @@ def decide():
         minimum = int(retrieveparams[1])
         print("\n>> Extracting particles that have at least " + str(minimum) + " neighbors within " + str(threshold) + " pixels.\n")
         clusterparticles = specialparticles.getcluster(allparticles, threshold,minimum)
+        print(">> Removed " + str(len(allparticles.index)-len(clusterparticles.index)) + " that did not match the criteria (" + str(len(clusterparticles.index)) + " remaining out of " + str(len(allparticles.index)) + ").")
         fileparser.writestar(clusterparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 

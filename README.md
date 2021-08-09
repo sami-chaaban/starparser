@@ -603,7 +603,6 @@ starparser --i particles1.star --f particles2.star --extract_if_nearby 650
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named particles_close.star and particles_far.star that will have particles that have a nearest neighbor closer than 650 pixels or not, respectively.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Particle_distances.png**:
-
 ![Particle distances](https://github.com/sami-chaaban/StarParser/blob/main/Images/Particle_distances.png?raw=true "Particle distances")
 
 ---

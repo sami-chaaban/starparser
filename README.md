@@ -1,6 +1,6 @@
 # starparser
 
-Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with some examples. Alternatively, use the starparser modules in your own python scripts or within Relion.
+Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with some examples. Alternatively, use starparser within Relion or load the modules in your own python scripts.
 
 1. [Installation](#installation)
 2. [Important notes](#notes)
@@ -13,7 +13,9 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 ## Installation<a name="installation"></a>
 
-* Set up a fresh conda environment with Python >= 3.6: `conda create -n sp python=3.6` and activate it with `conda activate sp`.
+* Set up a fresh conda environment with Python >= 3.6: `conda create -n sp python=3.6`
+
+* Activate the environment: `conda activate sp`.
 
 * Install starparser: **`pip install starparser`**
 
@@ -21,11 +23,11 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 * Your input file needs to be a standard **Relion** *.star* file. Typical files include *particles.star*, *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. For example, it does not work on *\*\_model.star* files.
 
-* If the star file lacks an optics table, such as those from Relion 3.0, just add the ```--opticsless``` option to parse it.
-
 * The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
 
 * Some of the options below are already available in Relion with "relion_star_handler".
+
+* If the star file lacks an optics table, such as those from Relion 3.0, add the ```--opticsless``` option to parse it.
 
 ## Command-line options<a name="cmdops"></a>
 
@@ -35,27 +37,27 @@ Use this package to manipulate Relion star files, including counting, modifying,
 starparser [input] [options]
 ```
 
-Typically, you just need to pass the star file ```starparser --i input.star``` followed by the desired option and its arguments (e.g. ```--count```). For some options, a second star file can also be passed as input ```--f secondfile.star```. The available options are organized by [Data Mining](#mining), [Modification](#modify), and [Plotting](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below.
+Typically, you just need to pass the star file ```starparser --i input.star``` followed by the desired option and its arguments (e.g. ```--count``` or ```--list_column _rlnOriginX```). For some options, a second star file can also be passed as input ```--f secondfile.star```. The list of options are organized by [Data Mining](#mining), [Modifications](#modify), and [Plots](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below.
 
 ### Input
 
-**```--i```** *```filename```*
+**```--i```** *```filename.star```*
 
 Path to the star file. This is a required input.
 
-**```--f```** *```filename```*
+**```--f```** *```filename.star```*
 
 Path to a second file, if necessary.
 
-### Data mining options<a name="mining"></a>
+### Data Mining Options<a name="mining"></a>
 
 **```--extract```** *`--c column --q query (--e)`*
 
-Find particles that match a column header (```--c```) and query (```--q```) (see the [*Querying*](#query) options) and write them to a new star file (default output.star, or specified with ```--o```).
+Find particles that match a column header ```--c``` and query ```--q``` (see the [*Querying*](#query) options) and write them to a new star file (default output.star, or specified with ```--o```).
 
 **```--limit```** *```column/comparator/value```*
 
-Extract particles that match a specific operator (*lt* for less than, *gt* for greater than, *le* for less than or equal to, *ge* for greater than or equal to). The argument to pass is "column/comparator/value" (e.g. *\_rlnDefocusU/lt/40000* for defocus values less than 40000).
+Extract particles that match a specific comparison (*lt* for less than, *gt* for greater than, *le* for less than or equal to, *ge* for greater than or equal to). The argument to pass is "column/comparator/value" (e.g. *\_rlnDefocusU/lt/40000* for defocus values less than 40000).
 
 **```--count```** *`(--c column --q query (--e))`*
 
@@ -75,7 +77,7 @@ Find particles that are shared between the input star file and the one provided 
 
 **```--extract_if_nearby```** *```distance```* *`--f otherfile.star`*
 
-For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbor closer than the distance (in pixels) provided here will be written to particles_close.star, and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change filetype; see the [*Output*](#output) options).
+For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbor closer than the distance (in pixels) provided here will be written to particles_close.star, and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change the file type; see the [*Output*](#output) options).
 
 **```--extract_clusters```** *```threshold-distance/minimum-number```*
 
@@ -105,7 +107,7 @@ Split the input star file into independent star files for each optics group. The
 
 Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. *\_rlnClassNumber/n*); otherwise, it will sort the values as text. 
 
-### Modification options<a name="modify"></a>
+### Modification Options<a name="modify"></a>
 
 **```--operate```** *```column-name[operator]value```*
 
@@ -125,7 +127,7 @@ Remove particles that match a query (specified with ```--q```) within a column h
 
 **```--remove_duplicates```** *```column-name```*
 
-Remove duplicate particles based on the column provided here (e.g. *\_rlnImageName*).
+Remove duplicate particles based on the column provided here (e.g. *\_rlnImageName*) (one instance of the duplicate is retained).
 
 **```--remove_mics_fromlist```** *`--f micrographs.txt`*
 
@@ -157,7 +159,7 @@ Find the nearest particle in a second star file (specified with ```--f```) and i
 
 **```--import_mic_values```** *```column-name(s)```* *`--f otherfile.star`*
 
-For every particle, find the micrograph that it belongs to in a second star file (specified with ```--f```) and replace the original column value with that of the second star file (e.g. *\_rlnOpticsGroup*). This requires that the second star file only has one instance of each micrograph name (e.g. a micrographs_ctf.star file). To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
+For every particle, find the micrograph that it belongs to in a second star file (specified with ```--f```) and replace the original column value with that of the second star file (e.g. *\_rlnOpticsGroup*). This requires that the second star file only has one instance of each micrograph name (e.g. a micrograph star file like micrographs_ctf.star). To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 **```--import_particle_values```** *```column-name(s)```* *`--f otherfile.star`*
 
@@ -175,23 +177,23 @@ Provide a new optics group name. Use ```--c``` and ```--q``` to specify which pa
 
 Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--remove_column``` to remove other bad columns (e.g. helix-specific columns). Note that to use starparser on Relion 3.0 star files, you need to pass the ```--opticsless``` option.
 
-### Plotting options<a name="plot"></a>
+### Plotting Options<a name="plot"></a>
 
 **```--histogram```** *```column-name```* *`(--c column --q query (--e))`*
 
-Plot values of a column as a histogram. Optionally, use ```--c``` and ```--q``` to only plot a subset of particles (see the [*Querying*](#query) options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the filetype (see the [*Output*](#output) options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
+Plot values of a column as a histogram. Optionally, use ```--c``` and ```--q``` to only plot a subset of particles (see the [*Querying*](#query) options), otherwise it will plot all. The filename will be that of the column name. Use ```--t``` to change the file type (see the [*Output*](#output) options). The number of bins is calculated using the Freedman-Diaconis rule. Note that "relion_star_handler --hist_column" also does this.
 
 **```--plot_orientations```** *`(--c column --q query (--e))`*
 
-Plot the particle orientations based on the *\_rlnAngleRot* and *\_rlnAngleTilt* columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change filetype (see the [*Output*](#output) options).
+Plot the particle orientations based on the *\_rlnAngleRot* and *\_rlnAngleTilt* columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change the file type (see the [*Output*](#output) options).
 
 **```--plot_class_iterations```** *```classes```*
 
-Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass "all" to plot all classes, or separate the classes that you want with a slash (e.g. *1/2/5*). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change filetype (see the [*Output*](#output) options).
+Plot the number of particles per class for all iterations up to the one provided in the input (skips iterations 0 and 1). Pass "all" to plot all classes, or separate the classes that you want with a slash (e.g. *1/2/5*). It can successfully handle filenames that have "\_ct" in them if you've continued from intermediate jobs (only tested on a single continue). Use ```--t``` to change the file type (see the [*Output*](#output) options).
 
 **```--plot_class_proportions```** *`--c column --q queries (--e)`*
 
-Find the proportion of particle sets that belong to each class. At least two queries (```--q```, separated by slashes) must be provided along with the column to search in (```--c```) (see the [*Querying*](#query) options). It will display the proportions in percentages and plot the result to Class_proportion.png. Use ```--t``` to change filetype (see the [*Output*](#output) options).
+Find the proportion of particle sets that belong to each class. Pass at least two queries (```--q```, queries are separated by a slash from each other) along with the column ```--c``` to search in (see the [*Querying*](#query) options). It will display the proportions in percentages and plot the result to Class_proportion.png. Use ```--t``` to change the file type (see the [*Output*](#output) options).
 
 **```--plot_coordinates```** *```number-of-micrographs(/circle-size)```*
 
@@ -239,7 +241,7 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 
 * ```--opticsless``` does not work when the second star file (```--f```) lacks an optics table or when multiple star files are being read. There is little incentive to fix this since few still use Relion 3.0.
 
-* Data mining options do not check if the subset that was created has rendered one of the optics groups void; they retain all optics groups.
+* Data mining options do not check if the subset that was created has rendered one of the optics groups void; they retain all optics groups. Optics groups should be modified manually.
 
 * ```--split_optics``` does not renumber the optics groups that were greater than 1 back to 1, although this does not affect any behavior downstream in Relion and elsewhere.
 
@@ -247,7 +249,7 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 
 ## Relion GUI Usage<a name="reliongui"></a>
 
-* Use the External commands tab to run starparser within Relion. You don't need the double dash ```--``` in this case.
+* Use the External commands tab to run starparser within Relion. You don't need the double dash ```--``` for the options (i.e. "Param label") in this case.
 
 ![Relion-GUI-1](https://github.com/sami-chaaban/StarParser/blob/main/Images/Relion-1.png?raw=true "Relion-GUI-1")
 
@@ -266,16 +268,16 @@ from starparser import fileparser
 particles, metadata = fileparser.getparticles("file.star")
 ```
 
-* The particles DataFrame can be manipulated with pandas functions (see the example below). However, here are some examples of starparser options that are also available to use:
+* The particles DataFrame can be manipulated with pandas functions (see the example below). However, some starparser options are available:
 
 ```python
 from starparser import columnplay
 
-#Remove columns with delcolumn(particles,columns,metadata)
+#Remove columns with delcolumn(particles, columns, metadata)
 new_particles, new_metadata = columnplay.delcolumn(particles, ["_rlnMicrographName", "_rlnOpticsGroup"], metadata)
 
 #Operate on a column with operate(particles, column, operator, value) where operator is one of "multiply", "divide", "add", or "subtract"
-new_particles = columnplay.operate(particles, "_rlnHelicalTrackLength", "multiply", 0.25)
+operated_particles = columnplay.operate(particles, "_rlnHelicalTrackLength", "multiply", 0.25)
 
 from starparser import particleplay
 
@@ -283,16 +285,25 @@ from starparser import particleplay
 new_particles = particleplay.delparticles(particles, ["_rlnMicrographName"], ["0207"], False)
 
 #Remove duplicates with delduplicates(particles, column)
-new_particles = particleplay.delduplicates(particles, "_rlnMicrographName")
+noduplicate_particles = particleplay.delduplicates(particles, "_rlnImageName")
 
 #Limit values with limit(particles, column, limit, operator)
-new_particles = particleplay.limitparticles(particles, "_rlnDefocusU", 30000, "lt")
+limit_particles = particleplay.limitparticles(particles, "_rlnDefocusU", 30000, "lt")
+
+from starparser import specialparticles
+
+#Find particles that near those in another star file with findnearby(particles, otherparticles, threshold)
+otherparticles, metadata2 = fileparser.getparticles("dataset2/particles.star")
+far_particles, close_particles, distances = specialparticles.findnearby(particles, otherparticles, 600)
+
+#Extract particles that have a minimum number of neighbors within a radius with getcluster(particles, threshold, minimum)
+clusterparticles = specialparticles.findnearby(particles, 250, 4)
 ``` 
 
 * After manipulating the particles, you can write the star file:
 
 ```python
-fileparser.writestar(new_particles, metadata, "output.star")
+fileparser.writestar(new_particles, metadata, "processed-particles.star")
 ```
 
 * Here is a simple workflow to iterate through particles, one micrograph at a time

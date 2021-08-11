@@ -235,15 +235,13 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 
 * The Freedman-Diaconis rule for histogram binning is not always appropriate.
 
-* Star files that lack a version header, which sometimes occurs with those generated outside of Relion, cannot be parsed. Temporary fix: add ```*blank line* # version 30001 *blank line*``` before each data table.
-
-* The ```--plot_coordinates``` circle size does not exactly match the requested value. If you need it to be exact, save the file as pdf with ```--t pdf``` and open the plot in illustrator to modify the circle size.
-
 * ```--opticsless``` does not work when the second star file (```--f```) lacks an optics table or when multiple star files are being read. There is little incentive to fix this since few still use Relion 3.0.
 
 * Data mining options do not check if the subset that was created has rendered one of the optics groups void; they retain all optics groups. Optics groups should be modified manually.
 
 * ```--split_optics``` does not renumber the optics groups that were greater than 1 back to 1, although this does not affect any behavior downstream in Relion and elsewhere.
+
+* The ```--plot_coordinates``` circle size does not exactly match the requested value. If you need it to be exact, save the file as pdf with ```--t pdf``` and open the plot in illustrator to modify the circle size.
 
 ---
 

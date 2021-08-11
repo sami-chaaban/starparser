@@ -718,7 +718,7 @@ def decide():
             circlesize = float(currentparams[1])
         else:
             #This is arbitrary
-            circlesize = 80
+            circlesize = 200
 
         if not file2particles.empty:
             if numtoplot != -1:

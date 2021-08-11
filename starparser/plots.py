@@ -492,7 +492,7 @@ def classproportion(particles, columns, query, queryexact, outtype):
 """
 --plot_coordinates
 """
-def comparecoords(file1parts,file2parts,numtoplot, circlesize):
+def comparecoords(file1parts, file2parts, numtoplot, circlesize):
 
     #This is arbitrary, but seems to get close to the real values.
     #Consider getting this accurate.
@@ -542,11 +542,19 @@ def comparecoords(file1parts,file2parts,numtoplot, circlesize):
         count+=1
 
         #Check if the second star file has particles in this micrograph
-        #If get_group succeeds, then it exists, skipflag stays False
-        skipflag = False
-        try:
-            file2mic = file2mics.get_group(file1mic[0])
-        except KeyError:
+        #We will store this information in a "skipflag" True/False variable
+        if not file2parts.empty:
+            try:
+                 #If get_group succeeds, then it exists, skipflag is False
+                file2mic = file2mics.get_group(file1mic[0])
+                skipflag = False
+
+            #If it fails, skipflag is True
+            except KeyError:
+                skipflag = True
+        
+        #If there was no second file to begin with, skipflag is True
+        else:
             skipflag = True
             
         #Since we didn't expand the file1mics groupby object, file1mic[0] is the micrograph name
@@ -568,7 +576,7 @@ def comparecoords(file1parts,file2parts,numtoplot, circlesize):
             plt.scatter(x1,y1, color='red', facecolors='none', s=circlesize, alpha=0.7, linewidth = 4)
 
         #If there is a second star file and there are particles on this micrograph, do the same
-        if not file2parts.empty and not skipflag:
+        if not skipflag:
 
             for file2part in file2mic.itertuples():
 
@@ -576,7 +584,7 @@ def comparecoords(file1parts,file2parts,numtoplot, circlesize):
                 y2 = float(file2part[file2yloc])
 
                 #The circle size is made slightly bigger so you can see it
-                plt.scatter(x2,y2, color='blue', facecolors='none', s=circlesize*3, alpha=0.7, linewidth = 3.5)
+                plt.scatter(x2,y2, color='blue', facecolors='none', s=circlesize, alpha=0.7, linewidth = 3.5, linestyle='dashed')
 
         #We need the micrograph with the full path to source it
         themic = file1part[file1originalmics]

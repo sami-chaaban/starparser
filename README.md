@@ -1,6 +1,6 @@
 # starparser
 
-Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with some examples. Alternatively, use starparser within Relion or load the modules in your own python scripts.
+Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with some examples. Alternatively, use starparser within Relion or load the modules in your own Python scripts.
 
 1. [Installation](#installation)
 2. [Important notes](#notes)
@@ -69,7 +69,7 @@ Count the number of unique micrographs and display the result. Optionally, this 
 
 **```--list_column```** *```column-name(s)```* *`(--c column --q query (--e))`*
 
-Write all values of a column to a file. For example, passing *\_rlnMicrographName* will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *\_rlnMicrographName/\_rlnCoordinateX* outputs MicrographName.txt and CoordinateX.txt). Optionally, this can be used with ```--c``` and ```--q``` to only consider values that match the query (see the [*Querying*](#query) options), otherwise it lists all values.
+Write all values of a column to a file. For example, passing *\_rlnMicrographName* will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *\_rlnMicrographName/\_rlnCoordinateX* outputs MicrographName.txt and CoordinateX.txt). Optionally, this can be used with ```--c``` and ```--q``` to only consider particles that match the query (see the [*Querying*](#query) options), otherwise it lists all values.
 
 **```--find_shared```** *```column-name```* *`--f otherfile.star`*
 
@@ -249,7 +249,7 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 
 ## Relion GUI Usage<a name="reliongui"></a>
 
-* Use the External commands tab to run starparser within Relion. You don't need the double dash ```--``` for the options (i.e. "Param label") in this case.
+* Use the External commands tab to run starparser within Relion. You don't need the double dash ```--``` for the options (i.e. "Param label").
 
 ![Relion-GUI-1](https://github.com/sami-chaaban/StarParser/blob/main/Images/Relion-1.png?raw=true "Relion-GUI-1")
 
@@ -261,7 +261,7 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 
 ## Scripting<a name="scripts"></a>
 
-* To parse a star file for downstream use in a python script:
+* To parse a star file for downstream use in a Python script:
 
 ```python
 from starparser import fileparser
@@ -273,7 +273,7 @@ particles, metadata = fileparser.getparticles("file.star")
 ```python
 from starparser import columnplay
 
-#Remove columns with delcolumn(particles, columns, metadata)
+#Remove columns with delcolumn(particles, [columns], metadata)
 new_particles, new_metadata = columnplay.delcolumn(particles, ["_rlnMicrographName", "_rlnOpticsGroup"], metadata)
 
 #Operate on a column with operate(particles, column, operator, value) where operator is one of "multiply", "divide", "add", or "subtract"
@@ -281,7 +281,7 @@ operated_particles = columnplay.operate(particles, "_rlnHelicalTrackLength", "mu
 
 from starparser import particleplay
 
-#Remove particles with delparticles(particles, columns, queries, queryexact)
+#Remove particles with delparticles(particles, [columns], [queries], queryexact)
 new_particles = particleplay.delparticles(particles, ["_rlnMicrographName"], ["0207"], False)
 
 #Remove duplicates with delduplicates(particles, column)
@@ -415,13 +415,13 @@ starparser --i run_it025_data.star --plot_class_proportions --c _rlnMicrographNa
 
 ---
 
-* Overlay the coordinates of two star files.
+* Overlay the coordinates of two star files for 1 micrograph with a marker size of 200 pixels.
 
 ```
-starparser --i particles.star --f select_particles.star --plot_coordinates 1
+starparser --i particles.star --f select_particles.star --plot_coordinates 1/200
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Plotting coordinates from the star file (red circles) and second file (blue circles) for 1 micrograph.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Plotting coordinates from the star file (red circles) and second file (blue circles) for 1 micrograph(s).
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **Coordinates.pdf**:
 

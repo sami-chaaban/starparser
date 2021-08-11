@@ -113,8 +113,11 @@ def findnearby(coreparticles,nearparticles,threshdist):
     and a list of particles that don't have a corresponding neighbor (noparts)
     """
 
-    #We want to return a dataframe with the correct particles. First,
-    #we'll create a copy of the particles from the first file to amend
+    """
+    With dataframes, stating dataframe1 = dataframe2 only creates
+    a reference. Therefore, we must create a copy if we want to leave
+    the original dataframe unmodified.
+    """
     farparticles = coreparticles.copy()
 
     #We can use pandas to only keep particles that are in the farparts list
@@ -145,28 +148,55 @@ def findnearby(coreparticles,nearparticles,threshdist):
 """
 def fetchnearby(coreparticles,nearparticles,threshdist,columnstoretrieve):
 
+    #Create a grouby object that is grouped by micrographs
     coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
+
+    #get_loc finds the index of the column for retrieval later down the function
+    #Consider simplifying this such that the columns are called directly.
     coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
     corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
     coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
     corenameloc = coreparticles.columns.get_loc("_rlnImageName")+1
 
+    #Do the same for the second star file
     nearmicrographs = nearparticles.groupby(["_rlnMicrographName"])
     nearxloc = nearparticles.columns.get_loc("_rlnCoordinateX")+1
     nearyloc = nearparticles.columns.get_loc("_rlnCoordinateY")+1
 
+    #Initialize a list that will store particles that do not have a neighbor
+    #in the second star file (i.e the second file lacks particles in that micrograph)
     noparts=[]
+
+    #This will store the particles that are too far
     farparts=[]
 
+    #We'll initialize a dataframe that's identical to the original one
+    #that we will modify in the loop below
+    """
+    With dataframes, stating dataframe1 = dataframe2 only creates
+    a reference. Therefore, we must create a copy if we want to leave
+    the original dataframe unmodified.
+    """
     stolenparticles = coreparticles.copy()
 
+    #Loop through the micrographs
     for coremicrograph in coremicrographs:
-        
+
+        #To check if there are particles in the second star file for this micrograph,
+        #we will try to get_group that micrograph, if it fails, there are none
         try:
             nearmicrograph = nearmicrographs.get_group(coremicrograph[0])
+
+        #It is bad practice to have a naked exception here. Works for now. Consider revising.
         except:
+
+            #If there are no particles in the second file, store all the particles from 
+            #the first file in the noparts list.
             for coreparticle in coremicrograph[1].itertuples():
                 noparts.append(coreparticle[corenameloc])
+
+            #Continue allows us to exit this iteration of the for loop
+            #and continue to the next micrograph
             continue 
         
         for coreparticle in coremicrograph[1].itertuples():
@@ -226,8 +256,16 @@ def getcluster(particles,threshold,minimum):
     elif len(keep) == len(particles.index):
         print("\n>> Error: all particles were retained. No star file will be output.")
         sys.exit()
+
+    """
+    With dataframes, stating dataframe1 = dataframe2 only creates
+    a reference. Therefore, we must create a copy if we want to leave
+    the original dataframe unmodified.
+    """
     particles_purged = particles.copy()
+
     toconcat = [particles_purged[particles_purged["_rlnImageName"] == q] for q in keep]
+
     particles_purged = pd.concat(toconcat)
 
     return(particles_purged)

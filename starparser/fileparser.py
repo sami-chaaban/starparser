@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+import numpy as np
 
 def getparticles(filename):
 
@@ -27,14 +28,14 @@ def getparticles(filename):
         version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
 
         # toc = time.perf_counter()
-        # print(f"parsestar took {toc - tic:0.4f} seconds")
+        # print(f"\nparsestar took {toc - tic:0.4f} seconds")
 
     #It is generally bad practice to have a naked exception here, but it should be fine for basic use.
     except:
 
         print("\n>> Error: a problem was encountered when trying to parse " + filename + ".\n")
         sys.exit()
-    
+
     #Make a dataframe out of the values and headers.
     alloptics = makepandas(opticsheaders, optics)
     allparticles = makepandas(particlesheaders, particles)
@@ -54,107 +55,93 @@ def getparticles(filename):
 def parsestar(starfile):
 
     """
-    This is a quite inefficient way of parsing a star file but does the job.
-    Assumption: the star file has version headers that look like "# version xxxxx". This can be improved in the future by looking for loop_ instead.
+    Assumption: there are two data tables.
     This function gets the star file information from getparticles() and the result is passed to the makepandas().
     """
 
     #Generate a list of lines from the star file. Anything that is tab or space delimited will occupy different indices in the list
     starfilesplit = starfile.split()
 
-    #This variable will be used to determine at which index the optics data ends
-    #It is initialized as 0 in case the end of the optics data is not found (see the check below)
-    opticsstop = 0
-
-    #Check from after the fist version header to index 2000 (arbitrary), that should be enough to find things
-    for i in range(4,2000):
-        
-        #Check if you reached the next version header, this means you've passed the optics data
-        if starfilesplit[i] == '#': 
-            
-            #We've found the index of the end of the next version header which means that the optics data has also ended.
-            opticsstop = i
-            break
-            
-    #Check if the opticsstop variable didn't change, which means something went wrong when parsing
-    if opticsstop == 0:
-        
-        print('\n>> Error: Could not find the end of the optics table.\n')
-        sys.exit()
-
-    #For finding the end of the particles table headers
-    particlesstop = 0 
-
-    #For finding the end of the optics table headers
-    opticstablestop = 0
-    
-    #Now that we know where the optics table ends, we can use that as an end to searching for the optics table
-    #Search every two indices since table headers have two values (i.e. _rlnColumnName #1).
-    for i in range(5,opticsstop,2):
-        
-        #Optics table headers start with _, so when it doesn't happen, we've reached the end of the table headers
-        if starfilesplit[i][0] != "_": 
-        
-            #We've found the index number of the end of the optics table headers
-            opticstablestop = i
-            break
-
-    #Now we can look for the particles table starting at the end of the optics table.
-    #Search every two indces since the particle table headers have two values.
-    for i in range(opticsstop+5,2000,2):
-
-        #As above, if you don't find a _, you've reached the end of the table header.
-        if starfilesplit[i][0] != "_":
-            
-            #We've found the index number of the end of the particle table headers.
-            particlesstop = i
-            break
-
-    #Check if the particlesstop variable didn't change, which means something went wrong when parsing
-    if particlesstop == 0:
-
-        print('\n>> Error: Could not find the end of the particles table.\n')
-        sys.exit()
-        
     """
-    Now that we've fond all the relevant indices, we can use those to parse starfilesplit.
+    We will make a short version of starfilesplit to use to figure out the heads
+    This increases the speed of parsing significantly, especially for large files
+    We'll use the first 2000 lines, which should be enough
+    """
+    if len(starfilesplit) > 2000:
+        starfilesplit_test = starfilesplit[0:2000]
+    else:
+        starfilesplit_test = starfilesplit
+
+    """
+    #Version
     """
 
-    #The version header is the first three indices (i.e. # version xxxxx)
-    version = starfilesplit[0:3]
+    #Check if "# version xxxx" exists
+    try:
+        versionindex = starfilesplit_test.index("version")
+        versionexist = True
+        version = starfilesplit_test[versionindex-1:versionindex+2]
+    except ValueError:
+        versionexist = False
+        version = ["#", "version", "30001"]
 
-    #The optics table starts from afte the version header to opticstablestop
-    opticstable = starfilesplit[3:opticstablestop]
-    
-    #We will parse the optics data (i.e. the opticstable list) to extract the headers
+    """
+    #Optics table headers
+    """
+
+    opticsstart = starfilesplit_test.index("loop_") + 1
+
     opticstableheaders = []
+    for i,n in enumerate(starfilesplit_test[opticsstart::2]):
+        if n[0] != "_":
+            opticsheaderend = opticsstart + i*2
+            break
+        opticstableheaders.append(n)
 
-    #Every two values is the column name (i.e. _rlnColumnName and skipping #1). The [1:] is to avoid the first line in the header, which is "data_optics".
-    for m in opticstable[::2][1:]: 
-        opticstableheaders.append(m)
+    """
+    #Version
+    """
 
-    #The optics values start from the end of the optics table to the end of the optics data
-    optics = starfilesplit[opticstablestop:opticsstop]
+    try:
+        starfilesplit_test[opticsheaderend:].index("version")
+        versionexist = True
+    except ValueError:
+        versionexist = False
 
-    #The table name for the particles table is the value just after the optics table and just before the particles table (e.g. data_particles).
-    tablename = starfilesplit[opticsstop+3]
+    """
+    #Table Name
+    """
 
-    #The particles table starts just after the optics data to the end of the particles table.
-    particlestable = starfilesplit[opticsstop+3:particlesstop]
-    
-    #As above, we will parse the particles data (i.e. the particlestable list) to extract the headers
+    if versionexist:
+        opticsdataend = starfilesplit_test[opticsheaderend:].index("#") + opticsheaderend
+        tablename = starfilesplit_test[opticsdataend+3]
+    else:
+        opticsdataend = starfilesplit_test[opticsheaderend:].index("loop_") + opticsheaderend - 1
+        tablename = starfilesplit_test[opticsdataend]
+
+    optics = starfilesplit_test[opticsheaderend:opticsdataend]
+
+    """
+    #Particles Header
+    """
+
+    particlesstart = starfilesplit_test[opticsdataend:].index("loop_") + 1 + opticsdataend
+
     particlestableheaders = []
+    for i,n in enumerate(starfilesplit_test[particlesstart::2]):
+        if n[0] != "_":
+            particlesheaderend = particlesstart + i*2
+            break
+        particlestableheaders.append(n)
 
-    #Every two values is the column name (i.e. _rlnColumnName and skipping #1). The [1:] is to avoid the first line in the header(e.g. "data_particles").
-    for m in particlestable[::2][1:]: 
-        particlestableheaders.append(m)
+    """
+    #Particles
+    """
 
-    #All the particles data starts after the end of the particles.
-    particles = starfilesplit[particlesstop:]
+    particles = starfilesplit[particlesheaderend:]
 
     #The optics data and particles data will get split properly and made into a dataframe with makepandas()
     return(version,opticstableheaders,optics,particlestableheaders,particles,tablename)
-
 
 def makepandas(headers,items):
 
@@ -169,6 +156,10 @@ def makepandas(headers,items):
 
     #Calculate the number of columns, since this will be used to properly split the data into lines that belong to each particle.
     totalcolumns = len(headers)
+
+    """
+    These are the slowest parts of the code. Consider making more efficient.
+    """
 
     #Split the list given the number of columns expected for each particle
     items_lst = [items[x:x+totalcolumns] for x in range(0, len(items), totalcolumns)]
@@ -292,3 +283,113 @@ def writestar(particles, metadata, outputname, relegate=False):
     output.close()
 
     print("-->> Output star file: " + outputname + "\n")
+
+"""
+The following is an old version of parsestar
+It is left here in case it is useful to others
+"""
+def parsestar_old(starfile):
+
+    """
+    This is a quite inefficient way of parsing a star file but does the job. Consider using find("_loop") instead.
+    The assumption below is that the star file has version headers that look like "# version xxxxx".
+
+    This function gets the star file information from getparticles() and the result is passed to the makepandas().
+    """
+
+    #Generate a list of lines from the star file. Anything that is tab or space delimited will occupy different indices in the list
+    starfilesplit = starfile.split()
+
+    #This variable will be used to determine at which index the optics data ends
+    #It is initialized as 0 in case the end of the optics data is not found (see the check below)
+    opticsstop = 0
+
+    #Check from after the fist version header to index 2000 (arbitrary), that should be enough to find things
+    for i in range(4,2000):
+        
+        #Check if you reached the next version header, this means you've passed the optics data
+        if starfilesplit[i] == '#': 
+            
+            #We've found the index of the end of the next version header which means that the optics data has also ended.
+            opticsstop = i
+            break
+            
+    #Check if the opticsstop variable didn't change, which means something went wrong when parsing
+    if opticsstop == 0:
+        
+        print('\n>> Error: Could not find the end of the optics table.\n')
+        sys.exit()
+
+    #For finding the end of the particles table headers
+    particlesstop = 0 
+
+    #For finding the end of the optics table headers
+    opticstablestop = 0
+    
+    #Now that we know where the optics table ends, we can use that as an end to searching for the optics table
+    #Search every two indices since table headers have two values (i.e. _rlnColumnName #1).
+    for i in range(5,opticsstop,2):
+        
+        #Optics table headers start with _, so when it doesn't happen, we've reached the end of the table headers
+        if starfilesplit[i][0] != "_": 
+        
+            #We've found the index number of the end of the optics table headers
+            opticstablestop = i
+            break
+
+    #Now we can look for the particles table starting at the end of the optics table.
+    #Search every two indces since the particle table headers have two values.
+    for i in range(opticsstop+5,2000,2):
+
+        #As above, if you don't find a _, you've reached the end of the table header.
+        if starfilesplit[i][0] != "_":
+            
+            #We've found the index number of the end of the particle table headers.
+            particlesstop = i
+            break
+
+    #Check if the particlesstop variable didn't change, which means something went wrong when parsing
+    if particlesstop == 0:
+
+        print('\n>> Error: Could not find the end of the particles table.\n')
+        sys.exit()
+
+
+    """
+    Now that we've fond all the relevant indices, we can use those to parse starfilesplit.
+    """
+
+    #The version header is the first three indices (i.e. # version xxxxx)
+    version = starfilesplit[0:3]
+
+    #The optics table starts from afte the version header to opticstablestop
+    opticstable = starfilesplit[3:opticstablestop]
+    
+    #We will parse the optics data (i.e. the opticstable list) to extract the headers
+    opticstableheaders = []
+
+    #Every two values is the column name (i.e. _rlnColumnName and skipping #1). The [1:] is to avoid the first line in the header, which is "data_optics".
+    for m in opticstable[::2][1:]: 
+        opticstableheaders.append(m)
+
+    #The optics values start from the end of the optics table to the end of the optics data
+    optics = starfilesplit[opticstablestop:opticsstop]
+
+    #The table name for the particles table is the value just after the optics table and just before the particles table (e.g. data_particles).
+    tablename = starfilesplit[opticsstop+3]
+
+    #The particles table starts just after the optics data to the end of the particles table.
+    particlestable = starfilesplit[opticsstop+3:particlesstop]
+    
+    #As above, we will parse the particles data (i.e. the particlestable list) to extract the headers
+    particlestableheaders = []
+
+    #Every two values is the column name (i.e. _rlnColumnName and skipping #1). The [1:] is to avoid the first line in the header(e.g. "data_particles").
+    for m in particlestable[::2][1:]: 
+        particlestableheaders.append(m)
+
+    #All the particles data starts after the end of the particles.
+    particles = starfilesplit[particlesstop:]
+
+    #The optics data and particles data will get split properly and made into a dataframe with makepandas()
+    return(version,opticstableheaders,optics,particlestableheaders,particles,tablename)

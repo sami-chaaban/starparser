@@ -498,6 +498,11 @@ def comparecoords(file1parts, file2parts, numtoplot, circlesize):
     #Consider getting this accurate.
     circlesize = (3.14*circlesize/11)**2
 
+    #Check that the micrograph column exists
+    if "_rlnMicrogrpahName" not in file1parts:
+        print("\n>> Error: the star file does not have a _rlnMicrographName column.\n")
+        sys.exit()
+
     #It makes this easier later if we remove the path to the micrograph name
     #(i.e. everything before the last '/'). The original micrograph name is preserved
     #in _rlnMicrographNameOriginal
@@ -508,6 +513,11 @@ def comparecoords(file1parts, file2parts, numtoplot, circlesize):
     #treat each micrograph independently
     file1mics = file1parts.groupby(["_rlnMicrographName"])
 
+    #Check that the coordinate columns exist
+    if "_rlnCoordinateX" not in file1parts or "_rlnCoordinateY" not in file1parts:
+        print("\n>> Error: the star file does not have a _rlnMicrographName column.\n")
+        sys.exit()
+
     #get_loc finds the index of the column for retrieval later down the function
     #Consider simplifying this such that the columns are called directly.
     file1originalmics = file1parts.columns.get_loc("_rlnMicrographNameOriginal")+1
@@ -517,8 +527,20 @@ def comparecoords(file1parts, file2parts, numtoplot, circlesize):
     #Do the same for the second star file if it has values. The original micrograph names don't 
     #need to be preserved.
     if not file2parts.empty:
+        
+        if "_rlnMicrogrpahName" not in file2parts:
+            print("\n>> Error: the second star file does not have a _rlnMicrographName column.\n")
+            sys.exit()
+
         file2parts["_rlnMicrographName"] = file2parts["_rlnMicrographName"].str.split('/').str[-1]
+
         file2mics = file2parts.groupby(["_rlnMicrographName"])
+
+        #Check that the coordinate columns exist
+        if "_rlnCoordinateX" not in file2parts or "_rlnCoordinateY" not in file2parts:
+            print("\n>> Error: the second star file does not have a _rlnMicrographName column.\n")
+            sys.exit()
+
         file2xloc = file2parts.columns.get_loc("_rlnCoordinateX")+1
         file2yloc = file2parts.columns.get_loc("_rlnCoordinateY")+1
 

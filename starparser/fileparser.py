@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-import numpy as np
 
 def getparticles(filename):
 
@@ -55,17 +54,17 @@ def getparticles(filename):
 def parsestar(starfile):
 
     """
-    Assumption: there are two data tables.
-    This function gets the star file information from getparticles() and the result is passed to the makepandas().
+    Assumption: there are two tables with data; the first is assumed to be the optics table.
+    This function gets the star file information from getparticles() and the result is passed to makepandas().
     """
 
     #Generate a list of lines from the star file. Anything that is tab or space delimited will occupy different indices in the list
     starfilesplit = starfile.split()
 
     """
-    We will make a short version of starfilesplit to use to figure out the heads
+    We will make a short version of starfilesplit to use while figuring out the headers
     This increases the speed of parsing significantly, especially for large files
-    We'll use the first 2000 lines, which should be enough
+    The first 2000 lines should be enough.
     """
     if len(starfilesplit) > 2000:
         starfilesplit_test = starfilesplit[0:2000]
@@ -74,33 +73,63 @@ def parsestar(starfile):
 
     """
     #Version
+    The version header is not always present
     """
 
     #Check if "# version xxxx" exists
     try:
+        
+        #Try getting the index for the word "version"
         versionindex = starfilesplit_test.index("version")
+        
+        #If no exception was thrown, the index was found, so there is a version header
+        #This flag will be useful later
         versionexist = True
+
+        #We want the "#" before "version" up to the "30001" after
         version = starfilesplit_test[versionindex-1:versionindex+2]
+
+    #If "version" doesn't exist, a ValueError exception will be thrown
     except ValueError:
+
+        #This flag will be useful later
         versionexist = False
+
+        #We'll make up a version header in this case
         version = ["#", "version", "30001"]
 
     """
     #Optics table headers
     """
 
+    #Data tables start with "loop_". The first data table is the optics table
     opticsstart = starfilesplit_test.index("loop_") + 1
 
+    #The column names (i.e. table headers) for the optics table are stored here
     opticstableheaders = []
+
+    #Loop through every other value from loop_ onwards, since the values will be
+    #"[#X, _rlnColumnName, #Y, _rlnNextColumnName,...]"
     for i,n in enumerate(starfilesplit_test[opticsstart::2]):
+        
+        #Once you hit a value that doesn't start with an underscore, the headers have ended
         if n[0] != "_":
+
+            #since "i" comes from an enumerate variable, it must be multiplied by two
+            #to accomodate the fact that we were looping every two values
             opticsheaderend = opticsstart + i*2
+
+            #We can get out of the for loop now
             break
+
+        #Keep adding the header names as long as one is found
         opticstableheaders.append(n)
 
     """
     #Version
     """
+
+    #The same logic as above
 
     try:
         starfilesplit_test[opticsheaderend:].index("version")
@@ -110,6 +139,11 @@ def parsestar(starfile):
 
     """
     #Table Name
+    """
+
+    """
+    For the second data table, we want to know what kind of table it is
+    e.g. data_particles
     """
 
     if versionexist:
@@ -125,6 +159,8 @@ def parsestar(starfile):
     #Particles Header
     """
 
+    #Same logic as above
+
     particlesstart = starfilesplit_test[opticsdataend:].index("loop_") + 1 + opticsdataend
 
     particlestableheaders = []
@@ -138,9 +174,11 @@ def parsestar(starfile):
     #Particles
     """
 
+    #The remainder of the data is the particles
+    #They will get parsed properly in makepandas()
+
     particles = starfilesplit[particlesheaderend:]
 
-    #The optics data and particles data will get split properly and made into a dataframe with makepandas()
     return(version,opticstableheaders,optics,particlestableheaders,particles,tablename)
 
 def makepandas(headers,items):
@@ -291,7 +329,7 @@ It is left here in case it is useful to others
 def parsestar_old(starfile):
 
     """
-    This is a quite inefficient way of parsing a star file but does the job. Consider using find("_loop") instead.
+    This is a quite inefficient way of parsing a star file but does the job.
     The assumption below is that the star file has version headers that look like "# version xxxxx".
 
     This function gets the star file information from getparticles() and the result is passed to the makepandas().

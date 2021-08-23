@@ -22,7 +22,7 @@ def findnearby(coreparticles,nearparticles,threshdist):
     coremicrographs = coreparticles.groupby(["_rlnMicrographNameSimple"])
 
     #get_loc finds the index of the column for retrieval later down the function
-    #Consider simplifying this such that the columns are called directly.
+    #(Consider simplifying this such that the columns are called directly.)
     coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
     corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
     coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
@@ -152,7 +152,7 @@ def fetchnearby(coreparticles,nearparticles,threshdist,columnstoretrieve):
     coremicrographs = coreparticles.groupby(["_rlnMicrographName"])
 
     #get_loc finds the index of the column for retrieval later down the function
-    #Consider simplifying this such that the columns are called directly.
+    #(Consider simplifying this such that the columns are called directly.)
     coremicloc = coreparticles.columns.get_loc("_rlnMicrographName")+1
     corexloc = coreparticles.columns.get_loc("_rlnCoordinateX")+1
     coreyloc = coreparticles.columns.get_loc("_rlnCoordinateY")+1
@@ -228,6 +228,8 @@ def fetchnearby(coreparticles,nearparticles,threshdist,columnstoretrieve):
 --extract_clusters
 """
 def getcluster(particles,threshold,minimum):
+
+    #~needs explanation~#
 
     uniquemics = particles.groupby(["_rlnMicrographName"])
     xloc = particles.columns.get_loc("_rlnCoordinateX")+1

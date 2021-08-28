@@ -64,10 +64,10 @@ def parsestar(starfile):
     """
     We will make a short version of starfilesplit to use while figuring out the headers
     This increases the speed of parsing significantly, especially for large files
-    The first 2000 lines should be enough.
+    The first 10000 lines should be enough.
     """
-    if len(starfilesplit) > 2000:
-        starfilesplit_test = starfilesplit[0:2000]
+    if len(starfilesplit) > 10000:
+        starfilesplit_test = starfilesplit[0:10000]
     else:
         starfilesplit_test = starfilesplit
 

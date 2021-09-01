@@ -225,7 +225,7 @@ def decide():
         file2 = params["parser_file2"]
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
-            sys.exit();
+            sys.exit()
         with open(file2) as f:
             micstodelete = [line.split()[0] for line in f]
         newparticles = particleplay.delmics(allparticles,micstodelete)
@@ -841,6 +841,23 @@ def decide():
 
         sys.exit()
 
+    """
+    --swap_optics
+    """
+
+    if params["parser_swapoptics"]:
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to swap in the optics table from.\n")
+            sys.exit()
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
+            sys.exit()
+        otherparticles, newmetadata = fileparser.getparticles(file2)
+        fileparser.writestar(allparticles, [metadata[0],newmetadata[1],newmetadata[2],metadata[3],metadata[4]], params["parser_outname"], relegateflag)
+        sys.exit()
+
+
     ############
     """
     The remaining functions may all be passed with a query (--c/--q)
@@ -945,6 +962,7 @@ def decide():
         print("\n>> Regrouped: " + str(numpergroup) + " particles per group with similar defocus values (" + str(numgroups) + " groups in total).")
         fileparser.writestar(regroupedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
 
     """
     If --relegate is the only option that is passed, then the star file is written without the optics table

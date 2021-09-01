@@ -169,6 +169,10 @@ For every particle in the input star file, find the equivalent particle in a sec
 
 Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if *\_rlnGroupNumber* is being used in the star file rater than *\_rlnGroupName*. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
+**```--swap_optics```**
+
+Swap the optics table with that of another star file provided by ```--f```. The result is written to a new star file (default output.star, or specified with ```--o```).
+
 **```--new_optics```** *```optics-group-name```* *`--c column --q query (--e)`*
 
 Provide a new optics group name. Use ```--c``` and ```--q``` to specify which particles belong to this optics group (see the [*Querying*](#query) options). The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).

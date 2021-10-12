@@ -499,7 +499,7 @@ def comparecoords(file1parts, file2parts, numtoplot, circlesize):
     circlesize = (3.14*circlesize/11)**2
 
     #Check that the micrograph column exists
-    if "_rlnMicrogrpahName" not in file1parts:
+    if "_rlnMicrographName" not in file1parts:
         print("\n>> Error: the star file does not have a _rlnMicrographName column.\n")
         sys.exit()
 

@@ -395,8 +395,13 @@ def decide():
             sys.exit()
 
         column1, secondhalf = arguments
-        column2 = secondhalf.split("=")[0]
-        newcolumn = secondhalf.split("=")[1]
+
+        try:
+            column2 = secondhalf.split("=")[0]
+            newcolumn = secondhalf.split("=")[1]
+        except IndexError:
+            print("\n>> Error: the argument to pass is column1[operator]column2=newcolumn (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted).\n")
+            sys.exit()
 
         if column1 not in allparticles:
             print("\n>> Error: Could not find the column " + column1 + " in the star file.\n")
@@ -688,6 +693,19 @@ def decide():
         print("\n>> Creating the column " + insertcol + " with the values in " + newcolfile + ".")
         allparticles[insertcol]=newcolvalues
         metadata[3].append(insertcol)
+        fileparser.writestar(allparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    if params["parser_insertopticscol"] != "":
+        try:
+            new_header, value = params["parser_insertopticscol"].split("/")
+        except ValueError:
+            print("\n>> Error: the argument to pass is column-name/value.\n")
+            sys.exit()
+        print("\n Creating the column " + new_header + " in the optics table with the value " + value)
+        print(metadata)
+        metadata[2][new_header]=value
+        metadata[1].append(new_header)
         fileparser.writestar(allparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 

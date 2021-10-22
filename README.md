@@ -153,6 +153,10 @@ Change all values of a column to the one provided here. The argument to pass is 
 
 Swap columns from another star file (specified with ```--f```). For example, pass *\_rlnMicrographName* to swap that column. To enter multiple columns, separate them with a slash: *\_rlnMicrographName/\_rlnCoordinateX*. Note that the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
+**```--insert_optics_column```** *```column-name/value```*
+
+Insert a new column in the optics table with the name and value provided (e.g. *\_rlnAmplitudeContrast/0.1*). The value will populate all rows of the optics table. The result is written to a new star file (default output.star, or specified with ```--o```).
+
 **```--fetch_from_nearby```** *```distance/column-name(s)```* *`--f otherfile.star`*
 
 Find the nearest particle in a second star file (specified with ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. *300/\_rlnClassNumber* or *100/\_rlnAnglePsi/\_rlnHelicalTubeID*). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from \_rlnMicrographName do not necessarily need to match, just the filenames need to.

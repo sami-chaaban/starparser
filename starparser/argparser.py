@@ -128,6 +128,10 @@ def argparse():
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
         help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
 
+    modify_opts.add_option("--insert_optics_column",
+        action="store", dest="parser_insertopticscol", type="string", default="", metavar='column-name/value',
+        help="Insert a new column in the optics table with the name and value provided (e.g. _rlnAmplitudeContrast/0.1). The value will populate all rows of the optics table.")
+
     modify_opts.add_option("--fetch_from_nearby",
         action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name(s)',
         help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from _rlnMicrographName do not necessarily need to match, just the filenames need to.")

@@ -297,6 +297,33 @@ def decide():
         sys.exit()
 
     """
+    --expand_optics
+    """
+
+    if params["parser_expandoptics"] != "":
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to import values from.\n")
+            sys.exit()       
+        opticsgrouptoexpand = params["parser_expandoptics"]
+
+        if opticsgrouptoexpand not in metadata[2]["_rlnOpticsGroupName"].tolist():
+            print("\n>> Error: the optics group " + opticsgrouptoexpand + " does not exist in the star file.\n")
+            sys.exit()
+
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
+            sys.exit();
+        newdata, newdata_metadata = fileparser.getparticles(file2)
+
+        print("\n>> Expanding the optics group " + opticsgrouptoexpand + " based on the micrograph optics in " + file2)
+        
+        expandedparticles, newmetadata = particleplay.expandoptics(allparticles,metadata,newdata,newdata_metadata,opticsgrouptoexpand)
+
+        fileparser.writestar(expandedparticles, newmetadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    """
     --import_particle_values
     """
 
@@ -703,7 +730,7 @@ def decide():
             print("\n>> Error: the argument to pass is column-name/value.\n")
             sys.exit()
         print("\n Creating the column " + new_header + " in the optics table with the value " + value)
-        print(metadata)
+
         metadata[2][new_header]=value
         metadata[1].append(new_header)
         fileparser.writestar(allparticles, metadata, params["parser_outname"], relegateflag)

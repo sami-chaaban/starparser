@@ -181,6 +181,10 @@ Swap the optics table with that of another star file provided by ```--f```. The 
 
 Provide a new optics group name. Use ```--c``` and ```--q``` to specify which particles belong to this optics group (see the [*Querying*](#query) options). The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
+**```--expand_optics```** *```opticsgroup-name```* *`--f filewithoptics.star`*
+
+Expand the optics table to its subset optics groups based on a second star file provided by ```--f```. Provide the optics group name to expand. The second star file needs to have the expanded optics table for those micrographs, and a data table with micrograph names and corresponding optics group numbers. The micrograph paths don't have to match exactly between the two files, just the file name. The result is written to a new star file (default output.star, or specified with ```--o```).
+
 **```--relegate```**
 
 Remove optics table and optics column and write to a new star file (default output.star, or specified with ```--o```) so that it is compatible with Relion 3.0. Note that in some cases this will not be sufficient to be fully compatible with Relion 3.0 and you may have to use ```--remove_column``` to remove other bad columns (e.g. helix-specific columns). Note that to use starparser on Relion 3.0 star files, you need to pass the ```--opticsless``` option.

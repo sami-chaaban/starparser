@@ -1,6 +1,11 @@
 import sys
 import pandas as pd
 from starparser import argparser
+from starparser import columnplay
+
+"""
+These functions still require explanations.
+"""
 
 """
 --limit
@@ -255,3 +260,114 @@ def importpartvalues(original_particles, importfrom_particles, columnstoswap):
 
     return(importedparticles)
 
+"""
+--expand_optics
+"""
+
+def expandoptics(original_particles, original_metadata, newdata, newdata_metadata, opticsgrouptoexpand):
+
+    #print(original_metadata)
+    #print(original_particles["_rlnMicrographName"])
+    #print(original_particles["_rlnOpticsGroup"].head())
+
+    if "_rlnMicrographName" not in original_particles.columns:
+        print("\n>> Error: the star file doesn't have a _rlnMicrographName column.\n")
+        sys.exit()
+    elif "_rlnMicrographName" not in newdata.columns:
+        print("\n>> Error: the second star file doesn't have a _rlnMicrographName column.\n")
+        sys.exit()
+
+    newmetadata = original_metadata
+
+    opticsgroupnum = int(original_metadata[2].loc[original_metadata[2]["_rlnOpticsGroupName"] == opticsgrouptoexpand]["_rlnOpticsGroup"].tolist()[0])
+    opticsgrouplist = original_metadata[2]["_rlnOpticsGroup"].tolist()
+    opticsgrouplist = [int(o) for o in opticsgrouplist]
+
+    importopticsnames = newdata_metadata[2]["_rlnOpticsGroupName"].tolist()
+    importopticsnums = newdata_metadata[2]["_rlnOpticsGroup"].tolist()
+    importopticsnums = [int(o) for o in importopticsnums]
+    totalimportoptics = len(importopticsnums)
+
+    #print(opticsgroupnum,opticsgrouplist,importopticsnums,totalimportoptics)
+
+    newoptics = original_metadata[2]
+    #print(newoptics["_rlnOpticsGroup"])
+
+    torepeat = []
+    for i,o in enumerate(opticsgrouplist):
+        i=i+1
+        if i < opticsgroupnum:
+            torepeat.append(1)
+            #continue
+        elif i == opticsgroupnum:
+            torepeat.append(totalimportoptics)
+        else:
+            torepeat.append(1)
+
+        #opticsgrouplist[i]+=totalimportoptics
+
+    #print(torepeat)
+    newoptics["times"] = torepeat
+
+    newoptics=newoptics.loc[newoptics.index.repeat(newoptics.times)].reset_index(drop=True)
+
+    newoptics["_rlnOpticsGroup"] = range(1,totalimportoptics+len(opticsgrouplist))
+    newoptics.drop("times",1, inplace=True)
+
+    newopticsnames = newoptics["_rlnOpticsGroupName"].tolist()
+
+    #print(newoptics)
+
+    j=0
+    for i,o in enumerate(newopticsnames):
+        if o == opticsgrouptoexpand:
+            newopticsnames[i] = importopticsnames[j]
+            j+=1
+
+    newoptics["_rlnOpticsGroupName"]=newopticsnames
+
+    newmetadata[2] = newoptics
+
+    #print(newoptics)
+
+    #original_particles["_rlnOpticsGroup"] = pd.to_numeric(original_particles["_rlnOpticsGroup"], downcast="integer")
+
+    particleoptics = original_particles["_rlnOpticsGroup"].tolist()
+    newparticleoptics = [int(p) for p in particleoptics]
+
+    for i,p in enumerate(newparticleoptics):
+        if p <= opticsgroupnum:
+            continue
+        else:
+            newparticleoptics[i]=str(int(p+totalimportoptics-1))
+
+    original_particles["_rlnOpticsGroup"] = newparticleoptics
+
+    ###############
+
+    #print(newdata)
+
+    newdataoptics = newdata["_rlnOpticsGroup"].tolist()
+    newdataoptics = [int(p) for p in newdataoptics]
+
+    for i,p in enumerate(newdataoptics):
+        newdataoptics[i]=str(int(p+opticsgroupnum-1))
+
+    newdata["_rlnOpticsGroup"] = newdataoptics
+
+    #print(newdata)
+
+    ####
+
+    #print(original_particles["_rlnOpticsGroup"].head())
+
+    expandedparticles = columnplay.importmicvalues(original_particles, newdata, "_rlnOpticsGroup")
+
+    totaldifferent = 0
+    for i, j in zip(original_particles.iterrows(), expandedparticles.iterrows()):
+        if i[1]["_rlnOpticsGroup"] != j[1]["_rlnOpticsGroup"]:
+            totaldifferent += 1
+
+    print("\n>> The number of particles that have acquired a new optics group number = " + str(totaldifferent) + "\n")
+
+    return(expandedparticles, newmetadata)

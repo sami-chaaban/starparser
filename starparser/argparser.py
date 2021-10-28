@@ -156,6 +156,10 @@ def argparse():
         action="store", dest="parser_newoptics", type="string", default="", metavar='opticsgroup-name',
         help="Provide a new optics group name. Use --c and --q to specify which particles belong to this optics group. The optics values from the last entry of the optics table will be duplicated.")
 
+    modify_opts.add_option("--expand_optics",
+        action="store", dest="parser_expandoptics", type="string", default="", metavar='opticsgroup-name',
+        help="Expand the optics table to its subset optics groups based on a second star file provided by --f. Provide the optics group name to expand. The second star file needs to have the expanded optics table for those micrographs, and a data table with micrograph names and corresponding optics group numbers. The micrograph paths don't have to match exactly between the two files, just the file name.")
+
     modify_opts.add_option("--relegate",
         action="store_true", dest="parser_relegate", default=False,
         help="Remove optics table and optics column and write to a new star file so that it is compatible with Relion 3.0.")

@@ -119,8 +119,15 @@ def decide():
     totalparticles = len(allparticles.index)
     
     #If a query was passed, then turn it into a list. Since queries are split by a slash, .split("/") creates the list for us
+    #Escape a / with a , preceding it (i.e. ,/).
+    #!!This needs to be updated in particleplay if change here!!
     if params["parser_query"] != "":
-        query = params["parser_query"].split("/")
+        query = params["parser_query"]
+        escape = ",/"
+        query = str.replace(params["parser_query"],escape, ",")
+        query = query.split("/")
+        for i,q in enumerate(query):
+            query[i] = str.replace(q,",", "/")
 
         #If no column was passed, the query can't be checked.
         if params["parser_column"] == "":
@@ -933,7 +940,7 @@ def decide():
         particles2use = particleplay.checksubset(allparticles, queryexact)
     
     """
-    --extract_particles
+    --extract
     """
 
     if params["parser_extractparticles"]:

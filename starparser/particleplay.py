@@ -130,8 +130,16 @@ def checksubset(particles, queryexact):
 
     params = argparser.argparse()
     if params["parser_column"] != "" and params["parser_query"] != "":
-        query = params["parser_query"].split("/")
+
+        query = params["parser_query"]
+        escape = ",/"
+        query = str.replace(params["parser_query"],escape, ",")
+        query = query.split("/")
+        for i,q in enumerate(query):
+            query[i] = str.replace(q,",", "/")
+
         columns = params["parser_column"].split("/")
+        
         subsetparticles, extractednumber = extractparticles(particles, columns, query, queryexact)
         
         print("\n>> Created a subset of " + str(extractednumber) + " particles (out of " + str(len(particles.index)) + ", " + str(round(extractednumber*100/len(particles.index),1)) + "%) that match " + str(query) +               " in the columns " + str(columns) + ".")

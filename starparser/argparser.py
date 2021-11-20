@@ -200,7 +200,7 @@ def argparse():
     
     query_opts.add_option("--q",
         action="store", dest="parser_query", type="string", default="", metavar='query(ies)',
-        help="Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. Use --e if the query should exactly match the value.")
+        help="Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash: 20200101/20200203. To escape a slash, use a \",\". Use --e if the query should exactly match the value.")
 
     query_opts.add_option("--e",
         action="store_true", dest="parser_exact", default=False, metavar="match-exactly",

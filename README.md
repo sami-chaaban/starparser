@@ -219,7 +219,7 @@ Column query term(s). E.g. *\_rlnMicrographName*. This is used to look for a spe
 
 **```--q```** *```query(ies)```*
 
-Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash (e.g. 20200101/20200203 to request matching either of the two queries). Use ```--e``` if the query(ies) should exactly match the values in the column.
+Particle query term(s) to look for in the values within the specified column. To enter multiple queries, separate them with a slash (e.g. 20200101/20200203 to request matching either of the two queries). To escape a slash, precede it with "," (i.e. ,/). Use ```--e``` if the query(ies) should exactly match the values in the column (see below).
 
 **```--e```**
 

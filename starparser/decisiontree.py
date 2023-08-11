@@ -496,7 +496,7 @@ def decide():
         otherparticles, f2metadata = fileparser.getparticles(file2)
         matchedparticles = allparticles[allparticles["_rlnMicrographName"].isin(otherparticles["_rlnMicrographName"])]
         print("\n>> Kept " + str(len(set(matchedparticles["_rlnMicrographName"].tolist()))) + " micrographs that matched the second file (out of " + str(len(set(allparticles["_rlnMicrographName"].tolist()))) + ").\n")
-        fileparser.writestar(matchedparticles, metadata, "output.star", relegateflag)
+        fileparser.writestar(matchedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
     """

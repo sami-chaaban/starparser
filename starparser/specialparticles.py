@@ -271,3 +271,44 @@ def getcluster(particles,threshold,minimum):
     particles_purged = pd.concat(toconcat)
 
     return(particles_purged)
+
+"""
+--extract_minimum
+"""
+def extractwithmin(particles,minimum):
+
+    #~needs explanation~#
+
+    uniquemics = particles.groupby(["_rlnMicrographName"])
+    nameloc = particles.columns.get_loc("_rlnImageName")+1
+
+    keep = []
+    badmics = 0
+    for mic in uniquemics:
+        if len(mic[1]) > minimum:
+            for particle in mic[1].itertuples():
+                keep.append(particle[nameloc])
+        else:
+            badmics+=1
+
+    if len(keep) == 0:
+        print("\n>> Error: no particles were retained based on the criteria.\n")
+        sys.exit()
+    elif len(keep) == len(particles.index):
+        print("\n>> Error: all particles were retained. No star file will be output.")
+        sys.exit()
+
+    print(">> " + str(badmics) + " micrographs don't meet the criteria.\n")
+
+    """
+    With dataframes, stating dataframe1 = dataframe2 only creates
+    a reference. Therefore, we must create a copy if we want to leave
+    the original dataframe unmodified.
+    """
+    particles_purged = particles.copy()
+
+    toconcat = [particles_purged[particles_purged["_rlnImageName"] == q] for q in keep]
+
+    particles_purged = pd.concat(toconcat)
+
+    return(particles_purged)

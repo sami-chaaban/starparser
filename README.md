@@ -75,6 +75,14 @@ Write all values of a column to a file. For example, passing *\_rlnMicrographNam
 
 Find particles that are shared between the input star file and the one provided by ```--f``` based on the column provided here. Two new star files will be output, one with the shared particles and one with the unique particles.
 
+**```--match_mics```**
+
+FKeep only micrographs that also exist in a second star file provided by ```--f```.
+
+**```--extract_min```** *```minimum-value```*
+
+Find the micrographs that have this minimum number of particles in them and extract all the particles belonging to them.
+
 **```--extract_if_nearby```** *```distance```* *`--f otherfile.star`*
 
 For every particle in the input star file, check the nearest particle in a second star file provided by ```--f```; particles that have a neighbor closer than the distance (in pixels) provided here will be written to particles_close.star, and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also output a histogram of nearest distances to Particles_distances.png (use ```--t``` to change the file type; see the [*Output*](#output) options).

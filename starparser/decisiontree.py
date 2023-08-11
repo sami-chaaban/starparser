@@ -479,6 +479,26 @@ def decide():
             fileparser.writestar(unsharedparticles, metadata, "unique.star", relegateflag)
         sys.exit()
 
+
+    """
+    --match_mics
+    """
+        
+    if params["parser_matchmics"]:
+        columntocheckunique = params["parser_findshared"]
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to compare to.\n")
+            sys.exit()
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
+            sys.exit();
+        otherparticles, f2metadata = fileparser.getparticles(file2)
+        matchedparticles = allparticles[allparticles["_rlnMicrographName"].isin(otherparticles["_rlnMicrographName"])]
+        print("\n>> Kept " + str(len(set(matchedparticles["_rlnMicrographName"].tolist()))) + " micrographs that matched the second file (out of " + str(len(set(allparticles["_rlnMicrographName"].tolist()))) + ").\n")
+        fileparser.writestar(matchedparticles, metadata, "output.star", relegateflag)
+        sys.exit()
+
     """
     --extract_if_nearby
     """
@@ -565,6 +585,19 @@ def decide():
         clusterparticles = specialparticles.getcluster(allparticles, threshold,minimum)
         print(">> Removed " + str(len(allparticles.index)-len(clusterparticles.index)) + " that did not match the criteria (" + str(len(clusterparticles.index)) + " remaining out of " + str(len(allparticles.index)) + ").")
         fileparser.writestar(clusterparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+
+    """
+    --extract_min
+    """
+
+    if params["parser_exractmin"] != -1:
+        extractmin = params["parser_exractmin"]
+        print("\n>> Extracting particles that belong to micrographs with at least " + str(extractmin) + " particles.\n")
+        particlesfrommin = specialparticles.extractwithmin(allparticles, extractmin)
+        print(">> Removed " + str(len(allparticles.index)-len(particlesfrommin.index)) + " that did not match the criteria (" + str(len(particlesfrommin.index)) + " remaining out of " + str(len(allparticles.index)) + ").")
+        fileparser.writestar(particlesfrommin, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
     """

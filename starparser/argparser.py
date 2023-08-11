@@ -47,6 +47,14 @@ def argparse():
         action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
         help="Find particles that are shared between the input star file and the one provided by --f based on the column provided here. Two new star files will be written, one with the shared particles and one with the unique particles.")
 
+    info_opts.add_option("--match_mics",
+        action="store_true", dest="parser_matchmics", default=False,
+        help="Keep only micrographs that also exist in a second star file provided by --f.")
+
+    info_opts.add_option("--extract_min",
+        action="store", dest="parser_exractmin", type="int", default=-1, metavar='minimum-number',
+        help="Find the micrographs that have this minimum number of particles in them and extract all the particles belonging to them.")
+
     info_opts.add_option("--extract_if_nearby",
         action="store", dest="parser_findnearby", type="float", default=-1, metavar='distance',
         help="Find the nearest particle in a second star file (specified by --f); particles that have a neighbor in the second star file closer than the distance provided here will be written to particles_close.star and those that don't will be written to particles_far.star. Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). It will also write a histogram of nearest distances to Particles_distances.png.")

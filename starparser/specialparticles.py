@@ -256,7 +256,7 @@ def getcluster(particles,threshold,minimum):
         print("\n>> Error: no particles were retained based on the criteria.\n")
         sys.exit()
     elif len(keep) == len(particles.index):
-        print("\n>> Error: all particles were retained. No star file will be output.")
+        print("\n>> Error: all particles were retained. No star file will be output.\n")
         sys.exit()
 
     """

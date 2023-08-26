@@ -1,7 +1,18 @@
 import sys
 import pandas as pd
+import numpy as np
 from starparser import argparser
 from starparser import columnplay
+from starparser import fileparser
+
+import matplotlib.pyplot as plt
+from matplotlib.widgets import LassoSelector
+from matplotlib.path import Path
+import matplotlib.patches as patches
+
+import warnings
+from matplotlib.cbook import MatplotlibDeprecationWarning
+warnings.filterwarnings("ignore", category=MatplotlibDeprecationWarning)
 
 """
 These functions still require explanations.
@@ -379,3 +390,94 @@ def expandoptics(original_particles, original_metadata, newdata, newdata_metadat
     print("\n>> The number of particles that have acquired a new optics group number = " + str(totaldifferent) + "\n")
 
     return(expandedparticles, newmetadata)
+
+"""
+--remove_poses
+"""
+class SelectFromCollection:
+    def __init__(self, ax, collection, alpha_other=1):
+        self.canvas = ax.figure.canvas
+        self.ax = ax
+        self.collection = collection
+        self.alpha_other = alpha_other
+        self.xys = collection.get_offsets()
+        self.Npts = len(self.xys)
+        self.fc = collection.get_facecolors()
+        if len(self.fc) == 0:
+            raise ValueError('Collection must have a facecolor')
+        elif len(self.fc) == 1:
+            self.fc = np.tile(self.fc, (self.Npts, 1))
+        
+        self.lasso = LassoSelector(ax, onselect=self.onselect)
+        self.lasso.line.set_color('red')
+        self.ind = []
+        self.selected_points = None
+
+    def onselect(self, verts):
+        path = Path(verts)
+        self.ind = np.nonzero(path.contains_points(self.xys))[0]
+        self.fc[:, -1] = self.alpha_other
+        self.fc[self.ind, -1] = 1
+        self.collection.set_facecolors(self.fc)
+        
+        # Overlay red points for the selected area
+        selected_x = self.xys[self.ind][:, 0]
+        selected_y = self.xys[self.ind][:, 1]
+        if self.selected_points is not None:
+            self.selected_points.remove()
+        self.selected_points = self.ax.scatter(selected_x, selected_y, s=3, c='red')
+        
+        self.canvas.draw_idle()
+
+    def disconnect(self):
+        self.lasso.disconnect_events()
+        self.fc[:, -1] = 1
+        self.collection.set_facecolors(self.fc)
+        if self.selected_points is not None:
+            self.selected_points.remove()
+        self.canvas.draw_idle()
+
+def remove_poses(particles, metadata, outputname, relegateflag):
+
+    x_coordinates = list(map(float, list(particles["_rlnAngleRot"])))
+    y_coordinates = list(map(float, list(particles["_rlnAngleTilt"])))
+
+    fig, ax = plt.subplots()
+
+    pts = ax.scatter(x_coordinates, y_coordinates, s=1)
+    selector = SelectFromCollection(ax, pts)
+
+    global selected_indices
+    selected_indices = []
+
+    def update_plot():
+        ax.clear()
+        unselected_x = [x_coordinates[i] for i in range(len(x_coordinates)) if i not in selected_indices]
+        unselected_y = [y_coordinates[i] for i in range(len(y_coordinates)) if i not in selected_indices]
+        ax.scatter(unselected_x, unselected_y, s=1)
+        ax.set_title("Press 'enter' to remove selected orientations, 'e' to save and exit")
+        ax.set_xlabel("Rot")
+        ax.set_ylabel("Tilt")
+        selector.__init__(ax, pts)  # Reinitialize the selector
+        plt.draw()
+
+    def accept(event):
+        
+        if event.key == "enter":
+            selected_indices.extend(selector.ind)
+            selector.disconnect()
+            update_plot()
+
+        elif event.key == "e":
+            if selected_indices:
+                non_selected_indices = [i for i in range(len(x_coordinates)) if i not in selected_indices]
+                non_selected_particles = particles.iloc[non_selected_indices]
+                plt.close()
+                print("\n>> Removed " + str(len(particles.index)-len(non_selected_particles.index)) + " particles out of " + str(len(particles.index)) + ".\n")
+                fileparser.writestar(non_selected_particles, metadata, outputname, relegateflag)
+
+    fig.canvas.mpl_connect("key_press_event", accept)
+    ax.set_title("Press 'enter' to remove selected points.")
+    ax.set_xlabel("Rot")
+    ax.set_ylabel("Tilt")
+    plt.show()

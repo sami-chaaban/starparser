@@ -99,6 +99,10 @@ Extract particles with indices that match a list in a second file (specified by 
 
 Get a random set of particles totaling the number provided here. Optionally, use ```--c``` and ```--q``` to extract a random set of each passed query in the specified column (see the [*Querying*](#query) options); in this case, the output star files will have the name(s) of the query(ies). Otherwise, a random set from all particles will be written to output.star (or specified with ```--o```).
 
+**```--remove_poses```**
+
+Remove poses based on the AngleRot and AngleTilt columns using an interactive scatter plot. Use the lasso tool to select poses to remove then press enter to remove them. Continue removing and then press "e" to save and exit. Output will be written to output.star (or specified with ```--o```).
+
 **```--split```** *```number-of-files```*
 
 Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will have the input file name with the suffix "\_split-#". Note that they will not necessarily contain exactly the same number of particles.

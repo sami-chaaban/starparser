@@ -7,8 +7,6 @@ def getparticles(filename):
     This is the entry point. The file is read, passed to parsestar() to figure out where the tables are,
     and that information is passed to makepandas() to generate dataframes.
     """
-
-    print("\n>> Reading " + filename)
     
     #Get the data from the star file.
     file = open(filename,mode='r')

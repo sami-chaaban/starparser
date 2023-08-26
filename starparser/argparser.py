@@ -71,6 +71,10 @@ def argparse():
         action="store", dest="parser_randomset", type="int", default=-1, metavar='number',
         help="Get a random set of particles totaling the number provided here. Optionally, use --c and --q to extract a random set of each passed query in the specified column. In this case, the output star files will have the names of the query.")
 
+    info_opts.add_option("--remove_poses",
+        action="store_true", dest="parser_removeposes", default=False,
+        help="Remove poses based on the AngleRot and AngleTilt columns using an interactive plot. Use the lasso tool to select poses to remove.")
+
     info_opts.add_option("--split",
         action="store", dest="parser_split", type="int", default=-1, metavar='number',
         help="Split the input star file into the number of star files passed here, making sure not to separate particles that belong to the same micrograph. The files will have the input file name with the suffix \"_split-#\". Note that they will not necessarily contain exactly the same number of particles")

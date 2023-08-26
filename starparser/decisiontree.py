@@ -100,6 +100,8 @@ def decide():
     deciding which function to call.
     """
 
+    print("\n>> Reading " + filename)
+
     #The --opticsless option requires the getparticles_dummyoptics function to insert
     #a fake optics table before moving on
     if params["parser_optless"]:
@@ -253,6 +255,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
+        print("\n>> Reading " + file2)
         otherparticles, metadata2 = fileparser.getparticles(file2)
         columnstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = columnplay.swapcolumns(allparticles, otherparticles, columnstoswap)
@@ -272,6 +275,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
+        print("\n>> Reading " + file2)
         otherparticles, metadata2 = fileparser.getparticles(file2)
         columnstoimport = params["parser_importmicvalues"].split("/")
 
@@ -321,6 +325,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
+        print("\n>> Reading " + file2)
         newdata, newdata_metadata = fileparser.getparticles(file2)
 
         print("\n>> Expanding the optics group " + opticsgrouptoexpand + " based on the micrograph optics in " + file2)
@@ -342,6 +347,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
+        print("\n>> Reading " + file2)
         otherparticles, metadata2 = fileparser.getparticles(file2)
         columnstoimport = params["parser_importpartvalues"].split("/")
 
@@ -469,6 +475,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
+        print("\n>> Reading " + file2)
         otherparticles, f2metadata = fileparser.getparticles(file2)
         unsharedparticles = allparticles[~allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         sharedparticles = allparticles[allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
@@ -493,6 +500,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
+        print("\n>> Reading " + file2)
         otherparticles, f2metadata = fileparser.getparticles(file2)
         matchedparticles = allparticles[allparticles["_rlnMicrographName"].isin(otherparticles["_rlnMicrographName"])]
         print("\n>> Kept " + str(len(set(matchedparticles["_rlnMicrographName"].tolist()))) + " micrographs that matched the second file (out of " + str(len(set(allparticles["_rlnMicrographName"].tolist()))) + ").\n")
@@ -515,6 +523,7 @@ def decide():
             print("\n>> Error: \"" + params["parser_file2"] + "\" does not exist.\n")
             sys.exit();
 
+        print("\n>> Reading " + params["parser_file2"])
         nearparticles, nearmetadata = fileparser.getparticles(params["parser_file2"])
 
         print("\n>> Creating subsets with particles that are closer/further than " + str(threshdist) + " pixels from the closest particle in the second star file.")
@@ -560,6 +569,7 @@ def decide():
         if not os.path.isfile(params["parser_file2"]):
             print("\n>> Error: \"" + params["parser_file2"] + "\" does not exist.\n")
             sys.exit();
+        print("\n>> Reading " + params["parser_file2"])
         nearparticles, nearmetadata = fileparser.getparticles(params["parser_file2"])
         for c in columnstoretrieve:
             if c not in nearparticles:
@@ -777,6 +787,14 @@ def decide():
         sys.exit()
 
     """
+    --remove_poses
+    """
+
+    if params["parser_removeposes"]:
+        filtered_particles = particleplay.remove_poses(allparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    """
     --plot_coordinates
     """
 
@@ -784,6 +802,7 @@ def decide():
         if params["parser_file2"] == "":
             file2particles = pd.DataFrame({'A' : []})
         else:
+            print("\n>> Reading " + params["parser_file2"])
             file2particles, metadata = fileparser.getparticles(params["parser_file2"])
         currentparams = params["parser_comparecoords"].split("/")
         numtoplot = currentparams[0]
@@ -938,6 +957,7 @@ def decide():
         if not os.path.isfile(file2):
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit()
+        print("\n>> Reading " + file2)
         otherparticles, newmetadata = fileparser.getparticles(file2)
         fileparser.writestar(allparticles, [metadata[0],newmetadata[1],newmetadata[2],metadata[3],metadata[4]], params["parser_outname"], relegateflag)
         sys.exit()

@@ -13,7 +13,7 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 ## Installation<a name="installation"></a>
 
-* Set up a fresh conda environment with Python >= 3.6: `conda create -n sp python=3.6`
+* Set up a fresh conda environment with Python >= 3.8: `conda create -n sp python=3.8`
 
 * Activate the environment: `conda activate sp`.
 

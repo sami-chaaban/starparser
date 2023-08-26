@@ -408,8 +408,7 @@ class SelectFromCollection:
         elif len(self.fc) == 1:
             self.fc = np.tile(self.fc, (self.Npts, 1))
         
-        self.lasso = LassoSelector(ax, onselect=self.onselect)
-        self.lasso.line.set_color('red')
+        self.lasso = LassoSelector(ax, onselect=self.onselect, props=dict(color='r'))
         self.ind = []
         self.selected_points = None
 

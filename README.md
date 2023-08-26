@@ -77,7 +77,7 @@ Find particles that are shared between the input star file and the one provided 
 
 **```--match_mics```**
 
-FKeep only micrographs that also exist in a second star file provided by ```--f```.
+Keep only micrographs that also exist in a second star file provided by ```--f```.
 
 **```--extract_min```** *```minimum-value```*
 

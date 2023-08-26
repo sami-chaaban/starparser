@@ -22,5 +22,5 @@ setup(name='starparser',
             ],
       },
       install_requires=["numpy","pandas","matplotlib", "scipy"],
-      python_requires='>=3.6'
+      python_requires='>=3.8'
      )

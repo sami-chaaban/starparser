@@ -41,8 +41,8 @@ def limitparticles(particles, column, limit, operator):
     elif operator == "le":
         limitedparticles = limitedparticles[limitedparticles[tempcolumnname]<=limit]
 
-    particles.drop(tempcolumnname,1, inplace=True)
-    limitedparticles.drop(tempcolumnname,1, inplace=True)
+    particles.drop(tempcolumnname, axis=1, inplace=True)
+    limitedparticles.drop(tempcolumnname, axis=1, inplace=True)
 
     if len(limitedparticles.index) == 0:
         print("\n>> Error: there are no particles that match the criterion.\n")
@@ -74,10 +74,10 @@ def delparticles(particles, columns, query, queryexact):
 
     if not queryexact:
         q = "|".join(query)
-        purgedparticles.drop(purgedparticles[purgedparticles[columns[0]].str.contains(q)].index , 0,inplace=True)
+        purgedparticles.drop(purgedparticles[purgedparticles[columns[0]].str.contains(q)].index , axis=0,inplace=True)
     else:
         for q in query:
-            purgedparticles.drop(purgedparticles[purgedparticles[columns[0]]==q].index , 0,inplace=True)
+            purgedparticles.drop(purgedparticles[purgedparticles[columns[0]]==q].index , axis=0,inplace=True)
     
     return(purgedparticles)
 
@@ -94,7 +94,7 @@ def delduplicates(particles, column):
 def delmics(particles, micstodelete):
     purgedparticles = particles.copy()
     m = "|".join(micstodelete)
-    purgedparticles.drop(purgedparticles[purgedparticles["_rlnMicrographName"].str.contains(m)].index , 0,inplace=True)    
+    purgedparticles.drop(purgedparticles[purgedparticles["_rlnMicrographName"].str.contains(m)].index , axis=0,inplace=True)    
     return(purgedparticles)
 
 """
@@ -122,7 +122,7 @@ def extractparticles(particles, columns, query, queryexact):
     if not queryexact:
         extractedparticles = particles.copy()
         q = "|".join(query)
-        extractedparticles.drop(extractedparticles[~extractedparticles[columns[0]].str.contains(q)].index, 0,inplace=True)
+        extractedparticles.drop(extractedparticles[~extractedparticles[columns[0]].str.contains(q)].index, axis=0,inplace=True)
     else:
         toconcat = [particles[particles[columns[0]] == q] for q in query]
         extractedparticles = pd.concat(toconcat)
@@ -212,11 +212,11 @@ def regroup(particles, numpergroup):
     regroupedparticles.sort_values("_rlnDefocusU", inplace=True)
 
     if "_rlnGroupNumber" in regroupedparticles.columns:
-        regroupedparticles.drop("_rlnGroupNumber", 1, inplace=True)
+        regroupedparticles.drop("_rlnGroupNumber", axis=1, inplace=True)
         regroupedparticles["_rlnGroupNumber"] = newgroups
 
     if "_rlnGroupName" in regroupedparticles.columns:
-        regroupedparticles.drop("_rlnGroupName", 1, inplace=True)
+        regroupedparticles.drop("_rlnGroupName", axis=1, inplace=True)
         newgroups = [("group_"+str(i).zfill(4)) for i in newgroups]
         regroupedparticles["_rlnGroupName"] = newgroups
     
@@ -331,7 +331,7 @@ def expandoptics(original_particles, original_metadata, newdata, newdata_metadat
     newoptics=newoptics.loc[newoptics.index.repeat(newoptics.times)].reset_index(drop=True)
 
     newoptics["_rlnOpticsGroup"] = range(1,totalimportoptics+len(opticsgrouplist))
-    newoptics.drop("times",1, inplace=True)
+    newoptics.drop("times",axis=1, inplace=True)
 
     newopticsnames = newoptics["_rlnOpticsGroupName"].tolist()
 

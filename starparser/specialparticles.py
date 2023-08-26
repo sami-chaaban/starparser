@@ -138,8 +138,8 @@ def findnearby(coreparticles,nearparticles,threshdist):
     print("\n>> Out of " + str(len(coreparticles.index)) + ", the subsets have:\n-FAR: " + str(len(farparticles.index)) + " particles\n-CLOSE: " + str(len(closeparticles.index)) + " particles\n-NO-MATCH: " + str(len(noparts)) + " particles\n")
 
     #We can remove the new column we made above before returning the dataframes
-    closeparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)
-    farparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)
+    closeparticles.drop("_rlnMicrographNameSimple", axis=1, inplace=True)
+    farparticles.drop("_rlnMicrographNameSimple", axis=1, inplace=True)
 
     return(farparticles, closeparticles, alldistances)
 
@@ -253,10 +253,10 @@ def getcluster(particles,threshold,minimum):
                 keep.append(names[i])
 
     if len(keep) == 0:
-        print("\n>> Error: no particles were retained based on the criteria.\n")
+        print(">> Error: no particles were retained based on the criteria.\n")
         sys.exit()
     elif len(keep) == len(particles.index):
-        print("\n>> Error: all particles were retained. No star file will be output.\n")
+        print(">> Error: all particles were retained. No star file will be output.\n")
         sys.exit()
 
     """

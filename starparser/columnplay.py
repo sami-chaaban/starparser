@@ -27,7 +27,7 @@ def delcolumn(particles, columns, metadata):
         The "1" tells .drop that it is the column axis that we want to drop
         inplace means we want the dataframe to be modified instead of creating an assignment
         """
-        nocolparticles.drop(c, 1, inplace=True)
+        nocolparticles.drop(c, axis=1, inplace=True)
 
         #We nead to remove that column header too. The heads are the third
         #metadata (i.e. metadata[3])
@@ -77,7 +77,7 @@ def swapcolumns(original_particles, swapfrom_particles, columns):
         The "1" means the column axis and inplace means the dataframe
         should be modified instead of creating an assignment
         """
-        swappedparticles.drop(c,1,inplace=True)
+        swappedparticles.drop(c,axis=1,inplace=True)
 
         """
         Insert the new column in the right index using .insert()
@@ -140,7 +140,7 @@ def importmicvalues(importedparticles, importfrom_particles, column):
         The "1" tells .drop that it is the column axis that we want to drop
         inplace means we want the dataframe to be modified instead of creating an assignment
         """
-        importedparticles.drop("_rlnMicrographNameSimple", 1, inplace=True)
+        importedparticles.drop("_rlnMicrographNameSimple", axis=1, inplace=True)
     
     return(importedparticles)
 
@@ -293,7 +293,7 @@ def replacecolumn(particles,replacecol,newcol):
     The "1" means the column axis and inplace means the dataframe
     should be modified instead of creating an assignment
     """
-    particles.drop(replacecol, 1, inplace=True)
+    particles.drop(replacecol, axis=1, inplace=True)
 
     #Insert the new column in the right index using .insert()
     #Since newcol comes in as a list, we don't have to modify it

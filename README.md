@@ -2,6 +2,8 @@
 
 Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with some examples. Alternatively, use starparser within Relion or load the modules in your own Python scripts.
 
+Some of the options below are already available in Relion with "relion_star_handler".
+
 1. [Installation](#installation)
 2. [Command-line options](#cmdops)
 3. [Tips](#tips)
@@ -44,8 +46,6 @@ starparser --i particles1.star --f particles2.star --find_shared _rlnMicrographN
 ```
 
 The list of options are organized by [Data Mining](#mining), [Modifications](#modify), and [Plots](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below. Do not include the parentheses in your arguments.
-
-Some of the options below are already available in Relion with "relion_star_handler".
 
 ### Input
 

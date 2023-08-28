@@ -3,8 +3,8 @@
 Use this package to manipulate Relion star files, including counting, modifying, plotting, and sifting the data. At the very least, this is a useful alternative to *awk* commands, which can get *awk*ward. Below is a description of the command-line options with some examples. Alternatively, use starparser within Relion or load the modules in your own Python scripts.
 
 1. [Installation](#installation)
-2. [Important notes](#notes)
-3. [Command-line options](#cmdops)
+2. [Command-line options](#cmdops)
+3. [Tips](#tips)
 4. [Limitations](#limits)
 5. [Relion GUI usage](#reliongui)
 6. [Scripting](#scripts)
@@ -19,16 +19,6 @@ Use this package to manipulate Relion star files, including counting, modifying,
 
 * Install starparser: **`pip install starparser`**
 
-## Important notes<a name="notes"></a>
-
-* Your input file needs to be a standard **Relion** *.star* file. Typical files include *particles.star*, *run_data.star*, *run_itxxx_data.star*, *movies.star*, etc. For example, it does not work on *\*\_model.star* files.
-
-* The term *particles* here refers to rows in a star file, which may represent objects other than particles, such as movies in a *movies.star* file.
-
-* Some of the options below are already available in Relion with "relion_star_handler".
-
-* If the star file lacks an optics table, such as those from Relion 3.0, add the ```--opticsless``` option to parse it.
-
 ## Command-line options<a name="cmdops"></a>
 
 ### Usage
@@ -37,7 +27,25 @@ Use this package to manipulate Relion star files, including counting, modifying,
 starparser [input] [options]
 ```
 
-Typically, you just need to pass the star file ```starparser --i input.star``` followed by the desired option and its arguments (e.g. ```--count``` or ```--list_column _rlnOriginX```). For some options, a second star file can also be passed as input ```--f secondfile.star```. The list of options are organized by [Data Mining](#mining), [Modifications](#modify), and [Plots](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below.
+Typically, you just need to pass the star file ```starparser --i input.star``` followed by the desired option and its arguments.
+
+```
+starparser --i particles.star --count
+```
+
+```
+starparser --i particles.star --list_column _rlnOriginX
+```
+
+For some options, a second star file can also be passed as input ```--f secondfile.star```.
+
+```
+starparser --i particles1.star --f particles2.star --find_shared _rlnMicrographName
+```
+
+The list of options are organized by [Data Mining](#mining), [Modifications](#modify), and [Plots](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below. Do not include the parentheses in your arguments.
+
+Some of the options below are already available in Relion with "relion_star_handler".
 
 ### Input
 
@@ -255,9 +263,17 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 
 ---
 
-## Limitations<a name="limits"></a>
+## Tips<a name="tips"></a>
 
-* The Freedman-Diaconis rule for histogram binning is not always appropriate.
+* Your input file needs to be a standard **Relion** *.star* file. Typical files include *particles.star*, *run_data.star*, *run_itxxx_data.star*, *movies.star*, *micrographs_ctf.star*, etc. You cannot parse *\*\_model.star* files for example.
+
+* The term *particles* here refers to rows in a star file, but the star files don't need to contain particles (e.g. parsing movies in a *movies.star* file).
+
+* If the star file lacks an optics table, such as those from Relion 3.0, add the ```--opticsless``` option to parse it.
+
+---
+
+## Limitations<a name="limits"></a>
 
 * ```--opticsless``` does not work when the second star file (```--f```) lacks an optics table or when multiple star files are being read. There is little incentive to fix this since few still use Relion 3.0.
 
@@ -266,6 +282,8 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 * ```--split_optics``` does not renumber the optics groups that were greater than 1 back to 1, although this does not affect any behavior downstream in Relion and elsewhere.
 
 * The ```--plot_coordinates``` circle size does not exactly match the requested value. If you need it to be exact, save the file as pdf with ```--t pdf``` and open the plot in illustrator to modify the circle size.
+
+* The Freedman-Diaconis rule for histogram binning is not always appropriate.
 
 ---
 
@@ -322,7 +340,7 @@ far_particles, close_particles, distances = specialparticles.findnearby(particle
 clusterparticles = specialparticles.getcluster(particles, 250, 4)
 ``` 
 
-* After manipulating the particles, you can write the star file:
+* After manipulating the particles, you can write out a new star file:
 
 ```python
 fileparser.writestar(new_particles, metadata, "processed-particles.star")

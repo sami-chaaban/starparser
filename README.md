@@ -544,6 +544,18 @@ starparser --i run_data.star --o run_data_under4um.star --limit _rlnDefocusU/lt/
 
 ---
 
+* **Remove specific poses from a star file**
+
+```
+starparser --i particles.star --o particles_remove_weird_poses.star --remove_poses
+```
+
+![Remove Poses](https://github.com/sami-chaaban/StarParser/blob/main/Images/Remove_poses.gif?raw=true "Remove Poses")
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *Removed 2544 particles out of 19519.*
+
+---
+
 **Count specific particles**
 
 ```

@@ -476,7 +476,7 @@ def remove_poses(particles, metadata, outputname, relegateflag):
                 fileparser.writestar(non_selected_particles, metadata, outputname, relegateflag)
 
     fig.canvas.mpl_connect("key_press_event", accept)
-    ax.set_title("Press 'enter' to remove selected points.")
+    ax.set_title("Press 'enter' to remove selected orientations.")
     ax.set_xlabel("Rot")
     ax.set_ylabel("Tilt")
     plt.show()

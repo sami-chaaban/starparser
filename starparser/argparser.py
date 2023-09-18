@@ -49,7 +49,11 @@ def argparse():
 
     info_opts.add_option("--match_mics",
         action="store_true", dest="parser_matchmics", default=False,
-        help="Keep only micrographs that also exist in a second star file provided by --f.")
+        help="Keep only particles belonging to micrographs that also exist in a second star file (provided by --f).")
+
+    info_opts.add_option("--extract_optics",
+        action="store_true", dest="parser_extractoptics", default=False,
+        help="Find optics group groups that match a column header (--c) and query (--q) and write the corresponding particles to a new star file.")
 
     info_opts.add_option("--extract_min",
         action="store", dest="parser_exractmin", type="int", default=-1, metavar='minimum-number',

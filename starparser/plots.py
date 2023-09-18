@@ -515,7 +515,7 @@ def comparecoords(file1parts, file2parts, numtoplot, circlesize):
 
     #Check that the coordinate columns exist
     if "_rlnCoordinateX" not in file1parts or "_rlnCoordinateY" not in file1parts:
-        print("\n>> Error: the star file does not have a _rlnMicrographName column.\n")
+        print("\n>> Error: the star file does not have a the coordinate columns.\n")
         sys.exit()
 
     #get_loc finds the index of the column for retrieval later down the function

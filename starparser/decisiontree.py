@@ -116,6 +116,26 @@ def decide():
     ####
 
 
+    ##########
+    """
+    Optics based querying here before assuming it is particle based querying
+    """
+
+    """
+    --extract_optics
+    """
+
+    if params["parser_extractoptics"]:
+        if params["parser_column"] == "" or params["parser_query"] == "":
+            print("\n>> Error: enter a column (--c) and query (--q) to extract.\n")
+            sys.exit()
+        particles_extractedoptics, newmetadata, extractednumber = particleplay.extractoptics(allparticles, metadata, queryexact)
+        print(f"\n>> Extracted {extractednumber} out of {len(allparticles.index)} ({round(100*extractednumber/len(allparticles.index),1)}%) that matched the optics query.")
+        fileparser.writestar(particles_extractedoptics, newmetadata, params["parser_outname"], False)
+        sys.exit()
+
+    ##########
+
     #Check how many particles there are. This variable isn't useful yet but will be used for
     #various things later.
     totalparticles = len(allparticles.index)
@@ -609,6 +629,8 @@ def decide():
         print(">> Removed " + str(len(allparticles.index)-len(particlesfrommin.index)) + " that did not match the criteria (" + str(len(particlesfrommin.index)) + " remaining out of " + str(len(allparticles.index)) + ").")
         fileparser.writestar(particlesfrommin, metadata, params["parser_outname"], relegateflag)
         sys.exit()
+
+
 
     """
     --plot_class_proportions

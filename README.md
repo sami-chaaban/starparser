@@ -87,6 +87,10 @@ Find particles that are shared between the input star file and the one provided 
 
 Keep only particles from micrographs that also exist in a second star file provided by ```--f```. Output will be written to output.star (or specified with ```--o```).
 
+**```--extract_optics```**
+
+Find optics group groups that match a column header ```--c``` and query ```--q``` (see the [*Querying*](#query) options) and write the corresponding particles to a new star file. Output will be written to output.star (or specified with ```--o```).
+
 **```--extract_min```** *```minimum-value```*
 
 Find the micrographs that have this minimum number of particles in them and extract all the particles belonging to them.

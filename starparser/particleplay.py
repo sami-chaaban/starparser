@@ -480,3 +480,69 @@ def remove_poses(particles, metadata, outputname, relegateflag):
     ax.set_xlabel("Rot")
     ax.set_ylabel("Tilt")
     plt.show()
+
+
+def extractoptics(particles, metadata, queryexact):
+
+    params = argparser.argparse()
+    if params["parser_column"] != "" and params["parser_query"] != "":
+
+        query = params["parser_query"]
+        escape = ",/"
+        query = str.replace(params["parser_query"],escape, ",")
+        query = query.split("/")
+        for i,q in enumerate(query):
+            query[i] = str.replace(q,",", "/")
+
+        column = params["parser_column"].split("/")
+
+    if len(column)>1:
+        print("\n>> Error: you have specified two column. Only specify one if you're extracting from a subset of the data using a query.\n")
+        sys.exit()
+    else:
+        column = column[0]
+
+    opticsheaders = metadata[1]
+    opticsdata = metadata[2]
+
+    if column not in opticsheaders:
+        print(f"\n>> Error: {column} is not in your optics table.\n")
+        sys.exit()
+
+    itisnumeric = True
+    try:
+        pd.to_numeric(opticsdata[column], downcast="float")
+    except ValueError:
+        itisnumeric = False
+
+    params = argparser.argparse()
+
+    if not queryexact and itisnumeric:
+        print("\n----------------------------------------------------------------------")        
+        print("\n>> Warning: it looks like this column has numbers but you haven't specified the exact option (--e).\n   Make sure that this is the behavior you intended.\n")
+        print("----------------------------------------------------------------------")
+
+    if not queryexact:
+        matching_opticsnumbers = opticsdata[opticsdata[column].str.contains('|'.join(query))]['_rlnOpticsGroup']
+        non_repeating_values_set = list(set(matching_opticsnumbers))
+
+    else:
+        matching_opticsnumbers = opticsdata[opticsdata[column].isin(query)]['_rlnOpticsGroup']
+        non_repeating_values_set = list(set(matching_opticsnumbers))
+
+    if len(non_repeating_values_set) == 0:
+        print("\n>> Error: No optics groups matched the optics query.\n")
+        sys.exit()
+
+    toconcat = [particles[particles["_rlnOpticsGroup"] == q] for q in non_repeating_values_set]
+    newparticles = pd.concat(toconcat)
+
+    if newparticles.empty:
+        print("\n>> Error: No particles matched the optics query.\n")
+        sys.exit()
+
+    extractednumber = len(newparticles.index)
+
+    newopticsdata = opticsdata[opticsdata['_rlnOpticsGroup'].isin(non_repeating_values_set)]
+    
+    return(newparticles, [metadata[0], metadata[1], newopticsdata, metadata[3], metadata[4]], extractednumber)

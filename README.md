@@ -89,7 +89,7 @@ Keep only particles from micrographs that also exist in a second star file provi
 
 **```--extract_optics```**
 
-Find optics group groups that match a column header ```--c``` and query ```--q``` (see the [*Querying*](#query) options) and write the corresponding particles to a new star file. Output will be written to output.star (or specified with ```--o```).
+Find optics groups that match a column header ```--c``` and query ```--q``` (see the [*Querying*](#query) options) and write the corresponding particles to a new star file. Output will be written to output.star (or specified with ```--o```).
 
 **```--extract_min```** *```minimum-value```*
 

@@ -36,13 +36,13 @@ starparser --i particles.star --count
 ```
 
 ```
-starparser --i particles.star --list_column _rlnOriginX
+starparser --i particles.star --list_column OriginX
 ```
 
 For some options, a second star file can also be passed as input ```--f secondfile.star```.
 
 ```
-starparser --i particles1.star --f particles2.star --find_shared _rlnMicrographName
+starparser --i particles1.star --f particles2.star --find_shared MicrographName
 ```
 
 The list of options are organized by [Data Mining](#mining), [Modifications](#modify), and [Plots](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below. Do not include the parentheses in your arguments.
@@ -65,7 +65,7 @@ Find particles that match a column header ```--c``` and query ```--q``` (see the
 
 **```--limit```** *```column/comparator/value```*
 
-Extract particles that match a specific comparison (*lt* for less than, *gt* for greater than, *le* for less than or equal to, *ge* for greater than or equal to). The argument to pass is "column/comparator/value" (e.g. *\_rlnDefocusU/lt/40000* for defocus values less than 40000).
+Extract particles that match a specific comparison (*lt* for less than, *gt* for greater than, *le* for less than or equal to, *ge* for greater than or equal to). The argument to pass is "column/comparator/value" (e.g. *DefocusU/lt/40000* for defocus values less than 40000).
 
 **```--count```** *`(--c column --q query (--e))`*
 
@@ -77,7 +77,7 @@ Count the number of unique micrographs and display the result. Optionally, this 
 
 **```--list_column```** *```column-name(s)```* *`(--c column --q query (--e))`*
 
-Write all values of a column to a file. For example, passing *\_rlnMicrographName* will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *\_rlnMicrographName/\_rlnCoordinateX* outputs MicrographName.txt and CoordinateX.txt). Optionally, this can be used with ```--c``` and ```--q``` to only consider particles that match the query (see the [*Querying*](#query) options), otherwise it lists all values.
+Write all values of a column to a file. For example, passing *MicrographName* will write all values to MicrographName.txt. To output multiple columns, separate the column names with a slash (for example, *MicrographName/CoordinateX* outputs MicrographName.txt and CoordinateX.txt). Optionally, this can be used with ```--c``` and ```--q``` to only consider particles that match the query (see the [*Querying*](#query) options), otherwise it lists all values.
 
 **```--find_shared```** *```column-name```* *`--f otherfile.star`*
 
@@ -129,21 +129,21 @@ Split the input star file into independent star files for each optics group. The
 
 **```--sort_by```** *```column-name(/n)```*
 
-Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. *\_rlnClassNumber/n*); otherwise, it will sort the values as text. 
+Sort the columns in ascending order according to the column passed here. Outputs a new file to output.star (or specified with ```--o```). Add a slash followed by "*n*" if the column contains numeric values (e.g. *ClassNumber/n*); otherwise, it will sort the values as text. 
 
 ### Modification Options<a name="modify"></a>
 
 **```--operate```** *```column-name[operator]value```*
 
-Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. *\_rlnHelicalTrackLength\*0.25*). The result is written to a new star file (default output.star, or specified with ```--o```). If your terminal throws an error, try surrounding the argument with quotations (e.g. *"\_rlnHelicalTrackLength\*0.25"*).
+Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. *HelicalTrackLength\*0.25*). The result is written to a new star file (default output.star, or specified with ```--o```). If your terminal throws an error, try surrounding the argument with quotations (e.g. *"HelicalTrackLength\*0.25"*).
 
 **```--operate_columns```** *```column1[operator]column2=newcolumn```*
 
-Perform operation between two columns and write to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. *\_rlnCoordinateX+\_rlnOriginX=\_rlnShiftedX*). If your terminal throws an error, try surrounding the argument with quotations (e.g. *"\_rlnCoordinateX+\_rlnOriginX=\_rlnShiftedX"*).
+Perform operation between two columns and write to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include "\*", "/", "+", and "-" (e.g. *CoordinateX+OriginX=ShiftedX*). If your terminal throws an error, try surrounding the argument with quotations (e.g. *"CoordinateX+OriginX=ShiftedX"*).
 
 **```--remove_column```** *```column-name(s)```*
 
-Remove column, renumber headers, and write to a new star file (default output.star, or specified with ```--o```). E.g. *\_rlnMicrographName*. To enter multiple columns, separate them with a slash: *\_rlnMicrographName/\_rlnCoordinateX*. Note that "relion_star_handler --remove_column" also does this.
+Remove column, renumber headers, and write to a new star file (default output.star, or specified with ```--o```). E.g. *MicrographName*. To enter multiple columns, separate them with a slash: *MicrographName/CoordinateX*. Note that "relion_star_handler --remove_column" also does this.
 
 **```--remove_particles```** *`--c column --q query (--e)`*
 
@@ -151,7 +151,7 @@ Remove particles that match a query (specified with ```--q```) within a column h
 
 **```--remove_duplicates```** *```column-name```*
 
-Remove duplicate particles based on the column provided here (e.g. *\_rlnImageName*) (one instance of the duplicate is retained).
+Remove duplicate particles based on the column provided here (e.g. *ImageName*) (one instance of the duplicate is retained).
 
 **```--remove_mics_fromlist```** *`--f micrographs.txt`*
 
@@ -167,41 +167,41 @@ Replace all entries of a column with a list of values found in the file provided
 
 **```--copy_column```** *```source-column/target-column```*
 
-Replace all entries of a target column with those of a source column in the same star file. If the target column does not exist, a new column will be made. The argument to pass is source-column/target-column (e.g. *\_rlnAngleTiltPrior/\_rlnAngleTilt*). The result is written to a new star file (default output.star, or specified with ```--o```)
+Replace all entries of a target column with those of a source column in the same star file. If the target column does not exist, a new column will be made. The argument to pass is source-column/target-column (e.g. *AngleTiltPrior/AngleTilt*). The result is written to a new star file (default output.star, or specified with ```--o```)
 
 **```--reset_column```** *```column-name/new-value```*
 
-Change all values of a column to the one provided here. The argument to pass is column-name/new-value (e.g. *\_rlnOriginX/0*). The result is written to a new star file (default output.star, or specified with ```--o```)
+Change all values of a column to the one provided here. The argument to pass is column-name/new-value (e.g. *OriginX/0*). The result is written to a new star file (default output.star, or specified with ```--o```)
 
 **```--swap_columns```** *```column-name(s)```* *`--f otherfile.star`*
 
-Swap columns from another star file (specified with ```--f```). For example, pass *\_rlnMicrographName* to swap that column. To enter multiple columns, separate them with a slash: *\_rlnMicrographName/\_rlnCoordinateX*. Note that the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
+Swap columns from another star file (specified with ```--f```). For example, pass *MicrographName* to swap that column. To enter multiple columns, separate them with a slash: *MicrographName/CoordinateX*. Note that the total number of particles should match. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 **```--insert_optics_column```** *```column-name/value```*
 
-Insert a new column in the optics table with the name and value provided (e.g. *\_rlnAmplitudeContrast/0.1*). The value will populate all rows of the optics table. The result is written to a new star file (default output.star, or specified with ```--o```).
+Insert a new column in the optics table with the name and value provided (e.g. *AmplitudeContrast/0.1*). The value will populate all rows of the optics table. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 **```--fetch_from_nearby```** *```distance/column-name(s)```* *`--f otherfile.star`*
 
-Find the nearest particle in a second star file (specified with ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. *300/\_rlnClassNumber* or *100/\_rlnAnglePsi/\_rlnHelicalTubeID*). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from \_rlnMicrographName do not necessarily need to match, just the filenames need to.
+Find the nearest particle in a second star file (specified with ```--f```) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name(s) (e.g. *300/ClassNumber* or *100/AnglePsi/HelicalTubeID*). Outputs to output.star (or specified with ```--o```). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from MicrographName do not necessarily need to match, just the filenames need to.
 
 **```--import_mic_values```** *```column-name(s)```* *`--f otherfile.star`*
 
-For every particle, find the micrograph that it belongs to in a second star file (specified with ```--f```) and replace the original column value with that of the second star file (e.g. *\_rlnOpticsGroup*). This requires that the second star file only has one instance of each micrograph name (e.g. a micrograph star file like micrographs_ctf.star). To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
+For every particle, find the micrograph that it belongs to in a second star file (specified with ```--f```) and replace the original column value with that of the second star file (e.g. *OpticsGroup*). The paths do not have to be identical, just the micrograph filename itself. To import multiple columns, separate them with a slash. The result is written to a new star file (default output.star, or specified with ```--o```).
 
 **```--import_particle_values```** *```column-name(s)```* *`--f otherfile.star`*
 
-For every particle in the input star file, find the equivalent particle in a second star file (specified with ```--f```) (i.e. those with equivalent *\_rlnImageName* values) and replace the original column value with the one from the second star file. To import multiple columns, separate them with a slash.
+For every particle in the input star file, find the equivalent particle in a second star file (specified with ```--f```) (i.e. those with identical *ImageName* values) and replace the original column value with the one from the second star file. To import multiple columns, separate them with a slash.
 
 **```--regroup```** *```particles-per-group```*
 
-Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if *\_rlnGroupNumber* is being used in the star file rater than *\_rlnGroupName*. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
+Regroup particles such that those with similar defocus values are in the same group (the number of particles per group is specified here) and write to a new star file (default output.star, or specified with ```--o```). Any value can be entered. This is useful if there aren't enough particles in each micrograph to make meaningful groups. This only works if *GroupNumber* is being used in the star file rater than *GroupName*. Note that Subset selection in Relion should be used for regrouping if possible (which groups on the \*\_model.star intensity scale factors).
 
 **```--swap_optics```**
 
 Swap the optics table with that of another star file provided by ```--f```. The result is written to a new star file (default output.star, or specified with ```--o```).
 
-**```--new_optics```** *```optics-group-name```* *`--c column --q query (--e)`*
+**```--new_optics```** *```opticsgroup-name```* *`--c column --q query (--e)`*
 
 Provide a new optics group name. Use ```--c``` and ```--q``` to specify which particles belong to this optics group (see the [*Querying*](#query) options). The optics values from the last entry of the optics table will be duplicated. The result is written to a new star file (default output.star, or specified with ```--o```).
 
@@ -221,7 +221,7 @@ Plot values of a column as a histogram. Optionally, use ```--c``` and ```--q``` 
 
 **```--plot_orientations```** *`(--c column --q query (--e))`*
 
-Plot the particle orientations based on the *\_rlnAngleRot* and *\_rlnAngleTilt* columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change the file type (see the [*Output*](#output) options).
+Plot the particle orientations based on the *AngleRot* and *AngleTilt* columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use ```--c``` and ```--q``` to only plot a subset of particles, otherwise it will plot all. The result will be saved to Particle_orientations.png. Use ```--t``` to change the file type (see the [*Output*](#output) options).
 
 **```--plot_class_iterations```** *```classes```*
 
@@ -233,13 +233,13 @@ Find the proportion of particle sets that belong to each class. Pass at least tw
 
 **```--plot_coordinates```** *```number-of-micrographs(/circle-size)```*
 
- Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Make sure you are running it in the Relion directory so that the micrograph .mrc files can be properly sourced (or change the *\_rlnMicrographName* column to absolute paths). Use ```--f``` to overlay the coordinates of a second star file (larger blue circles); in this case, the micrograph names should match between the two star files. Optionally, pass the desired size of the circle after a slash (e.g. *1/250* for 1 micrograph and a circle size of 250 pixels). The plots are written to Coordinates.pdf.
+ Plot the particle coordinates for the input star file for each micrograph in a multi-page pdf (red circles). The argument to pass is the total number of micrographs to plot (pass \"all\" to plot all micrographs, but it might take a long time if there are many). Make sure you are running it in the Relion directory so that the micrograph .mrc files can be properly sourced (or change the *MicrographName* column to absolute paths). Use ```--f``` to overlay the coordinates of a second star file (larger blue circles); in this case, the micrograph names should match between the two star files. Optionally, pass the desired size of the circle after a slash (e.g. *1/250* for 1 micrograph and a circle size of 250 pixels). The plots are written to Coordinates.pdf.
 
 ### Querying<a name="query"></a>
 
 **```--c```** *```column-name(s)```*
 
-Column query term(s). E.g. *\_rlnMicrographName*. This is used to look for a specific query specified with ```--q```. In cases where you can enter multiple columns, separate them with a slash: *\_rlnMicrographName/\_rlnCoordinateX*.
+Column query term(s). E.g. *MicrographName*. This is used to look for a specific query specified with ```--q```. In cases where you can enter multiple columns, separate them with a slash: *MicrographName/CoordinateX*.
 
 **```--q```** *```query(ies)```*
 
@@ -272,6 +272,8 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 * Your input file needs to be a standard **Relion** *.star* file. Typical files include *particles.star*, *run_data.star*, *run_itxxx_data.star*, *movies.star*, *micrographs_ctf.star*, etc. You cannot parse *\*\_model.star* files for example.
 
 * The term *particles* here refers to rows in a star file, but the star files don't need to contain particles (e.g. parsing movies in a *movies.star* file).
+
+* Columns can be specified by their full or short names (e.g. \_rlnColumnName, rlnColumnName, or ColumnName). If scripting with the starparser package, columns are specified as their full name (i.e.\_rlnColumnName).
 
 * If the star file lacks an optics table, such as those from Relion 3.0, add the ```--opticsless``` option to parse it.
 
@@ -417,7 +419,7 @@ fileparser.writestar(particles[particles.index.isin(keeplist)], metadata, "parti
 
 * Plot a histogram of defocus values.
 ```
-starparser --i run_data.star --histogram _rlnDefocusU
+starparser --i run_data.star --histogram DefocusU
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Output figure to **DefocusU.png**:
@@ -446,10 +448,10 @@ starparser --i run_it025_data.star --plot_class_iterations all
 
 ---
 
-* Plot the proportion of particles in each class that belong to particles with the term 200702 versus those with the term 200826 in the \_rlnMicrographName column.
+* Plot the proportion of particles in each class that belong to particles with the term 200702 versus those with the term 200826 in the MicrographName column.
 
 ```
-starparser --i run_it025_data.star --plot_class_proportions --c _rlnMicrographName --q 200702/200826
+starparser --i run_it025_data.star --plot_class_proportions --c MicrographName --q 200702/200826
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  The percentage in each class will be displayed in terminal.
@@ -478,7 +480,7 @@ starparser --i particles.star --f select_particles.star --plot_coordinates 1/200
 **Remove columns**
 
 ```
-starparser --i run_data.star --o run_data_del.star --remove_column _rlnCtfMaxResolution/_rlnCtfFigureOfMerit 
+starparser --i run_data.star --o run_data_del.star --remove_column CtfMaxResolution/CtfFigureOfMerit 
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del.star** will be identical to run_data.star except will be missing those two columns. The headers in the particles table will be renumbered.
 
@@ -487,27 +489,27 @@ starparser --i run_data.star --o run_data_del.star --remove_column _rlnCtfMaxRes
 **Remove a subset of particles**
 
 ```
-starparser --i run_data.star --o run_data_del.star --remove_particles --c _rlnMicrographName --q 200702/200715
+starparser --i run_data.star --o run_data_del.star --remove_particles --c MicrographName --q 200702/200715
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del.star** will be identical to run_data.star except will be missing any particles that have the term 200702 or 2000715 in the \_rlnMicrographName column. In this case, this was useful to remove particles from specific data-collection days that had the date in the filename.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_del.star** will be identical to run_data.star except will be missing any particles that have the term 200702 or 2000715 in the MicrographName column. In this case, this was useful to remove particles from specific data-collection days that had the date in the filename.
 
 ---
 
 **Replace values in a column with those of a text file**
 
 ```
-starparser --i particles.star --replace_column _rlnOpticsGroup --f newoptics.txt --o particles_newoptics.star
+starparser --i particles.star --replace_column OpticsGroup --f newoptics.txt --o particles_newoptics.star
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **particles_newoptics.star** will be output that will be identical to particles.star except for the \_rlnOpticsGroup column, which will have the values found in newoptics.txt.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **particles_newoptics.star** will be output that will be identical to particles.star except for the OpticsGroup column, which will have the values found in newoptics.txt.
 
 ---
 
 **Swap columns**
 
 ```
-starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swap_columns _rlnAnglePsi/_rlnAngleRot/_rlnAngleTilt/_rlnNormCorrection/_rlnLogLikeliContribution/_rlnMaxValueProbDistribution/_rlnNrOfSignificantSamples/_rlnOriginXAngst/_rlnOriginYAngst
+starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swap_columns AnglePsi/AngleRot/AngleTilt/NormCorrection/LogLikeliContribution/MaxValueProbDistribution/NrOfSignificantSamples/OriginXAngst/OriginYAngst
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_swapped.star** will be output that will be identical to run_data.star except for the columns in the input, which will instead be swapped in from run_data_2.star. This is useful for sourcing alignments from early global refinements.
@@ -520,17 +522,17 @@ starparser --i run_data.star --f run_data_2.star --o run_data_swapped.star --swa
 starparser --i run_data.star --o run_data_regroup200.star --regroup 200
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_regroup200.star** will be output that will be identical to run_data.star except for the \_rlnGroupNumber or \_rlnGroupName columns, which will be renumbered to have 200 particles per group.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_regroup200.star** will be output that will be identical to run_data.star except for the GroupNumber or GroupName columns, which will be renumbered to have 200 particles per group.
 
 ---
 
 **Create a new optics group for a subset of particles**
 
 ```
-starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsname --c _rlnMicrographName --q 10090
+starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsname --c MicrographName --q 10090
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_newoptics.star** will be output that will be identical to run_data.star except that a new optics group called *myopticsname* will be created in the optics table and particles with the term 10090 in the \_rlnMicrographName column will have modified \_rlnOpticsGroup and/or \_rlnOpticsName columns to match the new optics group.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_newoptics.star** will be output that will be identical to run_data.star except that a new optics group called *myopticsname* will be created in the optics table and particles with the term 10090 in the MicrographName column will have modified OpticsGroup and/or OpticsName columns to match the new optics group.
 
 ---
 
@@ -540,7 +542,7 @@ starparser --i run_data.star --o run_data_newoptics.star --new_optics myopticsna
 starparser --i run_data.star --o run_data_3p0.star --relegate
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and \_rlnOpticsGroup column. The headers in the particles table will be renumbered accordingly.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_3p0.star** will be output that will be identical to run_data.star except will be missing the optics table and OpticsGroup column. The headers in the particles table will be renumbered accordingly.
 
 ---
 
@@ -549,7 +551,7 @@ starparser --i run_data.star --o run_data_3p0.star --relegate
 **Extract a subset of particles**
 
 ```
-starparser --i run_data.star --o run_data_c1.star --extract --c _rlnClassNumber --q 1 --e
+starparser --i run_data.star --o run_data_c1.star --extract --c ClassNumber --q 1 --e
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_c1.star** will be output with only particles that belong to class 1. The `--e` option was passed to avoid extracting any class with the number 1 in it, such as "10", "11", etc.
@@ -559,7 +561,7 @@ starparser --i run_data.star --o run_data_c1.star --extract --c _rlnClassNumber 
 **Extract particles with limited defoci**
 
 ```
-starparser --i run_data.star --o run_data_under4um.star --limit _rlnDefocusU/lt/40000
+starparser --i run_data.star --o run_data_under4um.star --limit DefocusU/lt/40000
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  A new star file named **run_data_under4um.star** will be output with only particles that have defocus estimations below 4 microns.
@@ -581,7 +583,7 @@ starparser --i particles.star --o particles_remove_weird_poses.star --remove_pos
 **Count specific particles**
 
 ```
-starparser --i particles.star --o output.star --count --c _rlnMicrographName --q 200702/200715
+starparser --i particles.star --o output.star --count --c MicrographName --q 200702/200715
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *There are 7726 particles that match ['200702', '200715'] in the specified columns (out of 69120, or 11.2%).*
@@ -601,7 +603,7 @@ starparser --i run_data.star --count_mics
 **Count the number of micrographs for specific particles**
 
 ```
-starparser --i run_data.star --count_mics --c _rlnMicrographName --q 200826
+starparser --i run_data.star --count_mics --c MicrographName --q 200826
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  *Creating a subset of 2358 particles that match ['200826'] in the columns ['\_rlnMicrographName'] \(or 3.4%\)*
@@ -613,40 +615,40 @@ starparser --i run_data.star --count_mics --c _rlnMicrographName --q 200826
 **List all items from a column in a text file**
 
 ```
-starparser --i run_data.star --list_column _rlnMicrographName
+starparser --i run_data.star --list_column MicrographName
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of \_rlnMicrographName will be written to *MicrographName.txt* in a single column.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of MicrographName will be written to *MicrographName.txt* in a single column.
 
 ---
 
 **List all items from multiple columns in independent text files**
 
 ```
-starparser --i run_data.star --list_column _rlnDefocusU/_rlnCoordinateX
+starparser --i run_data.star --list_column DefocusU/CoordinateX
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of \_rlnDefocusU will be written to *DefocusU.txt* and all entries of \_rlnCoordinateX will be written to *CoordinateX.txt*.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  All entries of DefocusU will be written to *DefocusU.txt* and all entries of CoordinateX will be written to *CoordinateX.txt*.
 
 ---
 
 **List all items from a column that match specific particles**
 
 ```
-starparser --i run_data.star --list_column _rlnDefocusU --c _rlnMicrographName --q 200826
+starparser --i run_data.star --list_column DefocusU --c MicrographName --q 200826
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Only \_rlnDefocusU entries that have 200826 in \_rlnMicrographName will be written to *DefocusU.txt*.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Only DefocusU entries that have 200826 in MicrographName will be written to *DefocusU.txt*.
 
 ---
 
 **Compare particles between star files and extract those that are shared and unique**
 
 ```
-starparser --i run_data1.star --find_shared _rlnMicrographName --f run_data2.star
+starparser --i run_data1.star --find_shared MicrographName --f run_data2.star
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2.star (unique.star) and only the particles that are shared between them (shared.star) based on the \_rlnMicrographName column.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named shared.star and unique.star that will have only the particles that are unique to run_data1.star relative to run_data2.star (unique.star) and only the particles that are shared between them (shared.star) based on the MicrographName column.
 
 ---
 
@@ -666,10 +668,10 @@ starparser --i particles1.star --f particles2.star --extract_if_nearby 650
 **Extract a random set of specific particles**
 
 ```
-starparser --i run_it025_data.star --extract_random 10000 --c _rlnMicrographName --q DOA3/OAA2
+starparser --i run_it025_data.star --extract_random 10000 --c MicrographName --q DOA3/OAA2
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named DOA3_10000.star and OAA2_10000.star that will have a random set of 10000 particles that match DOA3 and OAA2 in the \_rlnMicrographName column, respectively.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594;  Two new star files will be created named DOA3_10000.star and OAA2_10000.star that will have a random set of 10000 particles that match DOA3 and OAA2 in the MicrographName column, respectively.
 
 ---
 

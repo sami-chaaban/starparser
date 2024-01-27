@@ -89,62 +89,6 @@ def swapcolumns(original_particles, swapfrom_particles, columns):
     return(swappedparticles)
 
 """
---import_mic_values
-"""
-def importmicvalues(importedparticles, importfrom_particles, column):
-
-    #~needs explanation~#
-
-    dropflag = False
-
-    if "/" in importedparticles['_rlnMicrographName'][0]:
-        importedparticles["_rlnMicrographNameSimple"] = importedparticles['_rlnMicrographName']
-        for idx, row in importedparticles.iterrows():
-            micname = importedparticles.loc[idx,"_rlnMicrographName"]
-            importedparticles.loc[idx,"_rlnMicrographNameSimple"] = micname[micname.rfind("/")+1:]
-
-        importedparticles = importedparticles.set_index('_rlnMicrographNameSimple')
-
-        dropflag = True
-
-    else:
-
-        importedparticles = importedparticles.set_index('_rlnMicrographName')
-
-    ##
-
-    if "/" in importfrom_particles['_rlnMicrographName'][0]:
-        importfrom_particles["_rlnMicrographNameSimple"] = importfrom_particles['_rlnMicrographName']
-        for idx, row in importfrom_particles.iterrows():
-            micname = importfrom_particles.loc[idx,"_rlnMicrographName"]
-            importfrom_particles.loc[idx,"_rlnMicrographNameSimple"] = micname[micname.rfind("/")+1:]
-
-        importfrom_particles = importfrom_particles[["_rlnMicrographNameSimple", column]]
-        importfrom_particles = importfrom_particles.set_index('_rlnMicrographNameSimple')
-
-    else:
-
-        importfrom_particles = importfrom_particles[["_rlnMicrographName", column]]
-        importfrom_particles = importfrom_particles.set_index('_rlnMicrographName')
-
-    importedparticles.update(importfrom_particles)
-
-    importedparticles.reset_index(inplace=True)
-
-    #If we created a new column with simple micrograph names, we
-    #need to remove it
-    if dropflag:
-
-        """
-        The .drop can be used to drop a whole column.
-        The "1" tells .drop that it is the column axis that we want to drop
-        inplace means we want the dataframe to be modified instead of creating an assignment
-        """
-        importedparticles.drop("_rlnMicrographNameSimple", axis=1, inplace=True)
-    
-    return(importedparticles)
-
-"""
 --operate
 """
 def operate(particles,column,operator,value):
@@ -166,11 +110,11 @@ def operate(particles,column,operator,value):
     """
 
     if operator == "multiply":
-        print("\n>> Multiplying  all values in " + column + " by " + str(value) + ".")
+        print("\n>> Multiplying all values in " + column + " by " + str(value) + ".")
         particles[column] = particles[column] * value
 
     elif operator == "divide":
-        print("\n>> Dividing  all values in " + column + " by " + str(value) + ".")
+        print("\n>> Dividing all values in " + column + " by " + str(value) + ".")
         particles[column] = particles[column] / value
 
     elif operator == "add":

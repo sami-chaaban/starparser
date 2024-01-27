@@ -31,6 +31,15 @@ def decide():
     if 'file' not in params:
         print("\n>> Error: no filename entered. See the help page (-h).\n")
         sys.exit()
+
+    #Modify column name to be _rlnXXX regardless of the format input by the user (rln, _rln or no prefix)
+    if params["parser_column"] != "":
+        tempsplit = params["parser_column"].split("/")
+        for i,c in enumerate(tempsplit):
+            tempsplit[i] = makefullname(c)
+        params["parser_column"]='/'.join(tempsplit)
+
+    print(params["parser_column"])
         
     #This is a rare ocurance, but it's possible that the user asks to delete the _rlnOpticsGroup column as well as pass the --relegate option, which is redundant.
     if "_rlnOpticsGroup" in params["parser_column"] and params["parser_relegate"]:
@@ -203,7 +212,9 @@ def decide():
     """
 
     if params["parser_delcolumn"] != "":
-        columns = params["parser_delcolumn"].split("/")
+        columns = makefullname(params["parser_delcolumn"]).split("/")
+        for i,c in enumerate(columns):
+            columns[i] = makefullname(c)
         newparticles, metadata = columnplay.delcolumn(allparticles, columns, metadata)
         print("\n>> Removed the columns " + str(columns))
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
@@ -228,7 +239,7 @@ def decide():
     """
 
     if params["parser_delduplicates"] != "":
-        column = params["parser_delduplicates"]
+        column = makefullname(params["parser_delduplicates"])
         if column not in allparticles:
             print("\n>> Error: the column " + str(column) + " does not exist in your star file.\n")
             sys.exit()
@@ -268,6 +279,9 @@ def decide():
     """
 
     if params["parser_swapcolumns"] != "":
+        columnstoswap = params["parser_swapcolumns"].split("/")
+        for i,c in enumerate(columnstoswap):
+            columnstoswap[i]=makefullname(c)
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f to swap columns from.\n")
             sys.exit()
@@ -277,7 +291,6 @@ def decide():
             sys.exit();
         print("\n>> Reading " + file2)
         otherparticles, metadata2 = fileparser.getparticles(file2)
-        columnstoswap = params["parser_swapcolumns"].split("/")
         swappedparticles = columnplay.swapcolumns(allparticles, otherparticles, columnstoswap)
         print("\n>> Swapped in " + str(columnstoswap) + " from " + file2)
         fileparser.writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
@@ -298,6 +311,8 @@ def decide():
         print("\n>> Reading " + file2)
         otherparticles, metadata2 = fileparser.getparticles(file2)
         columnstoimport = params["parser_importmicvalues"].split("/")
+        for i,c in enumerate(columnstoimport):
+            columnstoimport[i]=makefullname(c)
 
         for column in columnstoimport:
             if column not in allparticles:
@@ -322,7 +337,7 @@ def decide():
         """
         importedparticles = allparticles.copy()
         for column in columnstoimport:
-            importedparticles = columnplay.importmicvalues(importedparticles, otherparticles, column)
+            importedparticles = particleplay.importmicvalues(importedparticles, otherparticles, column)
 
         fileparser.writestar(importedparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
@@ -370,6 +385,8 @@ def decide():
         print("\n>> Reading " + file2)
         otherparticles, metadata2 = fileparser.getparticles(file2)
         columnstoimport = params["parser_importpartvalues"].split("/")
+        for i,c in enumerate(columnstoimport):
+            columnstoimport[i] = makefullname(c)
 
         for column in columnstoimport:
             if column not in allparticles:
@@ -417,6 +434,7 @@ def decide():
             print("\n>> Error: the argument to pass is column[operator]value (e.g. _rlnHelicalTrackLength*0.25).\n")
             sys.exit()
         column, value = arguments
+        column = makefullname(column)
         try:    
             value = float(value)
         except ValueError:
@@ -455,12 +473,15 @@ def decide():
             sys.exit()
 
         column1, secondhalf = arguments
+        column1 = makefullname(column1)
 
         try:
             column2 = secondhalf.split("=")[0]
+            column2 = makefullname(column2)
             newcolumn = secondhalf.split("=")[1]
+            newcolumn = makefullname(newcolumn)
         except IndexError:
-            print("\n>> Error: the argument to pass is column1[operator]column2=newcolumn (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted).\n")
+            print("\n>> Error: the argument to pass is column1[operator]column2=newcolumn (e.g. CoordinateX*OriginX=Shifted). Try using quotations around it if it doesn't work\n")
             sys.exit()
 
         if column1 not in allparticles:
@@ -484,7 +505,7 @@ def decide():
     """
         
     if params["parser_findshared"] != "":
-        columntocheckunique = params["parser_findshared"]
+        columntocheckunique = makefullname(params["parser_findshared"])
         if columntocheckunique not in allparticles.columns:
             print("\n>> Error: could not find the " + columntocheckunique + " column in " + filename + ".\n")
             sys.exit()
@@ -499,11 +520,13 @@ def decide():
         otherparticles, f2metadata = fileparser.getparticles(file2)
         unsharedparticles = allparticles[~allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         sharedparticles = allparticles[allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
-        if params["parser_findshared"] != "":
-            print("\nShared: \n-------\n" + str(len(sharedparticles.index)) + " particles are shared between " + filename + " and " + file2 + " in the " + str(columntocheckunique) + " column.\n")
-            fileparser.writestar(sharedparticles, metadata, "shared.star", relegateflag)
-            print("Unique: \n-------\n·" + filename + ": " + str(len(unsharedparticles.index)) + " particles (these will be written to unique.star)\n·" + file2 + ": " + str(len(otherparticles.index) - len(sharedparticles.index)) + " particles\n")
+        
+        print("\nShared: \n-------\n" + str(len(sharedparticles.index)) + " particles are shared between " + filename + " and " + file2 + " in the " + str(columntocheckunique) + " column.\n")
+        fileparser.writestar(sharedparticles, metadata, "shared.star", relegateflag)
+        print("Unique: \n-------\n·" + filename + ": " + str(len(unsharedparticles.index)) + " particles (written to unique.star if non-zero)\n·" + file2 + ": " + str(len(otherparticles.index) - len(sharedparticles.index)) + " particles\n")
+        if not unsharedparticles.empty:
             fileparser.writestar(unsharedparticles, metadata, "unique.star", relegateflag)
+
         sys.exit()
 
 
@@ -572,6 +595,8 @@ def decide():
             print("\n>> Error: provide argument in this format: distance/column(s) (e.g. 300/_rlnClassNumber).")
             sys.exit()
         columnstoretrieve = retrieveparams[1:]
+        for i,c in enumerate(columnstoretrieve):
+            columnstoretrieve[i]=makefullname(c)
         for c in columnstoretrieve:
             if c not in allparticles:
                 print("\n>> Error: " + c + " does no exist in the input star file.\n")
@@ -670,7 +695,7 @@ def decide():
         if len(parsedinput) != 3:
             print("\n>> Error: provide argument in this format: column/operator/value (e.g. _rlnDefocusU/lt/40000).\n")
             sys.exit()
-        columntocheck = parsedinput[0]
+        columntocheck = makefullname(parsedinput[0])
         operator = parsedinput[1]
         limit = float(parsedinput[2])
         if operator not in ["lt", "gt", "le", "ge"]:
@@ -779,7 +804,7 @@ def decide():
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f that has the list of values.\n")
             sys.exit()
-        insertcol = params["parser_insertcol"]
+        insertcol = makefullname(params["parser_insertcol"])
         if insertcol in allparticles.columns:
             print("\n>> Error: the column " + str(insertcol) + " already exists in your star file. Use --replace_column if you would like to replace it.\n")
             sys.exit()
@@ -795,12 +820,17 @@ def decide():
         fileparser.writestar(allparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
 
+    """
+    --insert_optics_column
+    """
+
     if params["parser_insertopticscol"] != "":
         try:
             new_header, value = params["parser_insertopticscol"].split("/")
         except ValueError:
             print("\n>> Error: the argument to pass is column-name/value.\n")
             sys.exit()
+        new_header = makefullname(new_header)
         print("\n Creating the column " + new_header + " in the optics table with the value " + value)
 
         metadata[2][new_header]=value
@@ -868,7 +898,7 @@ def decide():
         if params["parser_file2"] == "":
             print("\n>> Error: provide a second file with --f that has the list of values.\n")
             sys.exit()
-        replacecol = params["parser_replacecol"]
+        replacecol = makefullname(params["parser_replacecol"])
         if replacecol not in allparticles.columns:
             print("\n>> Error: the column " + str(replacecol) + " does not exist in your star file.\n")
             sys.exit()
@@ -894,6 +924,8 @@ def decide():
             print("\n>> Error: the input should be source-column/target-column.\n")
             sys.exit()
         sourcecol, targetcol = inputparams
+        sourcecol = makefullname(sourcecol)
+        targetcol = makefullname(targetcol)
         if sourcecol not in allparticles:
             print("\n>> Error: " + sourcecol + " does not exist in the star file.\n")
             sys.exit()
@@ -912,6 +944,7 @@ def decide():
             print("\n>> Error: the input should be column-name/value.\n")
             sys.exit()
         columntoreset, value = inputparams
+        columntoreset = makefullname(columntoreset)
         if columntoreset not in allparticles:
             print("\n>> Error: " + columntoreset + " does not exist in the star file.\n")
             sys.exit()
@@ -920,12 +953,12 @@ def decide():
         sys.exit()
 
     """
-    --sort
+    --sort_by
     """
 
     if params["parser_sort"] != "":
         inputparams = params["parser_sort"].split("/")
-        sortcol = inputparams[0]
+        sortcol = makefullname(inputparams[0])
         if sortcol not in allparticles.columns:
             print("\n>> Error: the column " + str(sortcol) + " does not exist in your star file.\n")
             sys.exit()
@@ -934,7 +967,7 @@ def decide():
             try:
                 pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
                 print("\n----------------------------------------------------------------------")        
-                print("\n>> Warning: it looks like this column is numeric but you haven't specified so.\n   Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
+                print("\n>> Warning: it looks like this column is numeric but you haven't specified so.\n>> Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
                 print("----------------------------------------------------------------------")
             except ValueError:
                 pass
@@ -945,7 +978,7 @@ def decide():
             try:
                 pd.to_numeric(allparticles[sortcol].iloc[0], downcast="float")
                 print("\n----------------------------------------------------------------------")        
-                print("\n>> Warning: it looks like this column is numeric but you haven't specified so.\n   Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
+                print("\n>> Warning: it looks like this column is numeric but you haven't specified so.\n>> Make sure that this is the behavior you intended. Otherwise, use \"column/n\".\n")
                 print("----------------------------------------------------------------------")
             except ValueError:
                 pass
@@ -1042,7 +1075,7 @@ def decide():
     """
 
     if params["parser_plot"] != "":
-        columntoplot = params["parser_plot"]
+        columntoplot = makefullname(params["parser_plot"])
         if columntoplot not in particles2use:
             print("\n>> Error: the column \"" + columntoplot + "\" does not exist.\n")
             sys.exit()
@@ -1071,7 +1104,9 @@ def decide():
         
     if params["parser_writecol"] != "": 
         colstowrite = params["parser_writecol"].split("/")
-        for col in colstowrite:
+        for i,col in enumerate(colstowrite):
+            col = makefullname(col)
+            colstowrite[i] = col
             if col not in particles2use:
                 print("\n>> Error: the column \"" + str(col) + "\" does not exist in your star file.\n")
                 sys.exit()
@@ -1103,3 +1138,19 @@ def decide():
 
     #The end.
     print("\n>> Error: either the options weren't passed correctly or none were passed at all. See the help page (-h).\n")
+
+
+def makefullname(col):
+    if col.startswith("_rln"):
+        return(col)
+    elif col.startswith("rln"):
+        return("_"+col)
+    elif col.startswith("_rn") or col.startswith("rn"):
+        print(f"\n>> Error: check the column name {col}.\n")
+        sys.exit()
+    elif col.startswith("rn") and not col.startswith("rln"):
+        print(f"\n>> Error: check the column name {col}.\n")
+        sys.exit()
+    else:
+        return("_rln"+col)
+

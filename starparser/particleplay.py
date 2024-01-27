@@ -264,18 +264,48 @@ def setparticleoptics(particles,column,query,queryexact,opticsnumber):
 --import_particle_values
 """
 def importpartvalues(original_particles, importfrom_particles, columnstoswap):
+    # Create a dictionary for fast lookup from importfrom_particles
+    lookup_dict = importfrom_particles.set_index('_rlnImageName')[columnstoswap].to_dict('index')
 
-    importedparticles = original_particles.copy()
+    # Check for duplicates in importfrom_particles
+    if importfrom_particles['_rlnImageName'].duplicated().any():
+        print("\n>> Error: Duplicate entries found in the star file.\n")
+        sys.exit()
 
-    for index, particle in original_particles.iterrows():
-        imagename = particle["_rlnImageName"]
-        importloc = importfrom_particles.index[importfrom_particles["_rlnImageName"] == imagename].tolist()
-        if len(importloc) > 1:
-            print("\n>> Error: " + imagename + " exists more than once in the star file.\n")
-            sys.exit()
-        importloc = importloc[0]
-        for c in columnstoswap:
-            importedparticles[c].iloc[index] = importfrom_particles[c].iloc[importloc]
+    # Perform the swapping of values
+    for c in columnstoswap:
+        # Map each value, checking if it exists in the dictionary
+        original_particles[c] = original_particles['_rlnImageName'].apply(
+            lambda x: lookup_dict[x][c] if x in lookup_dict else sys.exit(f"\n>> Error: {x} not found in file that you are importing from.")
+        )
+
+    return(original_particles)
+
+"""
+--import_mic_values
+"""
+def importmicvalues(importedparticles, importfrom_particles, column):
+    # Extract the simple micrograph name if necessary
+    if "/" in importedparticles['_rlnMicrographName'][0]:
+        importedparticles["_rlnMicrographNameSimple"] = importedparticles['_rlnMicrographName'].str.split('/').str[-1]
+    else:
+        importedparticles["_rlnMicrographNameSimple"] = importedparticles['_rlnMicrographName']
+
+    if "/" in importfrom_particles['_rlnMicrographName'][0]:
+        importfrom_particles["_rlnMicrographNameSimple"] = importfrom_particles['_rlnMicrographName'].str.split('/').str[-1]
+    else:
+        importfrom_particles["_rlnMicrographNameSimple"] = importfrom_particles['_rlnMicrographName']
+
+    # Create a lookup dictionary from importfrom_particles
+    lookup_dict = importfrom_particles.set_index('_rlnMicrographNameSimple')[column].to_dict()
+
+    # Update values in importedparticles using lookup_dict, with error reporting
+    importedparticles[column] = importedparticles['_rlnMicrographNameSimple'].apply(
+        lambda x: lookup_dict[x] if x in lookup_dict else sys.exit(f"\n>> Error: Micrograph {x} not found in original file.")
+    )
+
+    # Drop the temporary '_rlnMicrographNameSimple' column
+    importedparticles.drop("_rlnMicrographNameSimple", axis=1, inplace=True)
 
     return(importedparticles)
 

@@ -150,6 +150,8 @@ def checksubset(particles, queryexact):
             query[i] = str.replace(q,",", "/")
 
         columns = params["parser_column"].split("/")
+        for i,c in enumerate(columns):
+            columns[i] = makefullname(c)
         
         subsetparticles, extractednumber = extractparticles(particles, columns, query, queryexact)
         
@@ -527,10 +529,10 @@ def extractoptics(particles, metadata, queryexact):
         column = params["parser_column"].split("/")
 
     if len(column)>1:
-        print("\n>> Error: you have specified two column. Only specify one if you're extracting from a subset of the data using a query.\n")
+        print("\n>> Error: you have specified two columns. Only specify one if you're extracting from a subset of the data using a query.\n")
         sys.exit()
     else:
-        column = column[0]
+        column = makefullname(column[0])
 
     opticsheaders = metadata[1]
     opticsdata = metadata[2]
@@ -576,3 +578,17 @@ def extractoptics(particles, metadata, queryexact):
     newopticsdata = opticsdata[opticsdata['_rlnOpticsGroup'].isin(non_repeating_values_set)]
     
     return(newparticles, [metadata[0], metadata[1], newopticsdata, metadata[3], metadata[4]], extractednumber)
+
+def makefullname(col):
+    if col.startswith("_rln"):
+        return(col)
+    elif col.startswith("rln"):
+        return("_"+col)
+    elif col.startswith("_rn") or col.startswith("rn"):
+        print(f"\n>> Error: check the column name {col}.\n")
+        sys.exit()
+    elif col.startswith("rn") and not col.startswith("rln"):
+        print(f"\n>> Error: check the column name {col}.\n")
+        sys.exit()
+    else:
+        return("_rln"+col)

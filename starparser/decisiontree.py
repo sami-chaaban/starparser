@@ -1050,7 +1050,7 @@ def decide():
     """
     --extract
     """
-
+    #Particles were already subsetted above, just write them here
     if params["parser_extractparticles"]:
         if params["parser_column"] == "" or params["parser_query"] == "":
             print("\n>> Error: enter a column (--c) and query (--q) to extract.\n")

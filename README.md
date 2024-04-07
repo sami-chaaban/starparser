@@ -42,7 +42,7 @@ starparser --i particles.star --list_column OriginX
 For some options, a second star file can also be passed as input ```--f secondfile.star```.
 
 ```
-starparser --i particles1.star --f particles2.star --find_shared MicrographName
+starparser --i particles1.star --find_shared MicrographName --f particles2.star
 ```
 
 The list of options are organized by [Data Mining](#mining), [Modifications](#modify), and [Plots](#plot). Arguments that are not required are surrounded by parentheses in the descriptions below. Do not include the parentheses in your arguments.
@@ -153,9 +153,13 @@ Remove particles that match a query (specified with ```--q```) within a column h
 
 Remove duplicate particles based on the column provided here (e.g. *ImageName*) (one instance of the duplicate is retained).
 
-**```--remove_mics_fromlist```** *`--f micrographs.txt`*
+**```--remove_mics_list```** *`--f micrographs.txt`*
 
 Remove particles that belong to micrographs that have a match in a second file provided by ```--f```, and write to a new star file (default output.star, or specified with ```--o```). You only need to have the micrograph names and not necessarily the full paths in the second file.
+
+**```--keep_mics_list```** *`--f micrographs.txt`*
+
+Keep particles that belong to micrographs that have a match in a second file provided by ```--f```, and write to a new star file (default output.star, or specified with ```--o```). You only need to have the micrograph names and not necessarily the full paths in the second file.
 
 **```--insert_column```** *```column-name```* *`--f values.txt`*
 
@@ -273,7 +277,7 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 
 * The term *particles* here refers to rows in a star file, but the star files don't need to contain particles (e.g. parsing movies in a *movies.star* file).
 
-* Columns can be specified by their full or short names (e.g. \_rlnColumnName, rlnColumnName, or ColumnName). If scripting with the starparser package, columns are specified as their full name (i.e.\_rlnColumnName).
+* Columns can be specified by their full or short names (e.g. \_rlnColumnName, rlnColumnName, or ColumnName). If scripting with the starparser package, columns are specified as their full name (i.e. \_rlnColumnName).
 
 * If the star file lacks an optics table, such as those from Relion 3.0, add the ```--opticsless``` option to parse it.
 

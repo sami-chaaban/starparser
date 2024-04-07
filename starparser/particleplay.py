@@ -89,13 +89,22 @@ def delduplicates(particles, column):
     return(particles.drop_duplicates(subset=[column]))
 
 """
---remove_mics_fromlist
+--remove_mics_list
 """
 def delmics(particles, micstodelete):
     purgedparticles = particles.copy()
     m = "|".join(micstodelete)
     purgedparticles.drop(purgedparticles[purgedparticles["_rlnMicrographName"].str.contains(m)].index , axis=0,inplace=True)    
     return(purgedparticles)
+
+"""
+--keep_mics_list
+"""
+def keepmics(particles, micstokeep):
+    keptparticles = particles.copy()
+    m = "|".join(micstokeep)
+    keptparticles = keptparticles[keptparticles["_rlnMicrographName"].str.contains(m)]
+    return(keptparticles)
 
 """
 --extract

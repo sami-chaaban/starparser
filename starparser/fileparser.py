@@ -134,6 +134,12 @@ def parsestar(starfile):
     For the second data table, we want to know what kind of table it is
     e.g. data_particles
     """
+    try:
+        starfilesplit_test[opticsheaderend:].index("#")
+        starfilesplit_test[opticsheaderend:].index("loop_")
+    except ValueError:
+        print("\n>> Error: could not parse the star file. If it does not have an optics table, add --opticsless.\n")
+        sys.exit()
 
     if versionexist:
         opticsdataend = starfilesplit_test[opticsheaderend:].index("#") + opticsheaderend

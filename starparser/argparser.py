@@ -29,7 +29,7 @@ def argparse():
 
     info_opts.add_option("--limit",
         action="store", dest="parser_limitparticles", type="string", default = "", metavar='column/comparator/value',
-        help="Extract particles that match a specific comparison (\"lt\" for less than, \"gt\" for greater than, \"le\" for less than or equal to, \"ge\" for greater than or equal to). The argument to pass is column/comparator/value (e.g. \"_rlnDefocusU/lt/40000\" for defocus values less than 40000).")
+        help="Extract particles that match a specific comparison (\"lt\" for less than, \"gt\" for greater than, \"le\" for less than or equal to, \"ge\" for greater than or equal to). The argument to pass is column/comparator/value (e.g. \"DefocusU/lt/40000\" for defocus values less than 40000).")
     
     info_opts.add_option("--count",
         action="store_true", dest="parser_countme", default=False,
@@ -41,7 +41,7 @@ def argparse():
     
     info_opts.add_option("--list_column",
         action="store", dest="parser_writecol", type="string", default="", metavar='column-name(s)',
-        help="Write all values of a column to a file. For example, passing \"_rlnMicrographName\" will write all values to MicrographName.txt. To write multiple columns, separate the column names with a slash (for example, \"_rlnMicrographName/_rlnCoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
+        help="Write all values of a column to a file. For example, passing \"MicrographName\" will write all values to MicrographName.txt. To write multiple columns, separate the column names with a slash (for example, \"MicrographName/CoordinateX\" outputs MicrographName.txt and CoordinateX.txt). This can be used with --c and --q to only consider values that match the query, otherwise it lists all values.")
 
     info_opts.add_option("--find_shared",
         action="store", dest="parser_findshared", type="string", default="", metavar='column-name',
@@ -93,7 +93,7 @@ def argparse():
 
     info_opts.add_option("--sort_by",
         action="store", dest="parser_sort", type="string", default="", metavar='column-name',
-        help="Sort the column in ascending order and write a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"_rlnClassNumber/n\"); otherwise, it will sort the values as text.")   
+        help="Sort the column in ascending order and write a new file. Add a slash followed by \"n\" if the column contains numeric values (e.g. \"ClassNumber/n\"); otherwise, it will sort the values as text.")   
 
     parser.add_option_group(info_opts)
 
@@ -102,15 +102,15 @@ def argparse():
 
     modify_opts.add_option("--operate",
         action="store", dest="parser_operate", type="string", default="", metavar='column[operator]value',
-        help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnHelicalTrackLength*0.25). If the terminal throws an error, try surrounding the argument with quotes.")
+        help="Perform operation on all values of a column. The argument to pass is column[operator]value (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. HelicalTrackLength*0.25). If the terminal throws an error, try surrounding the argument with quotes.")
 
     modify_opts.add_option("--operate_columns",
         action="store", dest="parser_operatecolumns", type="string", default="", metavar='column[operator]value',
-        help="Perform operation between two columns and write to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. _rlnCoordinateX*_rlnOriginX=_rlnShifted). If the terminal throws an error, try surrounding the argument with quotes.")
+        help="Perform operation between two columns and write to a new column. The argument to pass is column1[operator]column2=newcolumn (without the brackets and without any spaces); operators include \"*\", \"/\", \"+\", and \"-\" (e.g. CoordinateX*OriginX=Shifted). If the terminal throws an error, try surrounding the argument with quotes.")
 
     modify_opts.add_option("--remove_column",
         action="store", dest="parser_delcolumn", type="string", default="", metavar='column-name(s)',
-        help="Remove column, renumber headers, and write to a new star file. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+        help="Remove column, renumber headers, and write to a new star file. E.g. MicrographName. To enter multiple columns, separate them with a slash: MicrographName/CoordinateX.")
     
     modify_opts.add_option("--remove_particles",
         action="store_true", dest="parser_delparticles", default=False,
@@ -118,11 +118,15 @@ def argparse():
 
     modify_opts.add_option("--remove_duplicates",
         action="store", dest="parser_delduplicates", default="", metavar='column-name',
-        help="Remove duplicate particles based on the column provided here (e.g. _rlnImageName).")
+        help="Remove duplicate particles based on the column provided here (e.g. ImageName).")
 
-    modify_opts.add_option("--remove_mics_fromlist",
+    modify_opts.add_option("--remove_mics_list",
         action="store_true", dest="parser_delmics", default=False,
-        help="Remove particles that belong to micrographs that have a match in a second file provided by --f.")
+        help="Remove particles that belong to micrographs that have a match in a second file provided by --f (single column list of micrographs).")
+
+    modify_opts.add_option("--keep_mics_list",
+        action="store_true", dest="parser_keepmics", default=False,
+        help="Keep particles that belong to micrographs that have a match in a second file provided by --f (single column list of micrographs).")
 
     modify_opts.add_option("--insert_column",
         action="store", dest="parser_insertcol", type="string", default="", metavar='column-name',
@@ -134,31 +138,31 @@ def argparse():
 
     modify_opts.add_option("--copy_column",
         action="store", dest="parser_copycol", type="string", default="", metavar='source-column/target-column',
-        help="Replace all entries of a target column with those of a source column in the same star file. If the target column exists, its values will be replaced. If the target does not exist, a new column will be made. The argument to pass is source-column/target-column (e.g. _rlnAngleTiltPrior/_rlnAngleTilt)")     
+        help="Replace all entries of a target column with those of a source column in the same star file. If the target column exists, its values will be replaced. If the target does not exist, a new column will be made. The argument to pass is source-column/target-column (e.g. AngleTiltPrior/AngleTilt)")     
 
     modify_opts.add_option("--reset_column",
         action="store", dest="parser_resetcol", type="string", default="", metavar='column-name/new-value',
-        help="Change all values of a column to the one provided here. The argument to pass is column-name/new-value (e.g. _rlnOriginX/0).")
+        help="Change all values of a column to the one provided here. The argument to pass is column-name/new-value (e.g. OriginX/0).")
 
     modify_opts.add_option("--swap_columns",
         action="store", dest="parser_swapcolumns", type="string", default="", metavar='column-name(s)',
-        help="Swap columns from another star file (specified with --f). E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+        help="Swap columns from another star file (specified with --f). E.g. MicrographName. To enter multiple columns, separate them with a slash: MicrographName/CoordinateX.")
 
     modify_opts.add_option("--insert_optics_column",
         action="store", dest="parser_insertopticscol", type="string", default="", metavar='column-name/value',
-        help="Insert a new column in the optics table with the name and value provided (e.g. _rlnAmplitudeContrast/0.1). The value will populate all rows of the optics table.")
+        help="Insert a new column in the optics table with the name and value provided (e.g. AmplitudeContrast/0.1). The value will populate all rows of the optics table.")
 
     modify_opts.add_option("--fetch_from_nearby",
         action="store", dest="parser_fetchnearby", type="string", default="", metavar='distance/column-name(s)',
-        help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/_rlnClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from _rlnMicrographName do not necessarily need to match, just the filenames need to.")
+        help="Find the nearest particle in a second star file (specified by --f) and if it is within a threshold distance, retrieve its column value to replace the original particle column value. The argument to pass is distance/column-name (e.g. 300/ClassNumber). Particles that couldn't be matched to a neighbor will be skipped (i.e. if the second star file lacks particles in that micrograph). The micrograph paths from MicrographName do not necessarily need to match, just the filenames need to.")
 
     modify_opts.add_option("--import_mic_values",
         action="store", dest="parser_importmicvalues", type="string", default="", metavar='column-name(s)',
-        help="For every particle, find the micrograph that it belongs to in a second star file (provided by --f) and replace the original column value with that of the second star file (e.g. _rlnOpticsGroup). This requires that the second star file only has one instance of each micrograph name (e.g. a micrographfs_ctf.star file). To import multiple columns, separate them with a slash.")
+        help="For every particle, find the micrograph that it belongs to in a second star file (provided by --f) and replace the original column value with that of the second star file (e.g. OpticsGroup). The paths do not have to be identical, just the micrograph filename itself. To import multiple columns, separate them with a slash.")
 
     modify_opts.add_option("--import_particle_values",
         action="store", dest="parser_importpartvalues", type="string", default="", metavar='column-name(s)',
-        help="For every particle in the input star file, find the equivalent particle in a second star file (provided by --f) (i.e. those with equivalent _rlnImageName values) and replace the original column value with the one from the second star file. To import multiple columns, separate them with a slash.")
+        help="For every particle in the input star file, find the equivalent particle in a second star file (provided by --f) (i.e. those with equivalent ImageName values) and replace the original column value with the one from the second star file. To import multiple columns, separate them with a slash.")
 
     modify_opts.add_option("--regroup",
         action="store", dest="parser_regroup", type="int", default=0, metavar='particles-per-group',
@@ -191,7 +195,7 @@ def argparse():
 
     plot_opts.add_option("--plot_orientations",
         action="store_true", dest="parser_plotangledist", default=False,
-        help="Plot the particle orientations based on the _rlnAngleRot and _rlnAngleTilt columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
+        help="Plot the particle orientations based on the AngleRot and AngleTilt columns on a Mollweide projection (longitude and latitude, respectively). Optionally, use --c and --q to only plot a subset of particles, otherwise it will plot all. Use --t to change the filetype.")
     
     plot_opts.add_option("--plot_class_iterations",
         action="store", dest="parser_classiterations", type="string", default="", metavar="classes",
@@ -212,7 +216,7 @@ def argparse():
     
     query_opts.add_option("--c",
         action="store", dest="parser_column", type="string", default="", metavar='column-name(s)',
-        help="Column query. E.g. _rlnMicrographName. To enter multiple columns, separate them with a slash: _rlnMicrographName/_rlnCoordinateX.")
+        help="Column query. E.g. MicrographName. To enter multiple columns, separate them with a slash: MicrographName/CoordinateX.")
     
     query_opts.add_option("--q",
         action="store", dest="parser_query", type="string", default="", metavar='query(ies)',

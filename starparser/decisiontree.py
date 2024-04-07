@@ -252,7 +252,7 @@ def decide():
         sys.exit()
 
     """
-    --remove_mics_fromlist
+    --remove_mics_list
     """
 
     if params["parser_delmics"]:
@@ -271,6 +271,29 @@ def decide():
         newparticles = particleplay.delmics(allparticles,micstodelete)
         purgednumber = totalparticles - len(newparticles.index)
         print("\n>> Removed " + str(purgednumber) + " particles (out of " + str(totalparticles) + ", " + str(round(purgednumber*100/totalparticles,1)) + "%) that matched the micrographs in " + file2 + ".")
+        fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
+        sys.exit()
+
+    """
+    --keep_mics_list
+    """
+
+    if params["parser_keepmics"]:
+        if params["parser_query"] != "" or params["parser_column"] != "":
+            print("\n>> Error: you cannot provide a query to the --keep_mics_fromlist option.\n")
+            sys.exit()
+        if params["parser_file2"] == "":
+            print("\n>> Error: provide a second file with --f to match micrographs.\n")
+            sys.exit()
+        file2 = params["parser_file2"]
+        if not os.path.isfile(file2):
+            print("\n>> Error: \"" + file2 + "\" does not exist.\n")
+            sys.exit()
+        with open(file2) as f:
+            micstokeep = [line.split()[0] for line in f]
+        newparticles = particleplay.keepmics(allparticles,micstokeep)
+        keptnumber = len(newparticles.index)
+        print("\n>> Kept " + str(keptnumber) + " particles (out of " + str(totalparticles) + ", " + str(round(keptnumber*100/totalparticles,1)) + "%) that matched the micrographs in " + file2 + ".")
         fileparser.writestar(newparticles, metadata, params["parser_outname"], relegateflag)
         sys.exit()
         

@@ -412,6 +412,9 @@ def decide():
             columnstoimport[i] = makefullname(c)
 
         for column in columnstoimport:
+            if column == "_rlnImageName":
+                print("\n>> Error: cannot import _rlnImageName since this column is used for matching.\n")
+                sys.exit() 
             if column not in allparticles:
                 print("\n>> Error: the column \"" + column + "\" does not exist in the original star file.\n")
                 sys.exit()

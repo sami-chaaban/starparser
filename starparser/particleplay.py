@@ -298,7 +298,7 @@ def importpartvalues(original_particles, importfrom_particles, columnstoswap):
     # Perform the swap
     for c in columnstoswap:
         original_particles[c] = original_particles.apply(
-            lambda row: lookup_dict[row['_rlnImageName']]['_rlnOpticsGroup'] if row['_rlnMatched'] else row[c], axis=1
+            lambda row: lookup_dict[row['_rlnImageName']][c] if row['_rlnMatched'] else row[c], axis=1
         )
 
     original_particles.drop("_rlnMatched", axis=1, inplace=True)

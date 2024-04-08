@@ -135,7 +135,6 @@ def parsestar(starfile):
     e.g. data_particles
     """
     try:
-        starfilesplit_test[opticsheaderend:].index("#")
         starfilesplit_test[opticsheaderend:].index("loop_")
     except ValueError:
         print("\n>> Error: could not parse the star file. If it does not have an optics table, add --opticsless.\n")

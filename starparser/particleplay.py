@@ -283,12 +283,25 @@ def importpartvalues(original_particles, importfrom_particles, columnstoswap):
         print("\n>> Error: Duplicate entries found in the star file.\n")
         sys.exit()
 
-    # Perform the swapping of values
+    original_particles['_rlnMatched'] = original_particles['_rlnImageName'].apply(lambda x: x in lookup_dict)
+
+    matched_count = original_particles['_rlnMatched'].sum()    
+
+    if matched_count == 0:
+        print("\n>> Error: could not match any particles to the second file.\n")
+        sys.exit()
+
+    if matched_count != len(original_particles.index):
+        print(f"\n!! Warning: Could not match {len(original_particles.index)-matched_count} particles. Their original values have been kept.\n")
+
+
+    # Perform the swap
     for c in columnstoswap:
-        # Map each value, checking if it exists in the dictionary
-        original_particles[c] = original_particles['_rlnImageName'].apply(
-            lambda x: lookup_dict[x][c] if x in lookup_dict else sys.exit(f"\n>> Error: {x} not found in file that you are importing from.")
+        original_particles[c] = original_particles.apply(
+            lambda row: lookup_dict[row['_rlnImageName']]['_rlnOpticsGroup'] if row['_rlnMatched'] else row[c], axis=1
         )
+
+    original_particles.drop("_rlnMatched", axis=1, inplace=True)
 
     return(original_particles)
 
@@ -310,13 +323,24 @@ def importmicvalues(importedparticles, importfrom_particles, column):
     # Create a lookup dictionary from importfrom_particles
     lookup_dict = importfrom_particles.set_index('_rlnMicrographNameSimple')[column].to_dict()
 
-    # Update values in importedparticles using lookup_dict, with error reporting
-    importedparticles[column] = importedparticles['_rlnMicrographNameSimple'].apply(
-        lambda x: lookup_dict[x] if x in lookup_dict else sys.exit(f"\n>> Error: Micrograph {x} not found in original file.")
+    importedparticles['_rlnMatched'] = importedparticles['_rlnMicrographNameSimple'].apply(lambda x: x in lookup_dict)
+    matched_count = importedparticles['_rlnMatched'].sum() 
+
+    if matched_count == 0:
+        print("\n>> Error: could not match any micrographs to the second file.\n")
+        sys.exit()
+
+    if matched_count != len(importedparticles.index):
+        print(f"\n!! Warning: Could not match the micrographs of {len(importedparticles.index)-matched_count} particles. Their original values in {column} have been kept.\n")
+
+    # Update values in importedparticles using lookup_dict
+    importedparticles[column] = importedparticles.apply(
+        lambda row: lookup_dict[row['_rlnMicrographNameSimple']] if row['_rlnMatched'] else row[column], axis=1
     )
 
     # Drop the temporary '_rlnMicrographNameSimple' column
     importedparticles.drop("_rlnMicrographNameSimple", axis=1, inplace=True)
+    importedparticles.drop("_rlnMatched", axis=1, inplace=True)
 
     return(importedparticles)
 
@@ -421,7 +445,7 @@ def expandoptics(original_particles, original_metadata, newdata, newdata_metadat
 
     #print(original_particles["_rlnOpticsGroup"].head())
 
-    expandedparticles = columnplay.importmicvalues(original_particles, newdata, "_rlnOpticsGroup")
+    expandedparticles = importmicvalues(original_particles, newdata, "_rlnOpticsGroup")
 
     totaldifferent = 0
     for i, j in zip(original_particles.iterrows(), expandedparticles.iterrows()):

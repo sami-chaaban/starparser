@@ -257,7 +257,7 @@ Pass this if you want an exact match of the values to the query(ies) provided by
 
 **```--opticsless```**
 
-Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. It will create a dummy optics table before moving on. This option does not work with ```--plot_class_proportions``` or commands that require parsing a second file.
+Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. This option does not work with ```--plot_class_proportions``` and most commands that also require parsing a second file.
 
 ### Output<a name="output"></a>
 

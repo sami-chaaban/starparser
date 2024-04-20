@@ -11,8 +11,8 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 
 import warnings
-from matplotlib.cbook import MatplotlibDeprecationWarning
-warnings.filterwarnings("ignore", category=MatplotlibDeprecationWarning)
+#from matplotlib.cbook import MatplotlibDeprecationWarning
+#warnings.filterwarnings("ignore", category=MatplotlibDeprecationWarning)
 
 """
 These functions still require explanations.
@@ -243,13 +243,13 @@ def makeopticsgroup(particles,metadata,newgroup):
     
     optics = metadata[2]
     
-    newoptics = optics.append(optics.loc[len(optics.index)-1], ignore_index = True)
+    newoptics = pd.concat([optics, optics.iloc[[len(optics.index)-1]]], ignore_index = True)
     
-    newoptics.loc[len(newoptics.index)-1]["_rlnOpticsGroupName"] = newgroup
+    newoptics.loc[newoptics.index[-1], "_rlnOpticsGroupName"] = newgroup
     
     opticsnumber = int(newoptics.loc[len(newoptics.index)-1]["_rlnOpticsGroup"]) + 1
     
-    newoptics.loc[len(newoptics.index)-1]["_rlnOpticsGroup"] = opticsnumber
+    newoptics.loc[newoptics.index[-1], "_rlnOpticsGroup"] = opticsnumber
     
     return(newoptics, opticsnumber)
 

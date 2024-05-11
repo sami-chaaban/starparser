@@ -528,7 +528,7 @@ def comparecoords(file1parts, file2parts, numtoplot, circlesize):
     #need to be preserved.
     if not file2parts.empty:
         
-        if "_rlnMicrogrpahName" not in file2parts:
+        if "_rlnMicrographName" not in file2parts:
             print("\n>> Error: the second star file does not have a _rlnMicrographName column.\n")
             sys.exit()
 

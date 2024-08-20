@@ -257,7 +257,7 @@ Pass this if you want an exact match of the values to the query(ies) provided by
 
 **```--opticsless```**
 
-Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. This option does not work with ```--plot_class_proportions``` and most commands that also require parsing a second file.
+Pass this if the input star file lacks an optics group (more specifically: the star file has exactly one table), such as with Relion 3.0 files. This option does not work with ```--plot_class_proportions```.
 
 ### Output<a name="output"></a>
 
@@ -284,8 +284,6 @@ File type of the plot that will be written. Choose between png, jpg, svg, and pd
 ---
 
 ## Limitations<a name="limits"></a>
-
-* ```--opticsless``` does not work when the second star file (```--f```) lacks an optics table or when multiple star files are being read. There is little incentive to fix this since few still use Relion 3.0.
 
 * Data mining options do not check if the subset that was created has rendered one of the optics groups void; they retain all optics groups. Optics groups should be modified manually.
 

@@ -313,7 +313,10 @@ def decide():
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         print("\n>> Reading " + file2)
-        otherparticles, metadata2 = fileparser.getparticles(file2)
+        if not params["parser_optless"]:
+            otherparticles, metadata2 = fileparser.getparticles(file2)
+        else:
+            otherparticles, metadata2 = fileparser.getparticles_dummyoptics(file2)
         swappedparticles = columnplay.swapcolumns(allparticles, otherparticles, columnstoswap)
         print("\n>> Swapped in " + str(columnstoswap) + " from " + file2)
         fileparser.writestar(swappedparticles, metadata, params["parser_outname"], relegateflag)
@@ -332,7 +335,10 @@ def decide():
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         print("\n>> Reading " + file2)
-        otherparticles, metadata2 = fileparser.getparticles(file2)
+        if not params["parser_optless"]:
+            otherparticles, metadata2 = fileparser.getparticles(file2)
+        else:
+            otherparticles, metadata2 = fileparser.getparticles_dummyoptics(file2)
         columnstoimport = params["parser_importmicvalues"].split("/")
         for i,c in enumerate(columnstoimport):
             columnstoimport[i]=makefullname(c)
@@ -384,7 +390,10 @@ def decide():
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         print("\n>> Reading " + file2)
-        newdata, newdata_metadata = fileparser.getparticles(file2)
+        if not params["parser_optless"]:
+            newdata, newdata_metadata = fileparser.getparticles(file2)
+        else:
+            newdata, newdata_metadata = fileparser.getparticles_dummyoptics(file2)
 
         print("\n>> Expanding the optics group " + opticsgrouptoexpand + " based on the micrograph optics in " + file2)
         
@@ -406,7 +415,10 @@ def decide():
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         print("\n>> Reading " + file2)
-        otherparticles, metadata2 = fileparser.getparticles(file2)
+        if not params["parser_optless"]:
+            otherparticles, metadata2 = fileparser.getparticles(file2)
+        else:
+            otherparticles, metadata2 = fileparser.getparticles_dummyoptics(file2)
         columnstoimport = params["parser_importpartvalues"].split("/")
         for i,c in enumerate(columnstoimport):
             columnstoimport[i] = makefullname(c)
@@ -540,7 +552,10 @@ def decide():
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         print("\n>> Reading " + file2)
-        otherparticles, f2metadata = fileparser.getparticles(file2)
+        if not params["parser_optless"]:
+            otherparticles, f2metadata = fileparser.getparticles(file2)
+        else:
+            otherparticles, f2metadata = fileparser.getparticles_dummyoptics(file2)
         unsharedparticles = allparticles[~allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         sharedparticles = allparticles[allparticles[columntocheckunique].isin(otherparticles[columntocheckunique])]
         
@@ -567,7 +582,10 @@ def decide():
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit();
         print("\n>> Reading " + file2)
-        otherparticles, f2metadata = fileparser.getparticles(file2)
+        if not params["parser_optless"]:
+            otherparticles, f2metadata = fileparser.getparticles(file2)
+        else:
+            otherparticles, f2metadata = fileparser.getparticles_dummyoptics(file2)
         matchedparticles = allparticles[allparticles["_rlnMicrographName"].isin(otherparticles["_rlnMicrographName"])]
         print("\n>> Kept " + str(len(set(matchedparticles["_rlnMicrographName"].tolist()))) + " micrographs that matched the second file (out of " + str(len(set(allparticles["_rlnMicrographName"].tolist()))) + ").\n")
         fileparser.writestar(matchedparticles, metadata, params["parser_outname"], relegateflag)
@@ -590,7 +608,10 @@ def decide():
             sys.exit();
 
         print("\n>> Reading " + params["parser_file2"])
-        nearparticles, nearmetadata = fileparser.getparticles(params["parser_file2"])
+        if not params["parser_optless"]:
+            nearparticles, nearmetadata = fileparser.getparticles(params["parser_file2"])
+        else:
+            nearparticles, nearmetadata = fileparser.getparticles_dummyoptics(params["parser_file2"])
 
         print("\n>> Creating subsets with particles that are closer/further than " + str(threshdist) + " pixels from the closest particle in the second star file.")
 
@@ -638,7 +659,10 @@ def decide():
             print("\n>> Error: \"" + params["parser_file2"] + "\" does not exist.\n")
             sys.exit();
         print("\n>> Reading " + params["parser_file2"])
-        nearparticles, nearmetadata = fileparser.getparticles(params["parser_file2"])
+        if not params["parser_optless"]:
+            nearparticles, nearmetadata = fileparser.getparticles(params["parser_file2"])
+        else:
+            nearparticles, nearmetadata = fileparser.getparticles_dummyoptics(params["parser_file2"])
         for c in columnstoretrieve:
             if c not in nearparticles:
                 print("\n>> Error: " + c + " does not exist in the second star file.\n")
@@ -878,7 +902,10 @@ def decide():
             file2particles = pd.DataFrame({'A' : []})
         else:
             print("\n>> Reading " + params["parser_file2"])
-            file2particles, metadata = fileparser.getparticles(params["parser_file2"])
+            if not params["parser_optless"]:
+                file2particles, metadata = fileparser.getparticles(params["parser_file2"])
+            else:
+                file2particles, metadata = fileparser.getparticles_dummyoptics(params["parser_file2"])
         currentparams = params["parser_comparecoords"].split("/")
         numtoplot = currentparams[0]
         if numtoplot in ["all", "All", "ALL"]:
@@ -1036,7 +1063,10 @@ def decide():
             print("\n>> Error: \"" + file2 + "\" does not exist.\n")
             sys.exit()
         print("\n>> Reading " + file2)
-        otherparticles, newmetadata = fileparser.getparticles(file2)
+        if not params["parser_optless"]:
+            otherparticles, newmetadata = fileparser.getparticles(file2)
+        else:
+            otherparticles, newmetadata = fileparser.getparticles_dummyoptics(file2)
         fileparser.writestar(allparticles, [metadata[0],newmetadata[1],newmetadata[2],metadata[3],metadata[4]], params["parser_outname"], relegateflag)
         sys.exit()
 

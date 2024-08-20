@@ -275,13 +275,21 @@ def setparticleoptics(particles,column,query,queryexact,opticsnumber):
 --import_particle_values
 """
 def importpartvalues(original_particles, importfrom_particles, columnstoswap):
-    # Create a dictionary for fast lookup from importfrom_particles
-    lookup_dict = importfrom_particles.set_index('_rlnImageName')[columnstoswap].to_dict('index')
-
+    
     # Check for duplicates in importfrom_particles
     if importfrom_particles['_rlnImageName'].duplicated().any():
-        print("\n>> Error: Duplicate entries found in the star file.\n")
-        sys.exit()
+        importfrom_particles_unique = importfrom_particles.drop_duplicates(subset=['_rlnImageName'], keep='first')
+        newlen = len(importfrom_particles_unique.index)
+        oldlen = len(importfrom_particles.index)
+        duplicates = oldlen - newlen
+        print(f"\n!! Warning: {duplicates} duplicate entries found in the original star file (--f)! Only considering first instance.")
+
+        # Create a dictionary for fast lookup from importfrom_particles
+        lookup_dict = importfrom_particles_unique.set_index('_rlnImageName')[columnstoswap].to_dict('index')
+        
+    else:
+        # Create a dictionary for fast lookup from importfrom_particles
+        lookup_dict = importfrom_particles.set_index('_rlnImageName')[columnstoswap].to_dict('index')
 
     original_particles['_rlnMatched'] = original_particles['_rlnImageName'].apply(lambda x: x in lookup_dict)
 

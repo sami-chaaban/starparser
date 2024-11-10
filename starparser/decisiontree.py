@@ -80,7 +80,7 @@ def decide():
     if queryexact:
         print("\n>> You have asked for exact matches between the queries and values (--e).")
 
-    #In the cases below, a subset of particles are generated from a qurey that must be exact, so the queryexact variable is forced to be True.
+    #In the cases below, a subset of particles are generated from a query that must be exact, so the queryexact variable is forced to be True.
     elif params["parser_splitoptics"] or params["parser_classiterations"] or params["parser_splitclasses"]:
         queryexact = True
 
@@ -1144,6 +1144,7 @@ def decide():
     """
 
     if params["parser_plotangledist"]:
+
         if "_rlnAngleRot" not in particles2use or "_rlnAngleTilt" not in particles2use:
             print("\n>> Error: the column _rlnAngleRot or _rlnAngleTilt does not exist.\n")
             sys.exit()

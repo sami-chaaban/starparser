@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+import time
 
 def getparticles(filename):
 
@@ -14,15 +15,13 @@ def getparticles(filename):
     file.close()
 
     #The commented timer lines below are used to test different ways of parsing the star file to eventually find the fastest method.
-    # import time
-    # tic = time.perf_counter()
+    #tic = time.perf_counter()
 
     #The file is parsed by parsestar() to figure out where the relevant information lies.
     version, opticsheaders, optics, particlesheaders, particles, tablename = parsestar(starfile)
 
-    # toc = time.perf_counter()
-    # print(f"\nparsestar took {toc - tic:0.4f} seconds")
-
+    #toc = time.perf_counter()
+    #print(f"\nparsestar took {toc - tic:0.4f} seconds")
 
     #Make a dataframe out of the values and headers.
     alloptics = makepandas(opticsheaders, optics)
@@ -180,26 +179,30 @@ def makepandas(headers,items):
     """
     The star file data is initially parsed with parsestar() before this function can generate a dataframe.
     """
-
+    #tic = time.perf_counter()
     #If there is another data table, then _rln will be found improperly in the particles data, which will not work.
-    if any("_rln" in i for i in items):
-        print("\n>> Error: something went wrong during parsing. Are there more than two data tables?\n")
-        sys.exit()
+    #TOO SLOW, REMOVED
+    #if any("_rln" in i for i in items):
+    #    print("\n>> Error: something went wrong during parsing. Are there more than two data tables?\n")
+    #    sys.exit()
+    #toc = time.perf_counter()
+    #print(f"\ncheck took {toc - tic:0.4f} seconds")
 
     #Calculate the number of columns, since this will be used to properly split the data into lines that belong to each particle.
     totalcolumns = len(headers)
 
-    """
-    These are the slowest parts of the code. Consider making more efficient.
-    """
-
     #Split the list given the number of columns expected for each particle
     items_lst = [items[x:x+totalcolumns] for x in range(0, len(items), totalcolumns)]
+
+    #tic = time.perf_counter()
 
     #Generate a pandas dataframe
     itemspd = pd.DataFrame(items_lst, columns = headers)
 
-    return(itemspd)
+    #toc = time.perf_counter()
+    #print(f"\nitemspd took {toc - tic:0.4f} seconds")
+
+    return itemspd
 
 
 def getparticles_dummyoptics(filename):

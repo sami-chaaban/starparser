@@ -6,12 +6,11 @@ import numpy as np
 import os
 import scipy
 import warnings
-
 from matplotlib.backends.backend_pdf import PdfPages
-
+from matplotlib.colors import SymLogNorm
+from scipy.ndimage import gaussian_filter
 from scipy.stats import gaussian_kde
 from itertools import accumulate
-
 from starparser import fileparser
 from starparser import particleplay
 
@@ -204,161 +203,57 @@ def getiterationlist(filename):
 
 """
 --plot_orientations
-The function below is adapted from Israel Fernandez (PirateFernandez) rln_star_2_mollweide_any_star.py
 """
+
 def plotangledist(particles, outtype):
 
-    """
-    AngleRot and AngleTilt are used for the plot.
-    list(map(float,list()) is used to turn the list of strings
-    into a list of floats
-    """
-    rot=list(map(float, list(particles["_rlnAngleRot"])))
-    tilt=list(map(float, list(particles["_rlnAngleTilt"])))
+    # Convert to NumPy arrays for better performance
+    rot = particles["_rlnAngleRot"].to_numpy(dtype=float)
+    tilt = particles["_rlnAngleTilt"].to_numpy(dtype=float)
 
-    #Rotate the tilt angle by 90 degrees
-    tilt_m90 = [i -90 for i in tilt]
-
-    #Turn degrees into radians
+    # Rotate tilt angle by 90 degrees and convert to radians
+    tilt_m90_rad = np.deg2rad(tilt - 90)
     rot_rad = np.deg2rad(rot)
-    tilt_m90_rad = np.deg2rad(tilt_m90)
 
-    #~needs explanation~
-    vertical_rad = np.vstack([tilt_m90_rad, rot_rad])
+    # Define bin edges for histogram
+    rot_edges = np.linspace(-np.pi, np.pi, 201)  # 200 bins
+    tilt_edges = np.linspace(-np.pi / 2, np.pi / 2, 101)  # 100 bins
 
-    #~needs explanation~
-    try:
-        m = gaussian_kde(vertical_rad)(vertical_rad)
+    # Compute 2D histogram of counts
+    H, rot_edges, tilt_edges = np.histogram2d(rot_rad, tilt_m90_rad, bins=[rot_edges, tilt_edges])
 
-    #It's bad practice to have a naked exception here. Consider getting the exact exception.
-    except:
-        print("\n>> Error: check the _rlnAngleRot and _rlnAngleTilt columns.\n")
-        sys.exit()
+    # Apply Gaussian filter to smooth the histogram counts
+    H_smooth = gaussian_filter(H, sigma=2)
 
-    # fig = plt.figure(figsize=(3, 3))
-    # plt.hist(rot_rad)
-    # outputfig(fig,"rot_rad")
+    # Create meshgrid for plotting
+    X, Y = np.meshgrid(rot_edges, tilt_edges)
 
-    # fig = plt.figure(figsize=(3, 3))
-    # plt.hist(tilt_m90_rad)
-    # outputfig(fig,"tilt_m90_rad")
+    # Set minimum and maximum values for color normalization
+    vmin = np.percentile(H_smooth, 5)    # 5th percentile
+    vmax = np.percentile(H_smooth, 99.5)  # 99.5th percentile
 
-    #Generate the figure instance
-    fig = plt.figure(figsize=(3.5, 1.8))
-
-    #Define the plot as a mollweide projection
+    # Create figure and Mollweide projection plot
+    fig = plt.figure(figsize=(8, 4))
     ax = plt.subplot(111, projection="mollweide")
 
-    """
-    For star files with more than 200,000 particles, the size if the plotted scatter point
-    should be 0.1, but that gets to be too small for fewer particles. This equation increases
-    the size so that particles in the tens of thousands can still look decent in the plot
-    """
-    spotsize = -0.000006*len(particles.index)+1.4
-    if spotsize < 0.1:
-        spotsize = 0.1
+    # Plot the smoothed counts on the Mollweide projection
+    im = ax.pcolormesh(
+        X, Y, H_smooth.T,
+        cmap="Blues",
+        shading='auto',
+        norm=SymLogNorm(linthresh=1, vmin=vmin, vmax=vmax)
+    )
 
-    """
-    In some cases, an invalid value error is thrown while calculating arcsin for the projection in scatter().
-    warnings.catch_warnings allows us to ignore it to keep the terminal output clean.
-    """
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-
-        #Plot!
-        ax.scatter(rot_rad, tilt_m90_rad, cmap="Blues", c=m, s=spotsize, alpha=0.1)
-
-    #Remove the tick labels to make the plot cleaner
+    # Remove tick labels for a cleaner plot
     ax.set_xticklabels([])
     ax.set_yticklabels([])
 
-    """
-    Draw curved lines at x -120, -60, 60, 120.
-    Currently commented out.
-    """
-    #x_60_rad = [1.047 for i in range(0,7)]
-    #x_m60_rad = [-1.047 for i in range(0,7)]
-    #x_120_rad = [2.094 for i in range(0,7)]
-    #x_m120_rad = [-2.094 for i in range(0,7)]
-    #ax.plot(x_60_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
-    #ax.plot(x_m60_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
-    #ax.plot(x_120_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
-    #ax.plot(x_m120_rad, np.arange(-1.5, 2, 0.5), color='k', lw=1.5, linestyle=':')
+    # Add color bar
+    cbar = plt.colorbar(im, ax=ax, shrink=0.6, pad=0.1)
+    cbar.set_label("Number of Particles")
 
-    """
-    Draw vertical and horizontal straight lines as x, y cartesian axes.
-    Currently commented out.
-    """
-    #ax.vlines(0,-1.6,1.6, colors='k', lw=1.5, linestyles=':')
-    #ax.hlines(0,-10,10, colors='k', lw=1.5, linestyles=':')
-
-    #########################################################################################################
-
-    #Show color bar
-
-    cbar = plt.colorbar(
-            plt.cm.ScalarMappable(
-                norm=mpl.colors.Normalize(0, 1), cmap="Blues"
-            ), shrink=0.6, pad = 0.1#cax = fig.add_axes([0.92, 0.33, 0.03, 0.38])
-        )
-    cbar.set_label("Orientation Density")
-
-    #Padding puts some white space around the figure
+    # Adjust layout and save output
     plt.tight_layout(pad=0.2)
-
-    #outputfig takes the Figure instance, the file name, and file type (passed by the user)
-    outputfig(fig, "Particle_orientations", outtype)
-
-"""
-This is the old function to plot angular distributions that I wrote,
-it is slower and uglier than plotangledist(), but works as well.
-It is left here in case it is helpful for others.
-"""
-def plotangledist_old(particles, outtype):
-
-    lon=list(map(float, list(particles["_rlnAngleRot"])))
-    lat=list(map(float, list(particles["_rlnAngleTilt"])))
-
-    lat = [l-90 for l in lat]
-    data = [list(a) for a in zip(lon, lat)]
-    data = np.array(data) / 180 * np.pi  # shape (n, 2)
-
-    # create bin edges
-    bin_number = 50 #this is not always ideal
-    lon_edges = np.linspace(-np.pi, np.pi, bin_number + 1)
-    lat_edges = np.linspace(-np.pi/2., np.pi/2., bin_number + 1)
-
-    # calculate 2D histogram, the shape of hist is (bin_number, bin_number)
-    hist, lon_edges, lat_edges = np.histogram2d(
-        *data.T, bins=[lon_edges, lat_edges], density=True
-    )
-
-    # generate the plot
-    fig = plt.figure(figsize=(3,2))
-    ax = fig.add_subplot(111, projection='mollweide')
-
-    cmap='Blues'
-
-    ax.pcolormesh(
-        lon_edges[:-1], lat_edges[:-1],
-        hist.T,  # transpose from (row, column) to (x, y)
-        cmap=cmap,
-        shading='gouraud'
-    )
-
-    # hide the tick labels
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-    # add the colorbar
-    cbar = plt.colorbar(
-            plt.cm.ScalarMappable(
-                norm=mpl.colors.Normalize(0, 1), cmap=cmap
-            )
-        )
-    cbar.set_label("Orientation Density")
-
-    #outputfig() takes the Figure instance, the file name, and file type (passed by the user)
     outputfig(fig, "Particle_orientations", outtype)
 
 """

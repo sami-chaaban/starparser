@@ -241,7 +241,8 @@ def plotangledist(particles, outtype):
         X, Y, H_smooth.T,
         cmap="Blues",
         shading='auto',
-        norm=SymLogNorm(linthresh=1, vmin=vmin, vmax=vmax)
+        norm=SymLogNorm(linthresh=1, vmin=vmin, vmax=vmax), 
+        rasterized=True
     )
 
     # Remove tick labels for a cleaner plot
